@@ -6,11 +6,14 @@ using System.Threading.Tasks;
 
 namespace PDS_Project
 {
-    enum CmType : byte
+    public enum CmType : byte
     {
         Authentication,
         EnterComm,
-        ExitComm
+        ExitComm,
+        Mouse,
+        Key,
+        Data
     }
 
     public class Message
