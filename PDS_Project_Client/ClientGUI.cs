@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace PDS_Project
+namespace PDS_Project_Client
 {
     public partial class ClientGUI : Form
     {

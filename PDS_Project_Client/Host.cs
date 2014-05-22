@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net.Sockets;
+using PDS_Project_Common;
 
-namespace PDS_Project
+namespace PDS_Project_Client
 {
     public class Host
     {

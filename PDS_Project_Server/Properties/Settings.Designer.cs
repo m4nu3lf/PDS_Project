@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace PDS_Project.Properties
+namespace PDS_Project_Server.Properties
 {
 
 

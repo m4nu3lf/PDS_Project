@@ -1,4 +1,4 @@
-﻿namespace PDS_Project
+﻿namespace PDS_Project_Client
 {
     partial class ClientGUI
     {

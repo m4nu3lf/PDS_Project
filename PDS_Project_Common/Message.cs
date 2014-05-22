@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PDS_Project
+namespace PDS_Project_Common
 {
     public enum CmType : byte
     {
