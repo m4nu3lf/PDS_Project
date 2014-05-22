@@ -1,6 +1,6 @@
 ﻿namespace PDS_Project
 {
-    partial class Form1
+    partial class ClientGUI
     {
         /// <summary>
         /// Variabile di progettazione necessaria.
@@ -87,6 +87,7 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 15F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(786, 375);
             this.tableLayoutPanel1.TabIndex = 2;
+
             // 
             // panel1
             // 
@@ -98,6 +99,7 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(780, 53);
             this.panel1.TabIndex = 1;
+
             // 
             // tableLayoutPanel2
             // 
@@ -115,12 +117,13 @@
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel2.Size = new System.Drawing.Size(780, 310);
             this.tableLayoutPanel2.TabIndex = 3;
+
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(810, 399);
+            this.ClientSize = new System.Drawing.Size(810, 400);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "Form1";
             this.Text = "Remote Control";
@@ -136,10 +139,13 @@
 
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Button button3;
+
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+
+        private System.Windows.Forms.Panel panel1;
+
     }
 }
 
