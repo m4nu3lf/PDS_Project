@@ -20,7 +20,7 @@ namespace PDS_Project_Server
             // Notify icon initialization
             notifyIcon = new NotifyIcon();
             notifyIcon.BalloonTipText = "PDS_Project_Server";
-            notifyIcon.Icon = new Icon("tray.ico");
+            notifyIcon.Icon = new Icon("../../tray.ico");
             notifyIcon.DoubleClick += notifyIcon_DoubleClick;
         }
 
