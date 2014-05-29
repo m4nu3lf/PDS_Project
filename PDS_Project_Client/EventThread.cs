@@ -13,11 +13,13 @@ namespace PDS_Project_Client
     {
         private AutoResetEvent are;
         private Queue<Int16> equ;
+        private Host ahost;
 
-        public ThreadParam(Queue<Int16> eq, AutoResetEvent ae)
+        public ThreadParam(Queue<Int16> eq, AutoResetEvent ae, Host h)
         {
             are = ae;
             equ = eq;
+            ahost = h;
         }
 
         public AutoResetEvent ae
@@ -29,8 +31,14 @@ namespace PDS_Project_Client
         {
             get { return equ; }
         }
+            
+        public Host h
+        {
+            get { return ahost; }
+        }
 
     }
+
 
     public class EventThread
     {
@@ -39,8 +47,11 @@ namespace PDS_Project_Client
 
             AutoResetEvent ae = ((ThreadParam)param).ae;
             Queue<Int16> eq = ((ThreadParam)param).eq;
+            Host ahost = ((ThreadParam)param).h;
+
             Console.WriteLine("In attesa");
             Int16 i = 0;
+
             while (ae.WaitOne())
             {
                 lock (eq)

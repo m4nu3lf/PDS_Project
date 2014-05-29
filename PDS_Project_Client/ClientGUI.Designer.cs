@@ -1,4 +1,12 @@
-﻿namespace PDS_Project_Client
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Net.Sockets;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace PDS_Project_Client
 {
     partial class ClientGUI
     {
@@ -9,14 +17,17 @@
 
         private System.Windows.Forms.Button exitB;
         private System.Windows.Forms.Button continueB;
-        private System.Windows.Forms.Button hotkeyB;
 
         private System.Windows.Forms.TableLayoutPanel tlp_OUTER;
         private System.Windows.Forms.TableLayoutPanel tlp_INNER;
+        private System.Windows.Forms.TableLayoutPanel tlp_PANEL;
 
         private System.Windows.Forms.Panel panel;
 
-       
+
+        private System.Windows.Forms.Button hotkeyB;
+        private System.Windows.Forms.TextBox tb_HK;
+        private System.Windows.Forms.Label hotkey;
 
 
         protected override void Dispose(bool disposing)
@@ -38,10 +49,19 @@
 
             this.exitB = new System.Windows.Forms.Button();
             this.continueB = new System.Windows.Forms.Button();
-            this.hotkeyB = new System.Windows.Forms.Button();
             this.tlp_OUTER = new System.Windows.Forms.TableLayoutPanel();
             this.tlp_INNER = new System.Windows.Forms.TableLayoutPanel();
+            this.tlp_PANEL = new System.Windows.Forms.TableLayoutPanel();
             this.panel = new System.Windows.Forms.Panel();
+
+
+
+            this.hotkeyB = new System.Windows.Forms.Button();
+            this.tb_HK = new System.Windows.Forms.TextBox();
+            this.hotkey = new System.Windows.Forms.Label();
+
+
+
             this.tlp_OUTER.SuspendLayout();
             this.panel.SuspendLayout();
             this.SuspendLayout();
@@ -50,8 +70,7 @@
             // 
             // exitB
             // 
-            this.exitB.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.exitB.Location = new System.Drawing.Point(677, 9);
+            this.exitB.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.exitB.Name = "exitB";
             this.exitB.Size = new System.Drawing.Size(100, 30);
             this.exitB.TabIndex = 0;
@@ -62,11 +81,10 @@
             // 
             // ContinueB
             // 
-            this.continueB.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.continueB.Location = new System.Drawing.Point(571, 9);
+            this.continueB.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.continueB.Name = "continueB";
             this.continueB.Size = new System.Drawing.Size(100, 30);
-            this.continueB.TabIndex = 1;
+            this.continueB.TabIndex = 0;
             this.continueB.Text = "Continue";
             this.continueB.UseVisualStyleBackColor = true;
 
@@ -74,31 +92,84 @@
             // 
             // hotkeyB
             // 
-            this.hotkeyB.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.hotkeyB.Location = new System.Drawing.Point(465, 9);
+            this.hotkeyB.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.hotkeyB.Name = "hotkeyB";
-            this.hotkeyB.Size = new System.Drawing.Size(100, 30);
-            this.hotkeyB.TabIndex = 2;
-            this.hotkeyB.Text = "Host Hotkey";
+            this.hotkeyB.Size = new System.Drawing.Size(150, 30);
+            this.hotkeyB.TabIndex = 0;
+            this.hotkeyB.Text = "Change Client HK";
             this.hotkeyB.UseVisualStyleBackColor = true;
+
+            this.hotkeyB.Click += new EventHandler(this.hotkeyB_click);
+
+
+            // 
+            // tb_HK
+            // 
+            this.tb_HK.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.tb_HK.Name = "tb_HK";
+            this.tb_HK.Size = new System.Drawing.Size(150, 30);
+            this.tb_HK.TabIndex = 0;
+
+
+            // 
+            // hotkey
+            // 
+            this.hotkey.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.hotkey.Name = "hotkey";
+            this.hotkey.Size = new System.Drawing.Size(200, 30);
+            this.hotkey.TabIndex = 0;
+            this.hotkey.Text = "Actual HK: ctrl + alt + 0";
+
+
+            // 
+            // tlpPANEL
+            // 
+            this.tlp_PANEL.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+
+            this.tlp_PANEL.AutoSize = true;
+
+            this.tlp_PANEL.ColumnCount = 6;
+            this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15F));
+            this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15F));
+            this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15F));
+            this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 35F));
+            this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+
+            this.tlp_PANEL.Controls.Add(this.hotkeyB, 0, 0);
+            this.tlp_PANEL.Controls.Add(this.tb_HK, 1, 0);
+            this.tlp_PANEL.Controls.Add(this.hotkey, 2, 0);
+            this.tlp_PANEL.Controls.Add(this.continueB, 4, 0);
+            this.tlp_PANEL.Controls.Add(this.exitB, 5, 0);
+
+            this.tlp_PANEL.Location = new System.Drawing.Point(0, 0); ;
+            this.tlp_PANEL.Name = "tlp_PANEL";
+            this.tlp_PANEL.RowCount = 1;
+            this.tlp_PANEL.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tlp_PANEL.TabIndex = 0;
+
+            this.tlp_PANEL.ResumeLayout(false);
+            this.tlp_PANEL.PerformLayout();
 
 
             // 
             // panel
             // 
+
+            this.panel.Location = new System.Drawing.Point(12, 12);
+            this.panel.Name = "Panel";
+            this.panel.TabIndex = 0;
+
             this.panel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
             | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel.Location = new System.Drawing.Point(3, 321);
-            this.panel.Name = "panel";
-            this.panel.Size = new System.Drawing.Size(780, 51);
-            this.panel.TabIndex = 1;
 
-            this.panel.Controls.Add(this.hotkeyB);
-            this.panel.Controls.Add(this.exitB);
-            this.panel.Controls.Add(this.continueB);
-
-
+            this.panel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel.Controls.Add(this.tlp_PANEL);
+            this.panel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            
 
             // 
             // tlpOUTER
@@ -161,7 +232,7 @@
             this.tlp_OUTER.ResumeLayout(false);
             this.panel.ResumeLayout(false);
             this.ResumeLayout(false);
-
+            
 
         }
 

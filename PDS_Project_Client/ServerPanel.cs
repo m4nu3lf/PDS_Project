@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PDS_Project_Client
@@ -11,12 +13,17 @@ namespace PDS_Project_Client
 
         private System.Windows.Forms.Button connectB;
         private System.Windows.Forms.Button disconnectB;
+        private System.Windows.Forms.Button chotkeyB;
 
         private System.Windows.Forms.Label serverActive;
         private System.Windows.Forms.Label connectionStatus;
 
         private System.Windows.Forms.Label status;
         private System.Windows.Forms.Label serverIndex;
+
+
+        private System.Windows.Forms.Label hotkey;
+        private System.Windows.Forms.Label hkLabel;
 
         /* datas */
 
@@ -31,6 +38,7 @@ namespace PDS_Project_Client
         private System.Windows.Forms.TextBox tb_PSW;
         private System.Windows.Forms.TextBox tb_DP;
         private System.Windows.Forms.TextBox tb_EP;
+        private System.Windows.Forms.TextBox tb_HK;
 
         /* layout */
 
@@ -38,15 +46,31 @@ namespace PDS_Project_Client
         
         /* variables */
 
-        private Host _host;
+        private Host my_host;
+        private Host ahost;         //global variable ACTUAL HOST
+
         private Int16 _index;
 
+        /* Control datas */
 
 
-        public ServerPanel(Int16 i)
+        private Thread cDeamon;
+
+        String IP;
+        String PSW;
+        String HK;
+        UInt16 EP;
+        UInt16 DP;
+
+        delegate void ConnectedCB(bool flag);
+
+
+        public ServerPanel(Int16 i, Host h)
         {
             _index = i;
+            ahost = h;
 
+            my_host = new Host();
 
             this.InitializeComponent();
 
@@ -57,24 +81,33 @@ namespace PDS_Project_Client
         private void InitializeComponent()
         {
             this.tlp = new System.Windows.Forms.TableLayoutPanel();
+
             this.tb_IP = new System.Windows.Forms.TextBox();
             this.tb_PSW = new System.Windows.Forms.TextBox();
             this.tb_DP = new System.Windows.Forms.TextBox();
             this.tb_EP = new System.Windows.Forms.TextBox();
+            this.tb_HK = new System.Windows.Forms.TextBox();
+
             this.pswLabel = new System.Windows.Forms.Label();
             this.ipLabel = new System.Windows.Forms.Label();
             this.eportLabel = new System.Windows.Forms.Label();
             this.dportLabel = new System.Windows.Forms.Label();
             this.serverIndex = new System.Windows.Forms.Label();
+            this.hotkey = new System.Windows.Forms.Label();
+            this.hkLabel = new System.Windows.Forms.Label();
             this.connectionStatus = new System.Windows.Forms.Label();
             this.status = new System.Windows.Forms.Label();
             this.serverActive = new System.Windows.Forms.Label();
 
             this.connectB = new System.Windows.Forms.Button();
             this.disconnectB = new System.Windows.Forms.Button();
+            this.chotkeyB = new System.Windows.Forms.Button();
 
             this.tlp.SuspendLayout();
             this.SuspendLayout();
+
+
+
 
 
             // 
@@ -91,8 +124,6 @@ namespace PDS_Project_Client
             this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.Controls.Add(this.tlp);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tlp.ResumeLayout(false);
-            this.tlp.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -103,7 +134,7 @@ namespace PDS_Project_Client
             this.tb_IP.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.tb_IP.Location = new System.Drawing.Point(103, 3);
             this.tb_IP.Name = "tb_IP";
-            this.tb_IP.Size = new System.Drawing.Size(94, 20);
+            this.tb_IP.Size = new System.Drawing.Size(94, 25);
             this.tb_IP.TabIndex = 0;
 
 
@@ -113,7 +144,7 @@ namespace PDS_Project_Client
             this.tb_PSW.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.tb_PSW.Location = new System.Drawing.Point(103, 28);
             this.tb_PSW.Name = "tb_PSW";
-            this.tb_PSW.Size = new System.Drawing.Size(94, 20);
+            this.tb_PSW.Size = new System.Drawing.Size(94, 25);
             this.tb_PSW.TabIndex = 0;
 
 
@@ -123,7 +154,7 @@ namespace PDS_Project_Client
             this.tb_DP.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.tb_DP.Location = new System.Drawing.Point(103, 53);
             this.tb_DP.Name = "tp_DP";
-            this.tb_DP.Size = new System.Drawing.Size(94, 20);
+            this.tb_DP.Size = new System.Drawing.Size(94, 25);
             this.tb_DP.TabIndex = 0;
 
 
@@ -133,8 +164,19 @@ namespace PDS_Project_Client
             this.tb_EP.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.tb_EP.Location = new System.Drawing.Point(103, 78);
             this.tb_EP.Name = "tb_EP";
-            this.tb_EP.Size = new System.Drawing.Size(94, 20);
+            this.tb_EP.Size = new System.Drawing.Size(94, 25);
             this.tb_EP.TabIndex = 0;
+
+
+
+            // 
+            // tb_HK
+            // 
+            this.tb_HK.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.tb_HK.Location = new System.Drawing.Point(103, 78);
+            this.tb_HK.Name = "tb_HK";
+            this.tb_HK.Size = new System.Drawing.Size(94, 25);
+            this.tb_HK.TabIndex = 0;
 
 
             // 
@@ -221,9 +263,34 @@ namespace PDS_Project_Client
             this.serverActive.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.serverActive.Location = new System.Drawing.Point(3, 50);
             this.serverActive.Name = "serverActive";
+            this.serverActive.ForeColor = System.Drawing.Color.Red;
             this.serverActive.Size = new System.Drawing.Size(94, 25);
             this.serverActive.TabIndex = 0;
             this.serverActive.Text = "Not Active";
+
+
+            // 
+            // hkLabel
+            // 
+            this.hkLabel.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.hkLabel.Location = new System.Drawing.Point(3, 50);
+            this.hkLabel.Name = "hkLabel";
+            this.hkLabel.Size = new System.Drawing.Size(94, 25);
+            this.hkLabel.TabIndex = 0;
+            this.hkLabel.Text = "Switch Hotkey: ";
+
+
+
+            // 
+            // hotkey
+            // 
+            this.hotkey.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.hotkey.Location = new System.Drawing.Point(3, 50);
+            this.hotkey.Name = "hotkey";
+            this.hotkey.Size = new System.Drawing.Size(94, 30);
+            this.hotkey.TabIndex = 0;
+            this.hotkey.Text =  "ctrl + alt + " + _index.ToString();
+
 
 
             // 
@@ -250,6 +317,18 @@ namespace PDS_Project_Client
             this.disconnectB.UseVisualStyleBackColor = true;
 
             // 
+            // chotkeyB
+            // 
+            this.chotkeyB.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.chotkeyB.Location = new System.Drawing.Point(677, 9);
+            this.chotkeyB.Name = "chotkeyB";
+            this.chotkeyB.Size = new System.Drawing.Size(94, 25);
+            this.chotkeyB.TabIndex = 0;
+            this.chotkeyB.Text = "Change HK";
+            this.chotkeyB.UseVisualStyleBackColor = true;
+
+
+            // 
             // tlp init
             // 
 
@@ -262,23 +341,22 @@ namespace PDS_Project_Client
             this.tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
 
 
-
             this.tlp.Location = new System.Drawing.Point(0, 0);
-            this.tlp.Name = "tableLayoutPanel1";
-            this.tlp.RowCount = 10;
-            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tlp.Name = "tlp";
+            this.tlp.RowCount = 9;
+            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11F));
+            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11F));
+            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11F));
+            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11F));
+            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11F));
+            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11F));
+            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11F));
+            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11F));
+            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11F));
             this.tlp.Size = new System.Drawing.Size(200, 100);
             this.tlp.TabIndex = 0;
-
+            this.tlp.ResumeLayout(false);
+            this.tlp.PerformLayout();
 
             //
             // Adding elements to Layout
@@ -292,20 +370,108 @@ namespace PDS_Project_Client
 
             this.tlp.Controls.Add(this.tb_IP, 1, 2);
             this.tlp.Controls.Add(this.tb_PSW, 1, 3);
-            this.tlp.Controls.Add(this.tb_DP, 1, 4);
-            this.tlp.Controls.Add(this.tb_EP, 1, 5);
+            this.tlp.Controls.Add(this.tb_EP, 1, 4);
+            this.tlp.Controls.Add(this.tb_DP, 1, 5);
 
             this.tlp.Controls.Add(this.ipLabel, 0, 2);
             this.tlp.Controls.Add(this.pswLabel, 0, 3);
             this.tlp.Controls.Add(this.eportLabel, 0, 4);
             this.tlp.Controls.Add(this.dportLabel, 0, 5);
 
-            this.tlp.Controls.Add(this.connectB, 0, 6);
-            this.tlp.Controls.Add(this.disconnectB, 1, 6);
+            this.tlp.Controls.Add(this.chotkeyB, 0, 6);
+            this.tlp.Controls.Add(this.tb_HK, 1, 6);
+
+            this.tlp.Controls.Add(this.hkLabel, 0, 7);
+            this.tlp.Controls.Add(this.hotkey, 1, 7);
+
+            this.tlp.Controls.Add(this.connectB, 0, 8);
+            this.tlp.Controls.Add(this.disconnectB, 1, 8);
+
+            /* Events */
+
+            connectB.Click += new EventHandler(this.connectB_click);
+
+        }
+
+        private void connectB_click(Object sender, EventArgs e)
+        {
+            IP = tb_IP.Text;
+            PSW = tb_PSW.Text;
+
+            try
+            {
+                EP = Convert.ToUInt16(tb_EP.Text);
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("errore 1");
+            }
+
+            this.connectionStatus.ForeColor = System.Drawing.Color.Orange;
+            this.connectionStatus.Text = "Connecting...";
+            this.connectB.Enabled = false;
+            tb_IP.Enabled = false;
+            tb_PSW.Enabled = false;
+            tb_EP.Enabled = false;
+            tb_DP.Enabled = false;
+
+            this.cDeamon = new Thread(new ThreadStart(this.Connect));
+            this.cDeamon.Start();
+
+            Console.WriteLine("creato thread");
+
+        }
+        
+
+        private void Connect() {
+            try
+            {
+                my_host.es = new Socket(SocketType.Stream, ProtocolType.Tcp);
+                Console.WriteLine("Connecting To -> " + IP + ":" + EP.ToString());
+                my_host.es.Connect(IP, EP);
+                this.Connected(true);
+            }
+            catch(Exception e)
+            {
+                this.Connected(false);
+            }
 
 
         }
 
 
-    }
-}
+        private void Connected(bool flag)
+        {
+            if (this.disconnectB.InvokeRequired)
+            {
+                ConnectedCB ccb = new ConnectedCB(Connected);
+                this.Invoke(ccb, new object[] { flag });
+            }
+            else
+            {
+                if (flag)
+                {
+                    this.connectionStatus.ForeColor = System.Drawing.Color.Green;
+                    this.connectionStatus.Text = "Connected";
+                }
+                else
+                {
+                    this.connectionStatus.ForeColor = System.Drawing.Color.Red;
+                    this.connectionStatus.Text = "Disconnected";
+                }
+
+                tb_IP.Enabled = !flag;
+                tb_PSW.Enabled = !flag;
+                tb_EP.Enabled = !flag;
+                tb_DP.Enabled = !flag;
+                this.disconnectB.Enabled = flag;
+                this.connectB.Enabled = !flag;
+            }
+
+        }
+
+
+    }//end ServerPanel
+
+
+}//end namespace

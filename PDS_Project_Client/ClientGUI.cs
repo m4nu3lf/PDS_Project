@@ -26,16 +26,16 @@ namespace PDS_Project_Client
             eq = new Queue<Int16>();
             ae = new AutoResetEvent(false);
 
-            sp1 = new ServerPanel(1);
-            sp2 = new ServerPanel(2);
-            sp3 = new ServerPanel(3);
-            sp4 = new ServerPanel(4);
+            sp1 = new ServerPanel(1, aHost);
+            sp2 = new ServerPanel(2, aHost);
+            sp3 = new ServerPanel(3, aHost);
+            sp4 = new ServerPanel(4, aHost);
 
             InitializeComponent();
 
             Thread eThread = new Thread((new EventThread()).run);
 
-            eThread.Start(new ThreadParam(eq, ae));
+            eThread.Start(new ThreadParam(eq, ae, aHost));
 
             lock (eq)
             {
@@ -62,6 +62,13 @@ namespace PDS_Project_Client
 
         }
 
+
+
+        /* EVENTS HANDLERS */
+
+        private void hotkeyB_click(Object sender, EventArgs e) { 
+        
+        }
 
     }
 }

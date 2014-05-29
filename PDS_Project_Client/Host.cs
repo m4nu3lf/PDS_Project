@@ -23,11 +23,13 @@ namespace PDS_Project_Client
 
         public Socket es
         {
+            get { return eventSocket; }
             set { eventSocket = value; }
         }
 
         public Socket cs
         {
+            get { return clipboardSocket; }
             set { clipboardSocket = value; }
         }
 
