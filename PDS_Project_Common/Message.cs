@@ -6,71 +6,76 @@ using System.Threading.Tasks;
 
 namespace PDS_Project_Common
 {
-    public enum CmType : byte
-    {
-        Authentication,
-        EnterComm,
-        ExitComm,
-        Mouse,
-        Key,
-        Data
-    }
 
+    [Serializable]
     public class Message
     {
-        private CmType cmType; 
-    
-
-        protected Message(CmType cmt){
-            cmType = cmt;
-        }
-
-        public CmType type
-        {
-            get { return cmType; }
-        }
+        public Message() { }
 
     }
 
+
+    [Serializable]
     public class AuthMsg : Message
     {
-        String psw;
+        String _psw;
 
-        public AuthMsg(CmType cmt, String p) 
-            : base(cmt) 
+        public AuthMsg(String p)
         {
-            psw = p;
+            _psw = p;
         }
-    
+
+        public String psw
+        {
+            get { return psw; }
+        }
+
     }
 
 
+    [Serializable]
+    public class AckMsg : Message
+    {
+        bool _ack;
+
+        public AckMsg(bool b)
+        {
+             _ack = b ;
+        }
+
+        public bool ack
+        {
+            get { return ack; }
+        }
+    }
+
+
+    [Serializable]
     public class KeyMsg : Message
     {
-        public KeyMsg(CmType cmt)
-            : base(cmt)
+        public KeyMsg()
         {
 
         }
     }
 
 
+    [Serializable]
     public class MouseMsg : Message
     {
-        public MouseMsg(CmType cmt)
-            : base(cmt)
+        public MouseMsg()
         {
 
         }
     }
 
 
+    [Serializable]
     public class DataMsg : Message
     {
         private String clipboard;
 
-        public DataMsg(CmType cmt, String clb)
-            : base(cmt)
+        public DataMsg(String clb)
         {
             clipboard = clb;
         }
@@ -79,6 +84,8 @@ namespace PDS_Project_Common
         {
             get { return clipboard; }
         }
+
     }
+
 
 }
