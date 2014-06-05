@@ -18,6 +18,7 @@
                 components.Dispose();
             }
             base.Dispose(disposing);
+            server.Terminate();
         }
 
         #region Codice generato da Progettazione Windows Form
@@ -214,6 +215,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.psswBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "ServerGUI";
             this.Text = "PDS Project Server";
             this.Load += new System.EventHandler(this.ServerGUI_Load);

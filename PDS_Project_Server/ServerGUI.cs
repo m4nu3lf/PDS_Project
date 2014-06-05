@@ -50,7 +50,7 @@ namespace PDS_Project_Server
 
         private void button1_Click(object sender, EventArgs e)
         {
-            server.Start(serverAddress, (int)eventsPortUpDown.Value);
+            server.Start(serverAddress, (int)eventsPortUpDown.Value, psswBox.Text);
         }
 
         private void ServerGUI_Resize(object sender, EventArgs e)
