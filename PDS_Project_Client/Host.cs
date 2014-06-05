@@ -13,10 +13,24 @@ namespace PDS_Project_Client
         private Socket eventSocket;
         private Socket clipboardSocket;
 
-        public Host(ref Socket es, ref Socket cs )
+        public Host() { }
+
+        public Host(Socket es, Socket cs )
         {
             eventSocket = es;
             clipboardSocket = cs;
+        }
+
+        public Socket es
+        {
+            get { return eventSocket; }
+            set { eventSocket = value; }
+        }
+
+        public Socket cs
+        {
+            get { return clipboardSocket; }
+            set { clipboardSocket = value; }
         }
 
         public void SendMsg(Message m)
