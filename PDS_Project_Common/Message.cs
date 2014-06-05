@@ -27,7 +27,7 @@ namespace PDS_Project_Common
 
         public String psw
         {
-            get { return psw; }
+            get { return _psw; }
         }
 
     }
@@ -45,7 +45,7 @@ namespace PDS_Project_Common
 
         public bool ack
         {
-            get { return ack; }
+            get { return _ack; }
         }
     }
 

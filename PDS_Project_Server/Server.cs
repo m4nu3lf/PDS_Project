@@ -7,6 +7,7 @@ using System.Threading;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using PDS_Project_Common;
 
 namespace PDS_Project_Server
 {
@@ -16,7 +17,8 @@ namespace PDS_Project_Server
         {
             Disconnected,
             Waiting,
-            Connected
+            Connected,
+            Active
         }
 
         public delegate void OnStateChanged(State newState); 
@@ -54,7 +56,21 @@ namespace PDS_Project_Server
                     }
                     else
                     {
-                        //TODO: receive from _commSocket
+                        object obj = MsgStream.Receive(_commSocket);
+                        if (obj is AuthMsg)
+                        {
+                            // authentication
+                            AuthMsg authMsg = (AuthMsg)obj;
+                            if (authMsg.psw == _password)
+                            {
+                                MsgStream.Send(new AckMsg(true), _commSocket);
+                            }
+                            else
+                            {
+                                MsgStream.Send(new AckMsg(false), _commSocket);
+                                _stopRequest = true;
+                            }
+                        } else if (obj is )
                     }
                 }
                 _stopRequest = false;
