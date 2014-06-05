@@ -450,7 +450,7 @@ namespace PDS_Project_Client
                 object o = MsgStream.Receive(tmp);
                 if (o is AckMsg)
                 {
-                    if ((AckMsg)o.ack)
+                    if ( ((AckMsg)o).ack )
                     {
                         this.Connected(true);
                         _host.es(tmp, i);
