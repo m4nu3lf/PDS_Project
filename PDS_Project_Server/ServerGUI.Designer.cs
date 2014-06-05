@@ -36,7 +36,11 @@
             this.label4 = new System.Windows.Forms.Label();
             this.eventsPortUpDown = new System.Windows.Forms.NumericUpDown();
             this.clipboardUpDown = new System.Windows.Forms.NumericUpDown();
-            this.saveButton = new System.Windows.Forms.Button();
+            this.startButton = new System.Windows.Forms.Button();
+            this.stopButton = new System.Windows.Forms.Button();
+            this.label5 = new System.Windows.Forms.Label();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.statusLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.eventsPortUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.clipboardUpDown)).BeginInit();
             this.SuspendLayout();
@@ -45,7 +49,7 @@
             // 
             this.psswBox.Location = new System.Drawing.Point(126, 90);
             this.psswBox.Name = "psswBox";
-            this.psswBox.Size = new System.Drawing.Size(100, 20);
+            this.psswBox.Size = new System.Drawing.Size(162, 20);
             this.psswBox.TabIndex = 0;
             // 
             // label1
@@ -63,8 +67,9 @@
             this.ipBox.Location = new System.Drawing.Point(126, 12);
             this.ipBox.Name = "ipBox";
             this.ipBox.ReadOnly = true;
-            this.ipBox.Size = new System.Drawing.Size(100, 20);
+            this.ipBox.Size = new System.Drawing.Size(162, 20);
             this.ipBox.TabIndex = 2;
+            this.ipBox.TextChanged += new System.EventHandler(this.ipBox_TextChanged);
             // 
             // label2
             // 
@@ -97,7 +102,7 @@
             // 
             // eventsPortUpDown
             // 
-            this.eventsPortUpDown.Location = new System.Drawing.Point(126, 38);
+            this.eventsPortUpDown.Location = new System.Drawing.Point(213, 38);
             this.eventsPortUpDown.Maximum = new decimal(new int[] {
             65535,
             0,
@@ -110,8 +115,9 @@
             0});
             this.eventsPortUpDown.Name = "eventsPortUpDown";
             this.eventsPortUpDown.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.eventsPortUpDown.Size = new System.Drawing.Size(100, 20);
+            this.eventsPortUpDown.Size = new System.Drawing.Size(75, 20);
             this.eventsPortUpDown.TabIndex = 8;
+            this.eventsPortUpDown.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.eventsPortUpDown.Value = new decimal(new int[] {
             1024,
             0,
@@ -120,7 +126,7 @@
             // 
             // clipboardUpDown
             // 
-            this.clipboardUpDown.Location = new System.Drawing.Point(126, 64);
+            this.clipboardUpDown.Location = new System.Drawing.Point(213, 64);
             this.clipboardUpDown.Maximum = new decimal(new int[] {
             65535,
             0,
@@ -133,30 +139,72 @@
             0});
             this.clipboardUpDown.Name = "clipboardUpDown";
             this.clipboardUpDown.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.clipboardUpDown.Size = new System.Drawing.Size(100, 20);
+            this.clipboardUpDown.Size = new System.Drawing.Size(75, 20);
             this.clipboardUpDown.TabIndex = 9;
+            this.clipboardUpDown.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.clipboardUpDown.Value = new decimal(new int[] {
             1024,
             0,
             0,
             0});
             // 
-            // saveButton
+            // startButton
             // 
-            this.saveButton.Location = new System.Drawing.Point(151, 116);
-            this.saveButton.Name = "saveButton";
-            this.saveButton.Size = new System.Drawing.Size(75, 23);
-            this.saveButton.TabIndex = 10;
-            this.saveButton.Text = "Save";
-            this.saveButton.UseVisualStyleBackColor = true;
-            this.saveButton.Click += new System.EventHandler(this.button1_Click);
+            this.startButton.Location = new System.Drawing.Point(132, 116);
+            this.startButton.Name = "startButton";
+            this.startButton.Size = new System.Drawing.Size(75, 23);
+            this.startButton.TabIndex = 10;
+            this.startButton.Text = "Start";
+            this.startButton.UseVisualStyleBackColor = true;
+            this.startButton.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // stopButton
+            // 
+            this.stopButton.Location = new System.Drawing.Point(213, 116);
+            this.stopButton.Name = "stopButton";
+            this.stopButton.Size = new System.Drawing.Size(75, 23);
+            this.stopButton.TabIndex = 12;
+            this.stopButton.Text = "Stop";
+            this.stopButton.UseVisualStyleBackColor = true;
+            this.stopButton.Click += new System.EventHandler(this.stopButton_Click);
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(80, 149);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(40, 13);
+            this.label5.TabIndex = 13;
+            this.label5.Text = "Status:";
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Location = new System.Drawing.Point(0, 144);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(300, 22);
+            this.statusStrip1.TabIndex = 11;
+            this.statusStrip1.Text = "Status:";
+            this.statusStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.statusStrip1_ItemClicked);
+            // 
+            // statusLabel
+            // 
+            this.statusLabel.AutoSize = true;
+            this.statusLabel.Location = new System.Drawing.Point(126, 149);
+            this.statusLabel.Name = "statusLabel";
+            this.statusLabel.Size = new System.Drawing.Size(73, 13);
+            this.statusLabel.TabIndex = 14;
+            this.statusLabel.Text = "Disconnected";
             // 
             // ServerGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(244, 149);
-            this.Controls.Add(this.saveButton);
+            this.ClientSize = new System.Drawing.Size(300, 166);
+            this.Controls.Add(this.statusLabel);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.stopButton);
+            this.Controls.Add(this.statusStrip1);
+            this.Controls.Add(this.startButton);
             this.Controls.Add(this.clipboardUpDown);
             this.Controls.Add(this.eventsPortUpDown);
             this.Controls.Add(this.label4);
@@ -167,7 +215,8 @@
             this.Controls.Add(this.psswBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "ServerGUI";
-            this.Text = "Form1";
+            this.Text = "PDS Project Server";
+            this.Load += new System.EventHandler(this.ServerGUI_Load);
             ((System.ComponentModel.ISupportInitialize)(this.eventsPortUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.clipboardUpDown)).EndInit();
             this.ResumeLayout(false);
@@ -185,7 +234,11 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.NumericUpDown eventsPortUpDown;
         private System.Windows.Forms.NumericUpDown clipboardUpDown;
-        private System.Windows.Forms.Button saveButton;
+        private System.Windows.Forms.Button startButton;
+        private System.Windows.Forms.Button stopButton;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.Label statusLabel;
     }
 }
 
