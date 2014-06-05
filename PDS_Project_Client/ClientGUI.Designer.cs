@@ -26,7 +26,6 @@ namespace PDS_Project_Client
 
 
         private System.Windows.Forms.Button hotkeyB;
-        private System.Windows.Forms.TextBox tb_HK;
         private System.Windows.Forms.Label hotkey;
 
 
@@ -57,7 +56,6 @@ namespace PDS_Project_Client
 
 
             this.hotkeyB = new System.Windows.Forms.Button();
-            this.tb_HK = new System.Windows.Forms.TextBox();
             this.hotkey = new System.Windows.Forms.Label();
 
 
@@ -102,23 +100,15 @@ namespace PDS_Project_Client
             this.hotkeyB.Click += new EventHandler(this.hotkeyB_click);
 
 
-            // 
-            // tb_HK
-            // 
-            this.tb_HK.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.tb_HK.Name = "tb_HK";
-            this.tb_HK.Size = new System.Drawing.Size(150, 30);
-            this.tb_HK.TabIndex = 0;
-
 
             // 
             // hotkey
             // 
             this.hotkey.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.hotkey.Name = "hotkey";
-            this.hotkey.Size = new System.Drawing.Size(200, 30);
+            this.hotkey.Size = new System.Drawing.Size(300, 30);
             this.hotkey.TabIndex = 0;
-            this.hotkey.Text = "Actual HK: ctrl + alt + 0";
+            this.hotkey.Text = "Actual Client Switch Hotkey: ctrl + alt + 0";
 
 
             // 
@@ -130,19 +120,17 @@ namespace PDS_Project_Client
 
             this.tlp_PANEL.AutoSize = true;
 
-            this.tlp_PANEL.ColumnCount = 6;
+            this.tlp_PANEL.ColumnCount = 5;
             this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15F));
-            this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15F));
-            this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15F));
+            this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 30F));
             this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 35F));
             this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
 
             this.tlp_PANEL.Controls.Add(this.hotkeyB, 0, 0);
-            this.tlp_PANEL.Controls.Add(this.tb_HK, 1, 0);
-            this.tlp_PANEL.Controls.Add(this.hotkey, 2, 0);
-            this.tlp_PANEL.Controls.Add(this.continueB, 4, 0);
-            this.tlp_PANEL.Controls.Add(this.exitB, 5, 0);
+            this.tlp_PANEL.Controls.Add(this.hotkey, 1, 0);
+            this.tlp_PANEL.Controls.Add(this.continueB, 3, 0);
+            this.tlp_PANEL.Controls.Add(this.exitB, 4, 0);
 
             this.tlp_PANEL.Location = new System.Drawing.Point(0, 0); ;
             this.tlp_PANEL.Name = "tlp_PANEL";

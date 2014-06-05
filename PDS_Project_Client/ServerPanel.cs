@@ -5,6 +5,7 @@ using System.Text;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using PDS_Project_Common;
 
 namespace PDS_Project_Client
 {
@@ -38,7 +39,6 @@ namespace PDS_Project_Client
         private System.Windows.Forms.TextBox tb_PSW;
         private System.Windows.Forms.TextBox tb_DP;
         private System.Windows.Forms.TextBox tb_EP;
-        private System.Windows.Forms.TextBox tb_HK;
 
         /* layout */
 
@@ -46,31 +46,30 @@ namespace PDS_Project_Client
         
         /* variables */
 
-        private Host my_host;
-        private Host ahost;         //global variable ACTUAL HOST
+        private Host _host;
 
-        private Int16 _index;
+        private int i;
 
         /* Control datas */
 
 
         private Thread cDeamon;
+        private bool c_flag;
 
-        String IP;
-        String PSW;
-        String HK;
-        UInt16 EP;
-        UInt16 DP;
+        private String IP;
+        private String PSW;
+        private String HK;
+        private UInt16 EP;
+        private UInt16 DP;
 
         delegate void ConnectedCB(bool flag);
 
 
-        public ServerPanel(Int16 i, Host h)
+        public ServerPanel(int index, Host h)
         {
-            _index = i;
-            ahost = h;
-
-            my_host = new Host();
+            i = index;      // index of the server
+            _host = h;      // host global object
+            c_flag = false;
 
             this.InitializeComponent();
 
@@ -86,7 +85,6 @@ namespace PDS_Project_Client
             this.tb_PSW = new System.Windows.Forms.TextBox();
             this.tb_DP = new System.Windows.Forms.TextBox();
             this.tb_EP = new System.Windows.Forms.TextBox();
-            this.tb_HK = new System.Windows.Forms.TextBox();
 
             this.pswLabel = new System.Windows.Forms.Label();
             this.ipLabel = new System.Windows.Forms.Label();
@@ -108,12 +106,9 @@ namespace PDS_Project_Client
 
 
 
-
-
             // 
             // ServerPanel
             // 
-
             this.Location = new System.Drawing.Point(12, 12);
             this.Name = "ServerPanel";
             this.Size = new System.Drawing.Size(200, 421);
@@ -170,16 +165,6 @@ namespace PDS_Project_Client
 
 
             // 
-            // tb_HK
-            // 
-            this.tb_HK.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.tb_HK.Location = new System.Drawing.Point(103, 78);
-            this.tb_HK.Name = "tb_HK";
-            this.tb_HK.Size = new System.Drawing.Size(94, 25);
-            this.tb_HK.TabIndex = 0;
-
-
-            // 
             // IP
             // 
             this.ipLabel.Anchor = System.Windows.Forms.AnchorStyles.None;
@@ -231,7 +216,7 @@ namespace PDS_Project_Client
             this.serverIndex.Name = "serverIndex";
             this.serverIndex.Size = new System.Drawing.Size(94, 25);
             this.serverIndex.TabIndex = 0;
-            this.serverIndex.Text = "Server " + _index.ToString() + " :";
+            this.serverIndex.Text = "Server " + i.ToString() + " :";
 
 
             // 
@@ -289,7 +274,7 @@ namespace PDS_Project_Client
             this.hotkey.Name = "hotkey";
             this.hotkey.Size = new System.Drawing.Size(94, 30);
             this.hotkey.TabIndex = 0;
-            this.hotkey.Text =  "ctrl + alt + " + _index.ToString();
+            this.hotkey.Text =  "ctrl + alt + " + i.ToString();
 
 
 
@@ -378,11 +363,10 @@ namespace PDS_Project_Client
             this.tlp.Controls.Add(this.eportLabel, 0, 4);
             this.tlp.Controls.Add(this.dportLabel, 0, 5);
 
-            this.tlp.Controls.Add(this.chotkeyB, 0, 6);
-            this.tlp.Controls.Add(this.tb_HK, 1, 6);
+            this.tlp.Controls.Add(this.chotkeyB, 0, 7);
 
-            this.tlp.Controls.Add(this.hkLabel, 0, 7);
-            this.tlp.Controls.Add(this.hotkey, 1, 7);
+            this.tlp.Controls.Add(this.hkLabel, 0, 6);
+            this.tlp.Controls.Add(this.hotkey, 1, 6);
 
             this.tlp.Controls.Add(this.connectB, 0, 8);
             this.tlp.Controls.Add(this.disconnectB, 1, 8);
@@ -390,6 +374,7 @@ namespace PDS_Project_Client
             /* Events */
 
             connectB.Click += new EventHandler(this.connectB_click);
+            disconnectB.Click += new EventHandler(this.disconnectB_click);
 
         }
 
@@ -404,8 +389,20 @@ namespace PDS_Project_Client
             }
             catch (FormatException)
             {
-                Console.WriteLine("errore 1");
+                tb_EP.Text = "Errore";
+                return;
             }
+
+            try
+            {
+                DP = Convert.ToUInt16(tb_DP.Text);
+            }
+            catch (FormatException)
+            {
+                tb_DP.Text = "Errore";
+                return;
+            }
+
 
             this.connectionStatus.ForeColor = System.Drawing.Color.Orange;
             this.connectionStatus.Text = "Connecting...";
@@ -421,27 +418,78 @@ namespace PDS_Project_Client
             Console.WriteLine("creato thread");
 
         }
+
+
+
+        private void disconnectB_click(Object sender, EventArgs e)
+        {
+
+            this.connectionStatus.ForeColor = System.Drawing.Color.Orange;
+            this.connectionStatus.Text = "Disconnecting...";
+
+            this.cDeamon = new Thread(new ThreadStart(this.Disconnect));
+            this.cDeamon.Start();
+
+        }
         
 
+
         private void Connect() {
+            Socket tmp = new Socket(SocketType.Stream, ProtocolType.Tcp);
+
             try
             {
-                my_host.es = new Socket(SocketType.Stream, ProtocolType.Tcp);
+
                 Console.WriteLine("Connecting To -> " + IP + ":" + EP.ToString());
-                my_host.es.Connect(IP, EP);
-                this.Connected(true);
+                tmp.Connect(IP, EP);
+
+                /* Authentication */
+
+
+                MsgStream.Send(new AuthMsg(PSW), tmp);
+                object o = MsgStream.Receive(tmp);
+                if (o is AckMsg)
+                {
+                    if ( ((AckMsg)o).ack )
+                    {
+                        this.Connected(true);
+                        _host.es(tmp, i);
+                    }
+                    else
+                    {
+                        tmp.Close();
+                        this.Connected(false);
+                    }
+                }
             }
             catch(Exception e)
             {
                 this.Connected(false);
             }
+            
+        }
 
+
+        private void Disconnect()
+        {
+            try
+            {
+                Console.WriteLine("Disconnecting From -> " + IP + ":" + EP.ToString());
+                _host.es(i).Close();
+                this.Connected(false);
+            }
+            catch (Exception e)
+            {
+                this.Connected(true);
+            }
 
         }
 
 
+
         private void Connected(bool flag)
         {
+
             if (this.disconnectB.InvokeRequired)
             {
                 ConnectedCB ccb = new ConnectedCB(Connected);
@@ -453,11 +501,15 @@ namespace PDS_Project_Client
                 {
                     this.connectionStatus.ForeColor = System.Drawing.Color.Green;
                     this.connectionStatus.Text = "Connected";
+                    c_flag = true;
+                    Activate(true);
                 }
                 else
                 {
                     this.connectionStatus.ForeColor = System.Drawing.Color.Red;
                     this.connectionStatus.Text = "Disconnected";
+                    c_flag = false;
+                    Activate(false);
                 }
 
                 tb_IP.Enabled = !flag;
@@ -466,6 +518,23 @@ namespace PDS_Project_Client
                 tb_DP.Enabled = !flag;
                 this.disconnectB.Enabled = flag;
                 this.connectB.Enabled = !flag;
+            }
+
+        }
+
+
+        public void Activate(bool flag)
+        {
+
+            if (flag && c_flag)
+            {
+                serverActive.Text = "Active";
+                this.serverActive.ForeColor = System.Drawing.Color.Green;
+            }
+            else
+            {
+                serverActive.Text = "Not Active";
+                this.serverActive.ForeColor = System.Drawing.Color.Red;
             }
 
         }

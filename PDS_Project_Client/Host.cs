@@ -4,41 +4,91 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net.Sockets;
+using System.Threading;
+
 using PDS_Project_Common;
 
 namespace PDS_Project_Client
 {
     public class Host
     {
-        private Socket eventSocket;
-        private Socket clipboardSocket;
+        private Socket[] _es;        //event socket vector
+        private Socket[] _cs;        //clipboard socket vector
 
-        public Host() { }
+        private Socket _aes;        //active event socket
+        private Socket _acs;        //active clipboard socket
 
-        public Host(Socket es, Socket cs )
-        {
-            eventSocket = es;
-            clipboardSocket = cs;
+        private AutoResetEvent _e;     
+        private Queue<Message> _q;     
+
+        public Host(int i) {
+            _es = new Socket[i];
+            _cs = new Socket[i];
+
+            _q = new Queue<Message>();
+            _e = new AutoResetEvent(false);
         }
 
-        public Socket es
+        public Socket aes
         {
-            get { return eventSocket; }
-            set { eventSocket = value; }
+            set { _aes = value; }
         }
 
-        public Socket cs
+        public Socket acs
         {
-            get { return clipboardSocket; }
-            set { clipboardSocket = value; }
+            set { _acs = value; }
         }
 
-        public void SendMsg(Message m)
-        {
 
+        /* GET A SOCKET */
+
+        public Socket es(int i)
+        {
+            return _es[i];
         }
 
-        public void SendClipboard(Message m)
+        public Socket cs(int i)
+        {
+            return _cs[i];
+        }
+
+
+        /* SET A SOCKET */
+
+
+        public void es(Socket es, int i)
+        {
+            _es[i] = es;
+        }
+
+        public void cs(Socket cs, int i)
+        {
+            _cs[i] = cs;
+        }
+
+
+        public void EnQueueMsg(Message m)
+        {
+            lock (_e)
+            {
+                Console.WriteLine("sleeping");
+                Thread.Sleep(1);
+                //ENQUEUE ;
+            }
+
+            _e.Set();
+        }
+
+        public void SendMsg()
+        {
+            lock (_e)
+            {
+                // DEQUEUE
+                // INVIO
+            }
+        }
+
+        public void SendClipboard()
         {
 
         }
