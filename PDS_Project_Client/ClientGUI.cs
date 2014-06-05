@@ -18,11 +18,14 @@ namespace PDS_Project_Client
         private Host _Host;
 
         private ServerPanel     sp1, sp2, sp3, sp4;
+        private int activePanel;
+
 
         public ClientGUI()
         {
 
             _Host = new Host(4);
+            activePanel = -1;
 
             sp1 = new ServerPanel(1, _Host);
             sp2 = new ServerPanel(2, _Host);
