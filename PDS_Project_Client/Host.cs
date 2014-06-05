@@ -19,7 +19,8 @@ namespace PDS_Project_Client
         private Socket _acs;        //active clipboard socket
 
         private AutoResetEvent _e;     
-        private Queue<Message> _q;     
+        private Queue<Message> _q;
+
 
         public Host(int i) {
             _es = new Socket[i];
@@ -27,16 +28,28 @@ namespace PDS_Project_Client
 
             _q = new Queue<Message>();
             _e = new AutoResetEvent(false);
+
         }
 
         public Socket aes
         {
-            set { _aes = value; }
+            set
+            {
+                lock (_e)
+                {
+                    _aes = value;
+                }
+            }
         }
 
         public Socket acs
         {
-            set { _acs = value; }
+            set {
+                lock (_e)
+                {
+                    _acs = value;
+                }
+            }
         }
 
 
@@ -79,12 +92,15 @@ namespace PDS_Project_Client
             _e.Set();
         }
 
+
         public void SendMsg()
         {
             lock (_e)
             {
                 // DEQUEUE
                 // INVIO
+
+                //if msg è 
             }
         }
 

@@ -62,7 +62,7 @@ namespace PDS_Project_Client
         private UInt16 EP;
         private UInt16 DP;
 
-        delegate void ConnectedCB(bool flag);
+        delegate void MyDelegate(bool flag);
 
 
         public ServerPanel(int index, Host h)
@@ -375,8 +375,15 @@ namespace PDS_Project_Client
 
             connectB.Click += new EventHandler(this.connectB_click);
             disconnectB.Click += new EventHandler(this.disconnectB_click);
-
+            chotkeyB.Click += new EventHandler(this.changeHK_click);
         }
+
+
+
+
+
+        /* GESTIONE CONNESSIONE */
+
 
         private void connectB_click(Object sender, EventArgs e)
         {
@@ -431,8 +438,13 @@ namespace PDS_Project_Client
             this.cDeamon.Start();
 
         }
-        
 
+        private void changeHK_click(Object sender, EventArgs e)
+        {
+
+            //ascolto tastiera;
+
+        }
 
         private void Connect() {
             Socket tmp = new Socket(SocketType.Stream, ProtocolType.Tcp);
@@ -445,15 +457,15 @@ namespace PDS_Project_Client
 
                 /* Authentication */
 
-
                 MsgStream.Send(new AuthMsg(PSW), tmp);
                 object o = MsgStream.Receive(tmp);
+
                 if (o is AckMsg)
                 {
                     if ( ((AckMsg)o).ack )
                     {
-                        this.Connected(true);
                         _host.es(tmp, i);
+                        this.Connected(true);
                     }
                     else
                     {
@@ -461,6 +473,7 @@ namespace PDS_Project_Client
                         this.Connected(false);
                     }
                 }
+
             }
             catch(Exception e)
             {
@@ -492,8 +505,8 @@ namespace PDS_Project_Client
 
             if (this.disconnectB.InvokeRequired)
             {
-                ConnectedCB ccb = new ConnectedCB(Connected);
-                this.Invoke(ccb, new object[] { flag });
+                MyDelegate md = new MyDelegate(Connected);
+                this.Invoke(md, new object[] { flag });
             }
             else
             {
@@ -502,14 +515,12 @@ namespace PDS_Project_Client
                     this.connectionStatus.ForeColor = System.Drawing.Color.Green;
                     this.connectionStatus.Text = "Connected";
                     c_flag = true;
-                    Activate(true);
                 }
                 else
                 {
                     this.connectionStatus.ForeColor = System.Drawing.Color.Red;
                     this.connectionStatus.Text = "Disconnected";
                     c_flag = false;
-                    Activate(false);
                 }
 
                 tb_IP.Enabled = !flag;
@@ -523,18 +534,24 @@ namespace PDS_Project_Client
         }
 
 
+        /* GESTIONE ATTIVAZIONE */
+
+
+
         public void Activate(bool flag)
         {
+            if(c_flag){
 
-            if (flag && c_flag)
-            {
-                serverActive.Text = "Active";
-                this.serverActive.ForeColor = System.Drawing.Color.Green;
-            }
-            else
-            {
-                serverActive.Text = "Not Active";
-                this.serverActive.ForeColor = System.Drawing.Color.Red;
+                if (flag)
+                {
+                    serverActive.Text = "Active";
+                    this.serverActive.ForeColor = System.Drawing.Color.Green;
+                }
+                else
+                {
+                    serverActive.Text = "Not Active";
+                    this.serverActive.ForeColor = System.Drawing.Color.Red;
+                }
             }
 
         }

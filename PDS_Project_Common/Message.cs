@@ -16,6 +16,26 @@ namespace PDS_Project_Common
 
 
     [Serializable]
+    public class StopComm : Message
+    { }
+
+    [Serializable]
+    public class InitComm : Message
+    {
+        private int _i;
+
+        public InitComm(int index)
+        {
+            _i = index;
+        }
+
+        public int i
+        {
+            get { return _i; }
+        }
+    }
+
+    [Serializable]
     public class AuthMsg : Message
     {
         String _psw;
