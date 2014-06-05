@@ -30,7 +30,7 @@ namespace PDS_Project_Server
             ipBox.Text = (ipAs[2]).ToString();
             serverAddress = ipAs[2];
 
-            server = new Server();
+            server = new Server(this.server_StateChange);
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -93,6 +93,47 @@ namespace PDS_Project_Server
         private void stopButton_Click(object sender, EventArgs e)
         {
             server.Stop();
+        }
+
+        delegate void stateChangedCallback(Server.State newState);
+        private void server_StateChange(Server.State newState)
+        {
+            if (this.InvokeRequired)
+            {
+                stateChangedCallback cb = new stateChangedCallback(server_StateChange);
+                this.Invoke(cb, new object[] {newState});
+            }
+            else
+            {
+                switch (newState)
+                {
+                    case Server.State.Waiting:
+                    case Server.State.Connected:
+                        if (newState == Server.State.Waiting)
+                            statusLabel.ForeColor = Color.Orange;
+                        else
+                            statusLabel.ForeColor = Color.Green;
+                        ipBox.Enabled = false;
+                        eventsPortUpDown.Enabled = false;
+                        clipboardUpDown.Enabled = false;
+                        psswBox.Enabled = false;
+                        startButton.Enabled = false;
+                        stopButton.Enabled = true;
+                        break;
+
+                    case Server.State.Disconnected:
+                        statusLabel.ForeColor = Color.Red;
+                        ipBox.Enabled = true;
+                        eventsPortUpDown.Enabled = true;
+                        clipboardUpDown.Enabled = true;
+                        psswBox.Enabled = true;
+                        startButton.Enabled = true;
+                        stopButton.Enabled = false;
+                        break;
+                }
+
+                statusLabel.Text = newState.ToString();
+            }
         }
     }
 

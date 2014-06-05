@@ -37,8 +37,10 @@
             this.eventsPortUpDown = new System.Windows.Forms.NumericUpDown();
             this.clipboardUpDown = new System.Windows.Forms.NumericUpDown();
             this.startButton = new System.Windows.Forms.Button();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.stopButton = new System.Windows.Forms.Button();
+            this.label5 = new System.Windows.Forms.Label();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.statusLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.eventsPortUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.clipboardUpDown)).BeginInit();
             this.SuspendLayout();
@@ -156,15 +158,6 @@
             this.startButton.UseVisualStyleBackColor = true;
             this.startButton.Click += new System.EventHandler(this.button1_Click);
             // 
-            // statusStrip1
-            // 
-            this.statusStrip1.Location = new System.Drawing.Point(0, 144);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(300, 22);
-            this.statusStrip1.TabIndex = 11;
-            this.statusStrip1.Text = "Status:";
-            this.statusStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.statusStrip1_ItemClicked);
-            // 
             // stopButton
             // 
             this.stopButton.Location = new System.Drawing.Point(213, 116);
@@ -175,11 +168,40 @@
             this.stopButton.UseVisualStyleBackColor = true;
             this.stopButton.Click += new System.EventHandler(this.stopButton_Click);
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(80, 149);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(40, 13);
+            this.label5.TabIndex = 13;
+            this.label5.Text = "Status:";
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Location = new System.Drawing.Point(0, 144);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(300, 22);
+            this.statusStrip1.TabIndex = 11;
+            this.statusStrip1.Text = "Status:";
+            this.statusStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.statusStrip1_ItemClicked);
+            // 
+            // statusLabel
+            // 
+            this.statusLabel.AutoSize = true;
+            this.statusLabel.Location = new System.Drawing.Point(126, 149);
+            this.statusLabel.Name = "statusLabel";
+            this.statusLabel.Size = new System.Drawing.Size(73, 13);
+            this.statusLabel.TabIndex = 14;
+            this.statusLabel.Text = "Disconnected";
+            // 
             // ServerGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(300, 166);
+            this.Controls.Add(this.statusLabel);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.stopButton);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.startButton);
@@ -193,7 +215,7 @@
             this.Controls.Add(this.psswBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "ServerGUI";
-            this.Text = "Form1";
+            this.Text = "PDS Project Server";
             this.Load += new System.EventHandler(this.ServerGUI_Load);
             ((System.ComponentModel.ISupportInitialize)(this.eventsPortUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.clipboardUpDown)).EndInit();
@@ -213,8 +235,10 @@
         private System.Windows.Forms.NumericUpDown eventsPortUpDown;
         private System.Windows.Forms.NumericUpDown clipboardUpDown;
         private System.Windows.Forms.Button startButton;
-        private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.Button stopButton;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.Label statusLabel;
     }
 }
 
