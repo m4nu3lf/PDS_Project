@@ -38,6 +38,8 @@ namespace PDS_Project_Client
         private static IntPtr KEYhook;
         private static IntPtr MOUSEhook;
 
+        private static HookCB k_delegate = new HookCB(KeyboardCB);
+        private static HookCB m_delegate = new HookCB(MouseCB);
 
         public ClientGUI()
         {
@@ -46,32 +48,32 @@ namespace PDS_Project_Client
 
 
             _hostHK = new Dictionary<VirtualKeyShort, bool>();
-            _hostHK.Add(VirtualKeyShort.CONTROL, false);
-            _hostHK.Add(VirtualKeyShort.ALT, false);
+            _hostHK.Add(VirtualKeyShort.LCONTROL, false);
+            _hostHK.Add(VirtualKeyShort.LMENU, false);
             _hostHK.Add(VirtualKeyShort.KEY_0, false);
 
 
             _sp1HK = new Dictionary<VirtualKeyShort, bool>();
-            _sp1HK.Add(VirtualKeyShort.CONTROL, false);
-            _sp1HK.Add(VirtualKeyShort.ALT, false);
+            _sp1HK.Add(VirtualKeyShort.LCONTROL, false);
+            _sp1HK.Add(VirtualKeyShort.LMENU, false);
             _sp1HK.Add(VirtualKeyShort.KEY_1, false);
 
 
             _sp2HK = new Dictionary<VirtualKeyShort, bool>();
-            _sp2HK.Add(VirtualKeyShort.CONTROL, false);
-            _sp2HK.Add(VirtualKeyShort.ALT, false);
+            _sp2HK.Add(VirtualKeyShort.LCONTROL, false);
+            _sp2HK.Add(VirtualKeyShort.LMENU, false);
             _sp2HK.Add(VirtualKeyShort.KEY_2, false);
 
 
             _sp3HK = new Dictionary<VirtualKeyShort, bool>();
-            _sp3HK.Add(VirtualKeyShort.CONTROL, false);
-            _sp3HK.Add(VirtualKeyShort.ALT, false);
+            _sp3HK.Add(VirtualKeyShort.LCONTROL, false);
+            _sp3HK.Add(VirtualKeyShort.LMENU, false);
             _sp3HK.Add(VirtualKeyShort.KEY_3, false);
 
 
             _sp4HK = new Dictionary<VirtualKeyShort, bool>();
-            _sp4HK.Add(VirtualKeyShort.CONTROL, false);
-            _sp4HK.Add(VirtualKeyShort.ALT, false);
+            _sp4HK.Add(VirtualKeyShort.LCONTROL, false);
+            _sp4HK.Add(VirtualKeyShort.LMENU, false);
             _sp4HK.Add(VirtualKeyShort.KEY_4, false);
 
 
@@ -101,8 +103,9 @@ namespace PDS_Project_Client
 
         private void continueB_click(Object sender, EventArgs e)
         {
-            KEYhook = WindowsAPI.SetWindowsHookEx(WindowsAPI.WH_KEYBOARD_LL, KeyboardCB, IntPtr.Zero, 0);
-            MOUSEhook = WindowsAPI.SetWindowsHookEx(WindowsAPI.WH_MOUSE_LL, KeyboardCB, IntPtr.Zero, 0);
+
+            KEYhook = WindowsAPI.SetWindowsHookEx(WindowsAPI.WH_KEYBOARD_LL, k_delegate, IntPtr.Zero, 0);
+            //MOUSEhook = WindowsAPI.SetWindowsHookEx(WindowsAPI.WH_MOUSE_LL, m_delegate, IntPtr.Zero, 0);
         }
 
         /* Capture Events */
@@ -114,36 +117,45 @@ namespace PDS_Project_Client
             {
                 KEYBDINPUT* kp = (KEYBDINPUT*)LParam.ToPointer();
                 VirtualKeyShort vks = kp->wVk;
+                ScanCodeShort wsc = kp->wScan;
                 KEYEVENTF dwf = kp->dwFlags;
+
+                System.Console.WriteLine("tasto: " + vks.ToString() + "  " + dwf.ToString() + "  " + wsc.ToString());
+
 
                 if (_hostHK.ContainsKey(vks))
                 {
-                    if ((dwf & KEYEVENTF.KEYUP) != 0)
+
+                    if (false)
                     {
                         _hostHK[vks] = true;
                         bool flag = true;
 
                         IDictionaryEnumerator ide = _hostHK.GetEnumerator();
 
-                        do
+
+                        while (ide.MoveNext())
                         {
-                            if ( !(bool)ide.Value )
-                            { 
+                            if (!(bool)ide.Value)
+                            {
                                 flag = false;
                                 break;
                             }
-                        }while(ide.MoveNext());
-
+                        }
 
                         if (flag)
                         {
                             WindowsAPI.UnhookWindowsHookEx(KEYhook);
-                            WindowsAPI.UnhookWindowsHookEx(MOUSEhook);
+                            //WindowsAPI.UnhookWindowsHookEx(MOUSEhook);
                             return new IntPtr(1);
                         }
 
                     }
-                    else _hostHK[vks] = false;
+                    else
+                    {
+                        _hostHK[vks] = false;
+                    }
+  
                 }
 
                 _Host.EnqueueMsg(new KeyMsg(*kp));
@@ -154,12 +166,12 @@ namespace PDS_Project_Client
             return new IntPtr(1);
         }
 
+
         public static IntPtr MouseCB(int nCode, IntPtr wParam, IntPtr LParam)
         {
             
             return new IntPtr(1);
         }
-
 
 
     }

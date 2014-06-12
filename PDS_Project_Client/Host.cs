@@ -84,8 +84,7 @@ namespace PDS_Project_Client
         {
             lock (_e)
             {
-                Console.WriteLine("sleeping");
-                Thread.Sleep(1);
+
                 //ENQUEUE ;
             }
 

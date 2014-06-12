@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 namespace PDS_Project_Common
 {
 
+
         public enum VirtualKeyShort : short
         {
             ///<summary>
@@ -61,7 +62,7 @@ namespace PDS_Project_Common
             ///<summary>
             ///ALT key
             ///</summary>
-            ALT = 0x12,
+            MENU = 0x12,
             ///<summary>
             ///PAUSE key
             ///</summary>
