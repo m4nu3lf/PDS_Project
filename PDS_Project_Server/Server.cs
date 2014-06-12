@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using PDS_Project_Common;
 
 namespace PDS_Project_Server
@@ -43,7 +42,6 @@ namespace PDS_Project_Server
                     {
                         try
                         {
-
                             Console.WriteLine("Listening");
                             _onStateChanged(State.Waiting);
                             _commSocket = _welcomeSocket.Accept();
@@ -70,7 +68,7 @@ namespace PDS_Project_Server
                                 MsgStream.Send(new AckMsg(false), _commSocket);
                                 _stopRequest = true;
                             }
-                        } else if (obj is )
+                        }
                     }
                 }
                 _stopRequest = false;

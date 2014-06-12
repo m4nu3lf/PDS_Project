@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="WindowsAPI.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="MsgStream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
