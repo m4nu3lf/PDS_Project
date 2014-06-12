@@ -109,7 +109,7 @@ namespace PDS_Project_Client
             this.hotkey.Name = "hotkey";
             this.hotkey.Size = new System.Drawing.Size(300, 30);
             this.hotkey.TabIndex = 0;
-            this.hotkey.Text = "Actual Client Switch Hotkey: ctrl + alt + 0";
+            this.hotkey.Text = "Actual Client Switch Hotkey: ctrl + alt + Q";
 
 
             // 
@@ -201,10 +201,10 @@ namespace PDS_Project_Client
             /* adding ServerPanels */
 
 
-            this.tlp_INNER.Controls.Add(this.sp1, 0, 0);
-            this.tlp_INNER.Controls.Add(this.sp2, 1, 0);
-            this.tlp_INNER.Controls.Add(this.sp3, 2, 0);
-            this.tlp_INNER.Controls.Add(this.sp4, 3, 0);
+            this.tlp_INNER.Controls.Add(sp[0], 0, 0);
+            this.tlp_INNER.Controls.Add(sp[1], 1, 0);
+            this.tlp_INNER.Controls.Add(sp[2], 2, 0);
+            this.tlp_INNER.Controls.Add(sp[3], 3, 0);
 
 
             // 

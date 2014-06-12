@@ -488,7 +488,9 @@ namespace PDS_Project_Client
             try
             {
                 Console.WriteLine("Disconnecting From -> " + IP + ":" + EP.ToString());
+                _host.EnqueueMsg(new StopComm(i));
                 _host.es(i).Close();
+                this.Activate(false);
                 this.Connected(false);
             }
             catch (Exception e)

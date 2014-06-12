@@ -7,6 +7,11 @@ using System.Runtime.InteropServices;
 
 namespace PDS_Project_Common
 {
+    public enum ButtonEvent : int
+    {
+        WM_KEYDOWN = 0x00100,
+        WM_KEYUP = 0X00101
+    }
 
     public enum InputType : uint
     {

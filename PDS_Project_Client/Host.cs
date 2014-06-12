@@ -15,11 +15,10 @@ namespace PDS_Project_Client
         private Socket[] _es;        //event socket vector
         private Socket[] _cs;        //clipboard socket vector
 
-        private Socket _aes;        //active event socket
-        private Socket _acs;        //active clipboard socket
-
         private AutoResetEvent _e;     
         private Queue<Message> _q;
+
+        private int _as;
 
 
         public Host(int i) {
@@ -29,27 +28,8 @@ namespace PDS_Project_Client
             _q = new Queue<Message>();
             _e = new AutoResetEvent(false);
 
-        }
+            _as = -1;
 
-        public Socket aes
-        {
-            set
-            {
-                lock (_e)
-                {
-                    _aes = value;
-                }
-            }
-        }
-
-        public Socket acs
-        {
-            set {
-                lock (_e)
-                {
-                    _acs = value;
-                }
-            }
         }
 
 
@@ -82,10 +62,10 @@ namespace PDS_Project_Client
 
         public void EnqueueMsg(Message m)
         {
-            lock (_e)
+            lock (_q)
             {
-
-                //ENQUEUE ;
+                System.Console.WriteLine("Inserito Messaggio");
+               _q.Enqueue(m);
             }
 
             _e.Set();
@@ -94,12 +74,27 @@ namespace PDS_Project_Client
 
         public void SendMsg()
         {
-            lock (_e)
-            {
-                // DEQUEUE
-                // INVIO
+            Message m;
 
-                //if msg è 
+            while (_e.WaitOne()) {
+                lock (_q)
+                {
+                    m = _q.Dequeue();
+                }
+
+
+                if (m is InitComm)
+                {
+                    _as = ((InitComm)m).i;
+                    return;
+                }
+
+                if (_es[_as] != null ) MsgStream.Send(m, _es[_as]);
+
+                if (m is StopComm)
+                {
+                    _as = -1;
+                }
             }
         }
 
