@@ -86,6 +86,7 @@ namespace PDS_Project_Client
             this.continueB.Text = "Continue";
             this.continueB.UseVisualStyleBackColor = true;
 
+            this.continueB.Click += new EventHandler(this.continueB_click);
 
             // 
             // hotkeyB

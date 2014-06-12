@@ -7,8 +7,6 @@ using System.Runtime.InteropServices;
 
 namespace PDS_Project_Common
 {
-    public class WindowsAPI
-    {
         public enum InputType : uint
         {
             INPUT_MOUSE = 0,
@@ -967,6 +965,8 @@ namespace PDS_Project_Common
             [FieldOffset(0)]
             public HARDWAREINPUT hi;
         }
+
+   public class WindowsAPI{
 
         /// <summary>
         /// Synthesizes keystrokes, mouse motions, and button clicks.

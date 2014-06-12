@@ -10,6 +10,10 @@ using System.Collections;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
+
 namespace PDS_Project_Client
 {
     public partial class ClientGUI : Form
@@ -20,6 +24,7 @@ namespace PDS_Project_Client
         private ServerPanel     sp1, sp2, sp3, sp4;
         private int activePanel;
 
+        private delegate IntPtr HookCB(int nCode, IntPtr wParam, IntPtr LParam);
 
         public ClientGUI()
         {
@@ -48,6 +53,27 @@ namespace PDS_Project_Client
         private void hotkeyB_click(Object sender, EventArgs e) { 
         
         }
+
+        private void continueB_click(Object sender, EventArgs e)
+        {
+
+        }
+
+        /* Capture Events */
+
+
+        public static IntPtr KeyboardCB(int nCode, IntPtr wParam, IntPtr LParam)
+        {
+            return new IntPtr(1);
+        }
+
+        public static IntPtr MouseCB(int nCode, IntPtr wParam, IntPtr LParam)
+        {
+            
+            return new IntPtr(1);
+        }
+
+
 
     }
 }
