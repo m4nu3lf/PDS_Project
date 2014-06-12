@@ -18,7 +18,7 @@
                 components.Dispose();
             }
             base.Dispose(disposing);
-            server.Terminate();
+            _server.Terminate();
         }
 
         #region Codice generato da Progettazione Windows Form

@@ -103,7 +103,7 @@ namespace PDS_Project_Common
         }
 
 
-        public MOUSEINPUT ki
+        public MOUSEINPUT mi
         {
             get { return _mi; }
             set { _mi = value; }
