@@ -7,51 +7,6 @@ using System.Runtime.InteropServices;
 
 namespace PDS_Project_Common
 {
-        public enum InputType : uint
-        {
-            INPUT_MOUSE = 0,
-            INPUT_KEYBOARD = 1,
-        }
-
-        [Flags]
-        public enum MOUSEEVENTF : uint
-        {
-            ABSOLUTE = 0x8000,
-            HWHEEL = 0x01000,
-            MOVE = 0x0001,
-            MOVE_NOCOALESCE = 0x2000,
-            LEFTDOWN = 0x0002,
-            LEFTUP = 0x0004,
-            RIGHTDOWN = 0x0008,
-            RIGHTUP = 0x0010,
-            MIDDLEDOWN = 0x0020,
-            MIDDLEUP = 0x0040,
-            VIRTUALDESK = 0x4000,
-            WHEEL = 0x0800,
-            XDOWN = 0x0080,
-            XUP = 0x0100
-        }
-
-        [Serializable]
-        [StructLayout(LayoutKind.Sequential)]
-        public struct MOUSEINPUT
-        {
-            public int dx;
-            public int dy;
-            public int mouseData;
-            public MOUSEEVENTF dwFlags;
-            public uint time;
-            public UIntPtr dwExtraInfo;
-        }
-
-        [Flags]
-        public enum KEYEVENTF : uint
-        {
-            EXTENDEDKEY = 0x0001,
-            KEYUP = 0x0002,
-            SCANCODE = 0x0008,
-            UNICODE = 0x0004
-        }
 
         public enum VirtualKeyShort : short
         {
@@ -106,7 +61,7 @@ namespace PDS_Project_Common
             ///<summary>
             ///ALT key
             ///</summary>
-            MENU = 0x12,
+            ALT = 0x12,
             ///<summary>
             ///PAUSE key
             ///</summary>
@@ -922,6 +877,50 @@ namespace PDS_Project_Common
             OEM_CLEAR = 0,
         }
 
+
+        [Flags]
+        public enum MOUSEEVENTF : uint
+        {
+            ABSOLUTE = 0x8000,
+            HWHEEL = 0x01000,
+            MOVE = 0x0001,
+            MOVE_NOCOALESCE = 0x2000,
+            LEFTDOWN = 0x0002,
+            LEFTUP = 0x0004,
+            RIGHTDOWN = 0x0008,
+            RIGHTUP = 0x0010,
+            MIDDLEDOWN = 0x0020,
+            MIDDLEUP = 0x0040,
+            VIRTUALDESK = 0x4000,
+            WHEEL = 0x0800,
+            XDOWN = 0x0080,
+            XUP = 0x0100
+        }
+
+
+        [Flags]
+        public enum KEYEVENTF : uint
+        {
+            EXTENDEDKEY = 0x0001,
+            KEYUP = 0x0002,
+            SCANCODE = 0x0008,
+            UNICODE = 0x0004
+        }
+
+
+        [Serializable]
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MOUSEINPUT
+        {
+            public int dx;
+            public int dy;
+            public int mouseData;
+            public MOUSEEVENTF dwFlags;
+            public uint time;
+            public UIntPtr dwExtraInfo;
+        }
+
+
         [Serializable]
         [StructLayout(LayoutKind.Sequential)]
         public struct KEYBDINPUT
@@ -966,27 +965,35 @@ namespace PDS_Project_Common
             public HARDWAREINPUT hi;
         }
 
-   public class WindowsAPI{
 
-        /// <summary>
-        /// Synthesizes keystrokes, mouse motions, and button clicks.
-        /// </summary>
-        [DllImport("user32.dll")]
-        public static extern uint SendInput(
-        uint nInputs,
-        [MarshalAs(UnmanagedType.LPArray), In] INPUT[] pInputs,
-        int cbSize);
+        public delegate IntPtr HookCB(int nCode, IntPtr wParam, IntPtr LParam);
 
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern IntPtr SetWindowsHookEx(int idHook,
-            HookCB lpfn, IntPtr hMod, uint dwThreadId);
+        public class WindowsAPI{
 
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool UnhookWindowsHookEx(IntPtr hhk);
+            public const int WH_KEYBOARD_LL = 13;
+            public const int WH_MOUSE_LL = 14;
 
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode,
-            IntPtr wParam, IntPtr lParam);
-    }
+            /// <summary>
+            /// Synthesizes keystrokes, mouse motions, and button clicks.
+            /// </summary>
+            /// 
+            [DllImport("user32.dll")]
+            public static extern uint SendInput(
+            uint nInputs,
+            [MarshalAs(UnmanagedType.LPArray), In] INPUT[] pInputs,
+            int cbSize);
+
+            [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+            public static extern IntPtr SetWindowsHookEx(int idHook,
+                HookCB lpfn, IntPtr hMod, uint dwThreadId);
+
+            [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            public static extern bool UnhookWindowsHookEx(IntPtr hhk);
+
+            [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+            public static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode,
+                IntPtr wParam, IntPtr lParam);
+
+        }
 }

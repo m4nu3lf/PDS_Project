@@ -80,7 +80,7 @@ namespace PDS_Project_Client
         }
 
 
-        public void EnQueueMsg(Message m)
+        public void EnqueueMsg(Message m)
         {
             lock (_e)
             {

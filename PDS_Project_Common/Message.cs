@@ -73,37 +73,20 @@ namespace PDS_Project_Common
     [Serializable]
     public class KeyMsg : Message
     {
-        private bool _pressed;
-        private short _wVk;
-        private int _time;
+        private KEYBDINPUT _ki;
 
-        public KeyMsg(bool p, short wVk, int t)
+        public KeyMsg(KEYBDINPUT ki)
         {
-            _pressed = p;
-            _wVk = wVk;
-            _time = t;
+            _ki = ki;
         }
 
 
-        public bool pressed
+        public KEYBDINPUT ki
         {
-            get { return _pressed; }
-            set { _pressed = value; }
+            get { return _ki; }
+            set { _ki = value; }
         }
 
-
-        public short wVk
-        {
-            get { return _wVk; }
-            set { _wVk = value; }
-        }
-
-
-        public int time
-        {
-            get { return _time; }
-            set { _time = value; }
-        }
 
     }
 
@@ -111,44 +94,20 @@ namespace PDS_Project_Common
     [Serializable]
     public class MouseMsg : Message
     {
-        private MOUSEEVENTF _me;
-        private int _dx, _dy;
-        private int _dw;
+        
+        private MOUSEINPUT _mi;
 
-        public MouseMsg(MOUSEEVENTF me, int dx, int dy, int dw)
+        public MouseMsg(MOUSEINPUT mi)
         {
-            _me = me;
-            _dx = dx;
-            _dy = dy;
-            _dw = dw;
-        }
-
-        public int dx
-        {
-            get { return _dx; }
-            set { _dx = value; }
+            _mi = mi;
         }
 
 
-        public int dy
+        public MOUSEINPUT ki
         {
-            get { return _dy; }
-            set { _dy = value; }
+            get { return _mi; }
+            set { _mi = value; }
         }
-
-
-        public int dw
-        {
-            get { return _dw; }
-            set { _dw = value; }
-        }
-
-        public MOUSEEVENTF me
-        {
-            get { return _me; }
-            set { _me = value; }
-        }
-
     }
 
 
