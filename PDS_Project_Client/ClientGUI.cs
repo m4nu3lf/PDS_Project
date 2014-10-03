@@ -31,10 +31,10 @@ namespace PDS_Project_Client
 
         private static Dictionary<VirtualKeyShort, bool> _hostHK;
 
+        private static Dictionary<VirtualKeyShort, bool> _sp0HK;
         private static Dictionary<VirtualKeyShort, bool> _sp1HK;
         private static Dictionary<VirtualKeyShort, bool> _sp2HK;
         private static Dictionary<VirtualKeyShort, bool> _sp3HK;
-        private static Dictionary<VirtualKeyShort, bool> _sp4HK;
         
 
         private static IntPtr KEYhook;
@@ -50,6 +50,8 @@ namespace PDS_Project_Client
 
             _Host = new Host();
 
+            activePanel = -1;
+
 
             _hostHK = new Dictionary<VirtualKeyShort, bool>();
             _hostHK.Add(VirtualKeyShort.LCONTROL, false);
@@ -57,28 +59,28 @@ namespace PDS_Project_Client
             _hostHK.Add(VirtualKeyShort.KEY_Q, false);
 
 
+            _sp0HK = new Dictionary<VirtualKeyShort, bool>();
+            _sp0HK.Add(VirtualKeyShort.LCONTROL, false);
+            _sp0HK.Add(VirtualKeyShort.LMENU, false);
+            _sp0HK.Add(VirtualKeyShort.KEY_0, false);
+
+
             _sp1HK = new Dictionary<VirtualKeyShort, bool>();
             _sp1HK.Add(VirtualKeyShort.LCONTROL, false);
             _sp1HK.Add(VirtualKeyShort.LMENU, false);
-            _sp1HK.Add(VirtualKeyShort.KEY_0, false);
+            _sp1HK.Add(VirtualKeyShort.KEY_1, false);
 
 
             _sp2HK = new Dictionary<VirtualKeyShort, bool>();
             _sp2HK.Add(VirtualKeyShort.LCONTROL, false);
             _sp2HK.Add(VirtualKeyShort.LMENU, false);
-            _sp2HK.Add(VirtualKeyShort.KEY_1, false);
+            _sp2HK.Add(VirtualKeyShort.KEY_2, false);
 
 
             _sp3HK = new Dictionary<VirtualKeyShort, bool>();
             _sp3HK.Add(VirtualKeyShort.LCONTROL, false);
             _sp3HK.Add(VirtualKeyShort.LMENU, false);
-            _sp3HK.Add(VirtualKeyShort.KEY_2, false);
-
-
-            _sp4HK = new Dictionary<VirtualKeyShort, bool>();
-            _sp4HK.Add(VirtualKeyShort.LCONTROL, false);
-            _sp4HK.Add(VirtualKeyShort.LMENU, false);
-            _sp4HK.Add(VirtualKeyShort.KEY_3, false);
+            _sp3HK.Add(VirtualKeyShort.KEY_3, false);
 
 
             sp[0] = new ServerPanel(0, _Host);
@@ -152,6 +154,13 @@ namespace PDS_Project_Client
                         {
                             WindowsAPI.UnhookWindowsHookEx(KEYhook);
                             WindowsAPI.UnhookWindowsHookEx(MOUSEhook);
+
+
+                            Console.WriteLine("Dectivating: SERVER " + activePanel);
+                            _Host.EnqueueMsg(new StopComm());
+                            sp[activePanel].Deactivate();
+                            activePanel = -1;
+
                             return new IntPtr(1);
                         }
 
@@ -165,6 +174,59 @@ namespace PDS_Project_Client
 
 
                 /* HOT KEY SERVER 0 */
+
+                if (_sp0HK.ContainsKey(vks))
+                {
+
+                    if ((wParam.ToInt32() == (int)ButtonEvent.WM_KEYDOWN))
+                    {
+                        _sp0HK[vks] = true;
+                        bool flag = true;
+
+                        IDictionaryEnumerator ide = _sp0HK.GetEnumerator();
+
+
+                        while (ide.MoveNext())
+                        {
+                            if (!(bool)ide.Value)
+                            {
+                                flag = false;
+                                break;
+                            }
+                        }
+
+                        if (flag)
+                        {
+
+                            Console.WriteLine("HOT KEY ACTIVATION: SERVER 0");
+
+                            if ((activePanel != 0) && (activePanel != -1))
+                            {
+                                Console.WriteLine("Dectivating: SERVER " + activePanel);
+                                _Host.EnqueueMsg(new StopComm());
+                                sp[activePanel].Deactivate();
+                            }
+
+                            if (activePanel != 0)
+                            {
+                                Console.WriteLine("Activating: SERVER 0");
+                                sp[0].Activate();
+                                activePanel = 0;
+                                _Host.EnqueueMsg(new InitComm(activePanel));
+                            }
+                            
+                            return new IntPtr(1);
+
+                        }
+                    }
+                    else
+                    {
+                        _sp0HK[vks] = false;
+                    }
+
+                }
+
+                /* HOT KEY SERVER 1 */
 
                 if (_sp1HK.ContainsKey(vks))
                 {
@@ -188,68 +250,30 @@ namespace PDS_Project_Client
 
                         if (flag)
                         {
-                            if (activePanel != -1)
+                            Console.WriteLine("HOT KEY ACTIVATION: SERVER 1");
+
+                            if ((activePanel != 1) && (activePanel != -1))
                             {
+                                Console.WriteLine("Dectivating: SERVER " + activePanel);
                                 _Host.EnqueueMsg(new StopComm());
-                                sp[activePanel].Activate(false);
+                                sp[activePanel].Deactivate();
                             }
 
-                            sp[0].Activate(true);
-                            activePanel = 0;
-                            _Host.EnqueueMsg(new InitComm(activePanel));
-                            
-                            return new IntPtr(1);
+                            if (activePanel != 1)
+                            {
+                                Console.WriteLine("Activating: SERVER 1");
+                                sp[1].Activate();
+                                activePanel = 1;
+                                _Host.EnqueueMsg(new InitComm(activePanel));
+                            }
 
+                            return new IntPtr(1);
                         }
+
                     }
                     else
                     {
                         _sp1HK[vks] = false;
-                    }
-
-                }
-
-                /* HOT KEY SERVER 1 */
-
-                if (_sp2HK.ContainsKey(vks))
-                {
-
-                    if ((wParam.ToInt32() == (int)ButtonEvent.WM_KEYDOWN))
-                    {
-                        _sp2HK[vks] = true;
-                        bool flag = true;
-
-                        IDictionaryEnumerator ide = _sp2HK.GetEnumerator();
-
-
-                        while (ide.MoveNext())
-                        {
-                            if (!(bool)ide.Value)
-                            {
-                                flag = false;
-                                break;
-                            }
-                        }
-
-                        if (flag)
-                        {
-                            if (activePanel != -1)
-                            {
-                                _Host.EnqueueMsg(new StopComm());
-                                sp[activePanel].Activate(false);
-                            }
-
-                            sp[1].Activate(true);
-                            activePanel = 1;
-                            _Host.EnqueueMsg(new InitComm(activePanel));
-
-                            return new IntPtr(1);
-                        }
-
-                    }
-                    else
-                    {
-                        _sp2HK[vks] = false;
                     }
 
 
