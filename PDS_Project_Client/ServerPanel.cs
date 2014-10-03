@@ -54,6 +54,8 @@ namespace PDS_Project_Client
 
 
         private Thread cDeamon;
+        private Thread aDeamon;
+
         private bool c_flag;
 
         private String IP;
@@ -62,7 +64,8 @@ namespace PDS_Project_Client
         private UInt16 EP;
         private UInt16 DP;
 
-        delegate void MyDelegate(bool flag);
+
+        delegate void UsefulDelegate();
 
 
         public ServerPanel(int index, Host h)
@@ -440,20 +443,6 @@ namespace PDS_Project_Client
 
         }
 
-
-
-        private void disconnectB_click(Object sender, EventArgs e)
-        {
-
-            this.connectionStatus.ForeColor = System.Drawing.Color.Orange;
-            this.connectionStatus.Text = "Disconnecting...";
-
-            this.cDeamon = new Thread(new ThreadStart(this.Disconnect));
-            this.cDeamon.Start();
-
-        }
-
-
         private void Connect() {
             Socket tmp = new Socket(SocketType.Stream, ProtocolType.Tcp); //data socket
 
@@ -473,22 +462,65 @@ namespace PDS_Project_Client
                     if ( ((AckMsg)o).ack )
                     {
                         _host.es(tmp, i);
-                        this.Connected(true);
+                        this.Connected();
                     }
                     else
                     {
                         tmp.Close();
-                        this.Connected(false);
+                        this.Disconnected();
                     }
                 }
 
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 tmp.Close();
-                this.Connected(false);
+                this.Disconnected();
             }
             
+        }
+
+
+        private void Connected()
+        {
+
+            if (this.disconnectB.InvokeRequired)
+            {
+                UsefulDelegate md = new UsefulDelegate(Connected);
+                this.Invoke(md);
+            }
+            else
+            {
+                this.connectionStatus.ForeColor = System.Drawing.Color.Green;
+                this.connectionStatus.Text = "Connected";
+                c_flag = true;
+                
+
+                tb_IP.Enabled = false;
+                tb_PSW.Enabled = false;
+                tb_EP.Enabled = false;
+                tb_DP.Enabled = false;
+                this.disconnectB.Enabled = true;
+                this.connectB.Enabled = false;
+            }
+
+        }
+
+
+        /* GESTIONE DISCONNESSIONE */
+
+
+        
+
+        private void disconnectB_click(Object sender, EventArgs e)
+        {
+
+            this.connectionStatus.ForeColor = System.Drawing.Color.Orange;
+            this.connectionStatus.Text = "Disconnecting...";
+
+            this.cDeamon = new Thread(new ThreadStart(this.Disconnect));
+            this.cDeamon.Start();
+
         }
 
 
@@ -508,68 +540,95 @@ namespace PDS_Project_Client
             }
 
 
-            this.Activate(false);
-            this.Connected(false);
+            this.Disconnected();
 
         }
 
 
-
-        private void Connected(bool flag)
+        private void Disconnected()
         {
 
             if (this.disconnectB.InvokeRequired)
             {
-                MyDelegate md = new MyDelegate(Connected);
-                this.Invoke(md, new object[] { flag });
+                UsefulDelegate md = new UsefulDelegate(Disconnected);
+                this.Invoke(md);
             }
             else
             {
-                if (flag)
-                {
-                    this.connectionStatus.ForeColor = System.Drawing.Color.Green;
-                    this.connectionStatus.Text = "Connected";
-                    c_flag = true;
-                }
-                else
-                {
-                    this.connectionStatus.ForeColor = System.Drawing.Color.Red;
-                    this.connectionStatus.Text = "Disconnected";
-                    c_flag = false;
-                }
+                this.connectionStatus.ForeColor = System.Drawing.Color.Red;
+                this.connectionStatus.Text = "Disconnected";
+                serverActive.Text = "Not Active";
+                this.serverActive.ForeColor = System.Drawing.Color.Red;
+                c_flag = false;
 
-                tb_IP.Enabled = !flag;
-                tb_PSW.Enabled = !flag;
-                tb_EP.Enabled = !flag;
-                tb_DP.Enabled = !flag;
-                this.disconnectB.Enabled = flag;
-                this.connectB.Enabled = !flag;
+                tb_IP.Enabled = true;
+                tb_PSW.Enabled = true;
+                tb_EP.Enabled = true;
+                tb_DP.Enabled = true;
+                this.disconnectB.Enabled = false;
+                this.connectB.Enabled = true;
             }
 
         }
+
 
 
         /* GESTIONE ATTIVAZIONE */
 
 
-
-        public void Activate(bool flag)
+        public void Deactivate() 
         {
-            if(c_flag){
+            if (c_flag)
+            {
+                this.aDeamon = new Thread(new ThreadStart(this.Deactivation));
+                this.aDeamon.Start();
+            }
+        }
 
-                if (flag)
-                {
-                    serverActive.Text = "Active";
-                    this.serverActive.ForeColor = System.Drawing.Color.Green;
-                }
-                else
-                {
-                    serverActive.Text = "Not Active";
-                    this.serverActive.ForeColor = System.Drawing.Color.Red;
-                }
+
+        public void Activate()
+        {
+            if (c_flag)
+            {
+                this.aDeamon = new Thread(new ThreadStart(this.Activation));
+                this.aDeamon.Start();
+            }
+        }
+
+
+        private void Deactivation()
+        {
+            if (this.serverActive.InvokeRequired)
+            {
+                UsefulDelegate ad = new UsefulDelegate(Deactivation);
+                this.Invoke(ad);
+            }
+            else
+            {
+                Console.WriteLine("Deactivation...");
+                serverActive.Text = "Not Active";
+                this.serverActive.ForeColor = System.Drawing.Color.Red;
+            }
+        }
+
+
+        private void Activation()
+        {
+
+            if (this.serverActive.InvokeRequired)
+            {
+                UsefulDelegate ad = new UsefulDelegate(Activation);
+                this.Invoke(ad);
+            }
+            else
+            {
+                Console.WriteLine("Activation...");
+                serverActive.Text = "Active";
+                this.serverActive.ForeColor = System.Drawing.Color.Green;
             }
 
         }
+
 
 
     }//end ServerPanel

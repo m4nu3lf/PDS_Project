@@ -34,7 +34,7 @@ namespace PDS_Project_Client
             _as = -1;
 
         }
-
+        
 
         /* GET A SOCKET */
 
@@ -84,7 +84,10 @@ namespace PDS_Project_Client
         {
             Message m;
 
-            while (_e.WaitOne()) {
+            Console.WriteLine("Sending Message...");
+
+            while (_e.WaitOne())
+            {
 
                 /* new message */
 
@@ -97,13 +100,22 @@ namespace PDS_Project_Client
 
                 if (m is InitComm)
                 {
+                    Console.WriteLine("InitComm Msg Found");
                     _as = ((InitComm)m).i; // changing active socket 
-                    return;
                 }
 
-                if( (_as != -1) && (_es[_as] != null) ) MsgStream.Send(m, _es[_as]); //sending data
+                if ((_as != -1) && (_es[_as] != null))
+                {
+                    MsgStream.Send(m, _es[_as]); //sending data
+                    Console.WriteLine("Sent");
+                }
 
-                if (m is StopComm)   _as = -1;  // no active socket from now till a new InitComm Message
+                if (m is StopComm)
+                {
+                    Console.WriteLine("StopComm Msg Found");
+                    _as = -1;  // no active socket from now till a new InitComm Message
+
+                }
             }
         }
 

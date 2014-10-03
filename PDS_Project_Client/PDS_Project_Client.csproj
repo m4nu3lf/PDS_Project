@@ -63,7 +63,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EventThread.cs" />
+    <Compile Include="Thread.cs" />
     <Compile Include="ClientGUI.cs">
       <SubType>Form</SubType>
     </Compile>
