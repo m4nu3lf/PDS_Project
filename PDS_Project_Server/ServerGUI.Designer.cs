@@ -18,6 +18,7 @@
                 components.Dispose();
             }
             base.Dispose(disposing);
+            System.Console.WriteLine("here");
             _server.Terminate();
         }
 

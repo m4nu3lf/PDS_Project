@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Blinking.cs" />
     <Compile Include="ServerGUI.cs">
       <SubType>Form</SubType>
     </Compile>

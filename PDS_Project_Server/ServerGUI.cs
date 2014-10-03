@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace PDS_Project_Server
 {
@@ -20,6 +21,8 @@ namespace PDS_Project_Server
         private Server _server;
         private Icon _inactiveIcon;
         private Icon _activeIcon;
+        private Blinking _blinking;
+        private Thread _blinkingThread;
 
         public ServerGUI()
         {
@@ -36,10 +39,12 @@ namespace PDS_Project_Server
 
             // Get local IP address
             IPAddress[] ipAs = Dns.GetHostAddresses(Dns.GetHostName());
-            ipBox.Text = (ipAs[2]).ToString();
-            _serverAddress = ipAs[2];
+            ipBox.Text = (ipAs[1]).ToString();
+            _serverAddress = ipAs[1];
 
             _server = new Server(this.server_StateChange);
+
+            _blinking = new Blinking();
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -100,8 +105,8 @@ namespace PDS_Project_Server
             _server.Stop();
         }
 
-        delegate void stateChangedCallback(Server.State newState);
-        private void server_StateChange(Server.State newState)
+        delegate void stateChangedCallback(Server.StateBase newState);
+        private void server_StateChange(Server.StateBase newState)
         {
             if (this.InvokeRequired)
             {
@@ -110,41 +115,42 @@ namespace PDS_Project_Server
             }
             else
             {
-                switch (newState)
+                if ((newState is Server.WaitingState) ||
+                    (newState is Server.ConnectedState) ||
+                    (newState is Server.AuthenticatedState))
                 {
-                    case Server.State.Waiting:
-                    case Server.State.Connected:
-                        if (newState == Server.State.Waiting)
-                            statusLabel.ForeColor = Color.Orange;
-                        else
-                            statusLabel.ForeColor = Color.Green;
-                        ipBox.Enabled = false;
-                        eventsPortUpDown.Enabled = false;
-                        clipboardUpDown.Enabled = false;
-                        psswBox.Enabled = false;
-                        startButton.Enabled = false;
-                        stopButton.Enabled = true;
-                        break;
-
-                    case Server.State.Disconnected:
-                        statusLabel.ForeColor = Color.Red;
-                        ipBox.Enabled = true;
-                        eventsPortUpDown.Enabled = true;
-                        clipboardUpDown.Enabled = true;
-                        psswBox.Enabled = true;
-                        startButton.Enabled = true;
-                        stopButton.Enabled = false;
-                        break;
-
-                    case Server.State.Active:
-                        statusLabel.ForeColor = Color.Blue;
-                        _notifyIcon.Icon = _activeIcon;
-                        break;
+                    ipBox.Enabled = false;
+                    eventsPortUpDown.Enabled = false;
+                    clipboardUpDown.Enabled = false;
+                    psswBox.Enabled = false;
+                    startButton.Enabled = false;
+                    stopButton.Enabled = true;
+                    if (newState is Server.WaitingState)
+                        statusLabel.ForeColor = Color.Orange;
+                    else
+                        statusLabel.ForeColor = Color.Green;
                 }
-
-                statusLabel.Text = newState.ToString();
+                else if (newState is Server.DisconnectedState)
+                {
+                    statusLabel.ForeColor = Color.Red;
+                    ipBox.Enabled = true;
+                    eventsPortUpDown.Enabled = true;
+                    clipboardUpDown.Enabled = true;
+                    psswBox.Enabled = true;
+                    startButton.Enabled = true;
+                    stopButton.Enabled = false;
+                }
+                else if (newState is Server.ActiveState)
+                {
+                    _blinking.Blink();
+                    statusLabel.ForeColor = Color.Blue;
+                    _notifyIcon.Icon = _activeIcon;
+                }
+                if (newState != null)
+                    statusLabel.Text = newState.ToString();
             }
         }
+
     }
 
 }
