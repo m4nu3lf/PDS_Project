@@ -381,6 +381,15 @@ namespace PDS_Project_Client
 
 
 
+        private void changeHK_click(Object sender, EventArgs e)
+        {
+
+            //ascolto tastiera;
+
+        }
+
+
+
 
         /* GESTIONE CONNESSIONE */
 
@@ -390,6 +399,8 @@ namespace PDS_Project_Client
             IP = tb_IP.Text;
             PSW = tb_PSW.Text;
 
+            bool err_flag = false;
+
             try
             {
                 EP = Convert.ToUInt16(tb_EP.Text);
@@ -397,7 +408,7 @@ namespace PDS_Project_Client
             catch (FormatException)
             {
                 tb_EP.Text = "Errore";
-                return;
+                err_flag = true;
             }
 
             try
@@ -407,8 +418,11 @@ namespace PDS_Project_Client
             catch (FormatException)
             {
                 tb_DP.Text = "Errore";
-                return;
+                err_flag = true;
             }
+
+
+            if (err_flag) return;
 
 
             this.connectionStatus.ForeColor = System.Drawing.Color.Orange;
@@ -422,7 +436,7 @@ namespace PDS_Project_Client
             this.cDeamon = new Thread(new ThreadStart(this.Connect));
             this.cDeamon.Start();
 
-            Console.WriteLine("creato thread");
+            Console.WriteLine("Creato Thread");
 
         }
 
@@ -439,15 +453,9 @@ namespace PDS_Project_Client
 
         }
 
-        private void changeHK_click(Object sender, EventArgs e)
-        {
-
-            //ascolto tastiera;
-
-        }
 
         private void Connect() {
-            Socket tmp = new Socket(SocketType.Stream, ProtocolType.Tcp);
+            Socket tmp = new Socket(SocketType.Stream, ProtocolType.Tcp); //data socket
 
             try
             {
@@ -477,6 +485,7 @@ namespace PDS_Project_Client
             }
             catch(Exception e)
             {
+                tmp.Close();
                 this.Connected(false);
             }
             
@@ -485,18 +494,22 @@ namespace PDS_Project_Client
 
         private void Disconnect()
         {
+            Socket tmp = _host.es(i);
+
             try
             {
                 Console.WriteLine("Disconnecting From -> " + IP + ":" + EP.ToString());
-                _host.EnqueueMsg(new StopComm(i));
-                _host.es(i).Close();
-                this.Activate(false);
-                this.Connected(false);
+                tmp.Shutdown(SocketShutdown.Both);
+                tmp.Close();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                this.Connected(true);
+                if (tmp.Connected) return;
             }
+
+
+            this.Activate(false);
+            this.Connected(false);
 
         }
 

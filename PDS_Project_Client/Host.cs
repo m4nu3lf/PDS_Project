@@ -10,6 +10,8 @@ using PDS_Project_Common;
 
 namespace PDS_Project_Client
 {
+
+
     public class Host
     {
         private Socket[] _es;        //event socket vector
@@ -20,10 +22,11 @@ namespace PDS_Project_Client
 
         private int _as;
 
+        private const int _ns = 4;
 
-        public Host(int i) {
-            _es = new Socket[i];
-            _cs = new Socket[i];
+        public Host() {
+            _es = new Socket[4];
+            _cs = new Socket[4];
 
             _q = new Queue<Message>();
             _e = new AutoResetEvent(false);
@@ -62,11 +65,16 @@ namespace PDS_Project_Client
 
         public void EnqueueMsg(Message m)
         {
+
+            /* putting in the message into the queue */
+
             lock (_q)
             {
                 System.Console.WriteLine("Inserito Messaggio");
                _q.Enqueue(m);
             }
+
+            /* setting the event to wake the thread */
 
             _e.Set();
         }
@@ -77,26 +85,34 @@ namespace PDS_Project_Client
             Message m;
 
             while (_e.WaitOne()) {
+
+                /* new message */
+
                 lock (_q)
                 {
                     m = _q.Dequeue();
                 }
 
+                /* checking type */
 
                 if (m is InitComm)
                 {
-                    _as = ((InitComm)m).i;
+                    _as = ((InitComm)m).i; // changing active socket 
                     return;
                 }
 
-                if (_es[_as] != null ) MsgStream.Send(m, _es[_as]);
+                if( (_as != -1) && (_es[_as] != null) ) MsgStream.Send(m, _es[_as]); //sending data
 
-                if (m is StopComm)
-                {
-                    _as = -1;
-                }
+                if (m is StopComm)   _as = -1;  // no active socket from now till a new InitComm Message
             }
         }
+
+
+
+
+        /* clipboard managing */
+
+
 
         public void SendClipboard()
         {
@@ -107,6 +123,9 @@ namespace PDS_Project_Client
         {
             return "prova";
         }
+
+
+
 
     }
 

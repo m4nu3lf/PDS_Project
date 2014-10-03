@@ -43,10 +43,12 @@ namespace PDS_Project_Client
         private static HookCB k_delegate = new HookCB(KeyboardCB);
         private static HookCB m_delegate = new HookCB(MouseCB);
 
+
+
         public ClientGUI()
         {
 
-            _Host = new Host(4);
+            _Host = new Host();
 
 
             _hostHK = new Dictionary<VirtualKeyShort, bool>();
@@ -106,6 +108,8 @@ namespace PDS_Project_Client
             KEYhook = WindowsAPI.SetWindowsHookEx(WindowsAPI.WH_KEYBOARD_LL, k_delegate, IntPtr.Zero, 0);
             MOUSEhook = WindowsAPI.SetWindowsHookEx(WindowsAPI.WH_MOUSE_LL, m_delegate, IntPtr.Zero, 0);
         }
+
+
 
         /* Capture Events */
 
@@ -251,7 +255,7 @@ namespace PDS_Project_Client
 
                 }
 
-                /* se non è stato identifacto nessun hotkey inseriamo nella coda */
+                /* no hotkey identyfied , enqueing message */
 
                 _Host.EnqueueMsg(new KeyMsg(*kp));
 
