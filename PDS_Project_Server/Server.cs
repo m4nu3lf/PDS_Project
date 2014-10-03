@@ -226,9 +226,11 @@ namespace PDS_Project_Server
             {
                 try
                 {
-                    _newState = value;
-                    _newState.Server = this;
-                    _state.Signal();
+                    lock (_newStateLock)
+                    {
+                        _newState = value;
+                        _newState.Server = this;
+                    }
                 }
                 catch (NullReferenceException)
                 {
@@ -238,7 +240,12 @@ namespace PDS_Project_Server
 
             get
             {
-                return _state;
+                StateBase tmpState;
+                lock(_stateLock)
+                {
+                    tmpState = _state;
+                }
+                return tmpState;
             }
         }
 
@@ -264,9 +271,15 @@ namespace PDS_Project_Server
                 {
                     _state.Exit();
 
-                    lock (_state)
+                    StateBase tmpState;
+                    lock (_newStateLock)
                     {
-                        _state = _newState;
+                        tmpState = _newState;
+                    }
+
+                    lock (_stateLock)
+                    {
+                        _state = tmpState;
                     }
 
                     if (_state != null)
@@ -296,12 +309,16 @@ namespace PDS_Project_Server
 
         public void Stop()
         {
+            StateBase prevState = State;
             State = new DisconnectedState();
+            prevState.Signal();
         }
 
         public void Terminate()
         {
+            StateBase prevState = State;
             State = null;
+            prevState.Signal();
         }
 
         private Thread _serverThread;
@@ -309,7 +326,9 @@ namespace PDS_Project_Server
         private Socket _commSocket;
         private String _password;
         private StateBase _state;
+        private Object _stateLock = new Object();
         private StateBase _newState;
+        private Object _newStateLock = new Object();
         private OnStateChanged _onStateChanged;
     }
 }
