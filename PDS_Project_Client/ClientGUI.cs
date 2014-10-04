@@ -107,40 +107,54 @@ namespace PDS_Project_Client
                 System.Console.WriteLine("tasto: " + vks.ToString() + "  " + dwf.ToString() + "  " + wsc.ToString());
 
 
-                /* HOT KEY HOST */
+                    Console.WriteLine("CTRL and ALT pressed");
+                    
 
-                /* HOST */
-                WindowsAPI.UnhookWindowsHookEx(KEYhook);
-                WindowsAPI.UnhookWindowsHookEx(MOUSEhook);
+                    //  HOT KEY HOST 
 
+                    if (vks == _hostHK)
+                    {
 
-                Console.WriteLine("Dectivating: SERVER " + activePanel);
-                _Host.EnqueueMsg(new StopComm());
-                sp[activePanel].Deactivate();
-                activePanel = -1;
-
-                //return new IntPtr(1);
-
-                /* SERVER */
-
-                System.Console.WriteLine("HOT KEY ACTIVATION: SERVER 0");
-
-                if ((activePanel != 0) && (activePanel != -1))
-                {
-                    Console.WriteLine("Dectivating: SERVER " + activePanel);
-                    _Host.EnqueueMsg(new StopComm());
-                    sp[activePanel].Deactivate();
-                }
-
-                if (activePanel != 0)
-                {
-                    Console.WriteLine("Activating: SERVER 0");
-                    sp[0].Activate();
-                    activePanel = 0;
-                    _Host.EnqueueMsg(new InitComm(activePanel));
-                }
+                        WindowsAPI.UnhookWindowsHookEx(KEYhook);
+                        WindowsAPI.UnhookWindowsHookEx(MOUSEhook);
 
 
+                        Console.WriteLine("Dectivating: SERVER " + activePanel);
+                        _Host.EnqueueMsg(new StopComm());
+
+                        if(activePanel != -1) sp[activePanel].Deactivate();
+                        activePanel = -1;
+
+                        return new IntPtr(1);
+                    }
+
+
+
+                    // SERVER
+
+
+                    if (vks == _sp0HK)
+                    {
+
+                        System.Console.WriteLine("HOT KEY ACTIVATION: SERVER 0");
+
+                        if ((activePanel != 0) && (activePanel != -1))
+                        {
+                            Console.WriteLine("Dectivating: SERVER " + activePanel);
+                            _Host.EnqueueMsg(new StopComm());
+                            sp[activePanel].Deactivate();
+                        }
+
+                        if (activePanel != 0)
+                        {
+                            Console.WriteLine("Activating: SERVER 0");
+                            sp[0].Activate();
+                            activePanel = 0;
+                            _Host.EnqueueMsg(new InitComm(activePanel));
+                        }
+                        
+                        return new IntPtr(1);
+                    }
 
                 /* no hotkey identyfied , enqueing message */
 
