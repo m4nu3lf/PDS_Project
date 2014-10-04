@@ -27,21 +27,19 @@ namespace PDS_Project_Client
 
         private static Host _Host;
         private static ServerPanel[] sp = new ServerPanel[4];
-        //private static int activePanel;
 
+        private Thread eThread;
 
         private static VirtualKeyShort _hostHK;
-        private static VirtualKeyShort _sp0HK, _sp1HK, _sp2HK, _sp3HK;
 
 
-
+        /* Keyboard and Mouse events managing variables */
 
         private static IntPtr KEYhook;
         private static IntPtr MOUSEhook;
 
         private static HookCB k_delegate = new HookCB(KeyboardCB);
         private static HookCB m_delegate = new HookCB(MouseCB);
-
 
 
         public ClientGUI()
@@ -62,16 +60,11 @@ namespace PDS_Project_Client
 
             _hostHK = VirtualKeyShort.KEY_Q;
 
-            _sp0HK = VirtualKeyShort.KEY_0;
-            _sp1HK = VirtualKeyShort.KEY_1;
-            _sp2HK = VirtualKeyShort.KEY_2;
-            _sp3HK = VirtualKeyShort.KEY_3;
-
             InitializeComponent();
 
 
 
-            Thread eThread = new Thread((new EventThread()).run);
+            eThread = new Thread((new EventThread()).run);
             eThread.Start(_Host);
 
         }
@@ -111,17 +104,17 @@ namespace PDS_Project_Client
                 switch(wParam.ToInt32()){
 
                     case 260:
-                        Console.WriteLine(km.VirtualKey.ToString() + ": Pressed - System");
+                        //Console.WriteLine(km.VirtualKey.ToString() + ": Pressed - System");
                         km.Pressed = true;
                         break;
 
                     case (int)ButtonEvent.WM_KEYUP:
-                        Console.WriteLine(km.VirtualKey.ToString() + ": Released");
+                        //Console.WriteLine(km.VirtualKey.ToString() + ": Released");
                         km.Pressed = false;
                         break;
 
                     case (int)ButtonEvent.WM_KEYDOWN:
-                        Console.WriteLine(km.VirtualKey.ToString() + ": Pressed");
+                        //Console.WriteLine(km.VirtualKey.ToString() + ": Pressed");
                         km.Pressed = true;
                         break;
 
@@ -139,70 +132,25 @@ namespace PDS_Project_Client
                         WindowsAPI.UnhookWindowsHookEx(MOUSEhook);
 
 
-                        Console.WriteLine("Dectivating: SERVER");
+                        //Console.WriteLine("Dectivating: SERVER");
                         _Host.EnqueueMsg(new StopComm(-1));
 
                         return new IntPtr(1);
                     }
 
 
-
-                    // SERVER 0
-
-
-                    if ( (km.VirtualKey == _sp0HK) && (!km.Pressed) )
+                    for (int k = 0; k < 4; k++)
                     {
+                        if ((km.VirtualKey == sp[k].hk) && (!km.Pressed))
+                        {
+                            _Host.EnqueueMsg(new StopComm(k));
+                            _Host.EnqueueMsg(new InitComm(k));
 
-                        System.Console.WriteLine("HOT KEY ACTIVATION: SERVER 0");
-                        _Host.EnqueueMsg(new StopComm(0));
-                        _Host.EnqueueMsg(new InitComm(0));
-
-                        return new IntPtr(1);
+                            return new IntPtr(1);
+                        }
                     }
-
-                    // SERVER 1
-
-
-                    if ((km.VirtualKey == _sp1HK) && (!km.Pressed))
-                    {
-
-                        System.Console.WriteLine("HOT KEY ACTIVATION: SERVER 0");
-                        _Host.EnqueueMsg(new StopComm(1));
-                        _Host.EnqueueMsg(new InitComm(1));
-
-                        return new IntPtr(1);
-                    }
-
-                    // SERVER 2
-
-
-                    if ((km.VirtualKey == _sp2HK) && (!km.Pressed))
-                    {
-
-                        System.Console.WriteLine("HOT KEY ACTIVATION: SERVER 0");
-                        _Host.EnqueueMsg(new StopComm(2));
-                        _Host.EnqueueMsg(new InitComm(2));
-
-                        return new IntPtr(1);
-                    }
-
-                    // SERVER 3
-
-
-                    if ((km.VirtualKey == _sp3HK) && (!km.Pressed))
-                    {
-
-                        System.Console.WriteLine("HOT KEY ACTIVATION: SERVER 0");
-                        _Host.EnqueueMsg(new StopComm(3));
-                        _Host.EnqueueMsg(new InitComm(3));
-
-                        return new IntPtr(1);
-                    }
-
-
 
                 /* no hotkey identyfied , enqueing message */
-
 
                 _Host.EnqueueMsg(km);
 

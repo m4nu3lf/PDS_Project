@@ -12,6 +12,8 @@ namespace PDS_Project_Client
     public class ServerPanel : System.Windows.Forms.Panel
     {
 
+        /* GRAPHICS VARIABLES */
+
         private System.Windows.Forms.Button connectB;
         private System.Windows.Forms.Button disconnectB;
         private System.Windows.Forms.Button chotkeyB;
@@ -44,28 +46,27 @@ namespace PDS_Project_Client
 
         private System.Windows.Forms.TableLayoutPanel tlp;
         
-        /* variables */
+
+
+
+        /* CONTROL VARIABLES */
 
         private Host _host;
 
         private int i;
 
-        /* Control datas */
-
+        public VirtualKeyShort hk { get; set; }
 
         private Thread cDeamon;     //Deamon used to connect
+        private Thread dDeamon;     //Deamon used to disconnect
         private Thread aDeamon;     //Deamon used to manage the Active Label
 
-        private Thread dDeamon;     //Deamon used to disconnect
 
         private bool c_flag;        //Connection flag
 
 
-
-
         private String IP;
         private String PSW;
-        private String HK;
         private UInt16 EP;
         private UInt16 DP;
 
@@ -78,6 +79,25 @@ namespace PDS_Project_Client
             i = index;      // index of the server
             _host = h;      // host global object
             c_flag = false;
+
+            switch (i)
+            {
+                case 0:
+                    hk = VirtualKeyShort.KEY_0;
+                    break;
+
+                case 1:
+                    hk = VirtualKeyShort.KEY_1;
+                    break;
+
+                case 2:
+                    hk = VirtualKeyShort.KEY_2;
+                    break;
+
+                case 3:
+                    hk = VirtualKeyShort.KEY_3;
+                    break;
+            }
 
             this.InitializeComponent();
 
@@ -415,7 +435,7 @@ namespace PDS_Project_Client
             }
             catch (FormatException)
             {
-                tb_EP.Text = "Errore";
+                tb_EP.Text = "Invalid Port";
                 err_flag = true;
             }
 
@@ -425,7 +445,7 @@ namespace PDS_Project_Client
             }
             catch (FormatException)
             {
-                tb_DP.Text = "Errore";
+                tb_DP.Text = "Invalid Port";
                 err_flag = true;
             }
 
@@ -444,7 +464,7 @@ namespace PDS_Project_Client
             this.cDeamon = new Thread(new ThreadStart(this.Connect));
             this.cDeamon.Start();
 
-            Console.WriteLine("Creato Thread");
+            //Console.WriteLine("Connection Deamon Created");
 
         }
 
@@ -536,22 +556,22 @@ namespace PDS_Project_Client
         private void Disconnect()
         {
             Socket tmp = _host.es(i);
+            _host.es(null, i);
 
             try
             {
-
-                this.connectionStatus.ForeColor = System.Drawing.Color.Orange;
-                this.connectionStatus.Text = "Disconnecting...";
                 Console.WriteLine("Disconnecting From -> " + IP + ":" + EP.ToString());
                 tmp.Shutdown(SocketShutdown.Both);
                 tmp.Close();
-                _host.es(null, i);
             }
             catch (Exception)
             {
-                if (tmp.Connected) return;
+                if (tmp.Connected)
+                {
+                    _host.es(tmp, i);
+                    return;
+                }
             }
-
 
             this.Disconnected();
 
@@ -570,8 +590,8 @@ namespace PDS_Project_Client
             {
                 this.connectionStatus.ForeColor = System.Drawing.Color.Red;
                 this.connectionStatus.Text = "Disconnected";
-                serverActive.Text = "Not Active";
                 this.serverActive.ForeColor = System.Drawing.Color.Red;
+                serverActive.Text = "Not Active";
                 c_flag = false;
 
                 tb_IP.Enabled = true;
@@ -618,7 +638,7 @@ namespace PDS_Project_Client
             }
             else
             {
-                Console.WriteLine("Deactivation...");
+                //Console.WriteLine("Deactivation...");
                 serverActive.Text = "Not Active";
                 this.serverActive.ForeColor = System.Drawing.Color.Red;
             }
@@ -635,7 +655,7 @@ namespace PDS_Project_Client
             }
             else
             {
-                Console.WriteLine("Activation...");
+                //Console.WriteLine("Activation...");
                 serverActive.Text = "Active";
                 this.serverActive.ForeColor = System.Drawing.Color.Green;
             }
