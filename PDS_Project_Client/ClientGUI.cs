@@ -26,14 +26,14 @@ namespace PDS_Project_Client
     {
 
         private static Host _Host;
-
         private static ServerPanel[] sp = new ServerPanel[4];
-        private static int activePanel;
+        //private static int activePanel;
 
 
         private static VirtualKeyShort _hostHK;
-
         private static VirtualKeyShort _sp0HK, _sp1HK, _sp2HK, _sp3HK;
+
+
 
 
         private static IntPtr KEYhook;
@@ -49,27 +49,26 @@ namespace PDS_Project_Client
 
             _Host = new Host();
 
-            activePanel = -1;
+            sp[0] = new ServerPanel(0, _Host);
+            sp[1] = new ServerPanel(1, _Host);
+            sp[2] = new ServerPanel(2, _Host);
+            sp[3] = new ServerPanel(3, _Host);
+
+            _Host.setPanel(sp[0], sp[1], sp[2], sp[3]);
 
 
             _hostHK = VirtualKeyShort.KEY_Q;
-
 
             _sp0HK = VirtualKeyShort.KEY_0;
             _sp1HK = VirtualKeyShort.KEY_1;
             _sp2HK = VirtualKeyShort.KEY_2;
             _sp3HK = VirtualKeyShort.KEY_3;
 
-
-            sp[0] = new ServerPanel(0, _Host);
-            sp[1] = new ServerPanel(1, _Host);
-            sp[2] = new ServerPanel(2, _Host);
-            sp[3] = new ServerPanel(3, _Host);
-
             InitializeComponent();
 
-            Thread eThread = new Thread((new EventThread()).run);
 
+
+            Thread eThread = new Thread((new EventThread()).run);
             eThread.Start(_Host);
 
 
@@ -119,11 +118,8 @@ namespace PDS_Project_Client
                         WindowsAPI.UnhookWindowsHookEx(MOUSEhook);
 
 
-                        Console.WriteLine("Dectivating: SERVER " + activePanel);
+                        Console.WriteLine("Dectivating: SERVER");
                         _Host.EnqueueMsg(new StopComm());
-
-                        if(activePanel != -1) sp[activePanel].Deactivate();
-                        activePanel = -1;
 
                         return new IntPtr(1);
                     }
@@ -137,14 +133,17 @@ namespace PDS_Project_Client
                     {
 
                         System.Console.WriteLine("HOT KEY ACTIVATION: SERVER 0");
+                        _Host.EnqueueMsg(new StopComm());
+                        _Host.EnqueueMsg(new InitComm(0));
 
+                        /*
                         if ((activePanel != 0) && (activePanel != -1))
                         {
                             Console.WriteLine("Dectivating: SERVER " + activePanel);
                             _Host.EnqueueMsg(new StopComm());
                             sp[activePanel].Deactivate();
                         }
-
+                        
                         if (activePanel != 0)
                         {
                             Console.WriteLine("Activating: SERVER 0");
@@ -152,7 +151,8 @@ namespace PDS_Project_Client
                             activePanel = 0;
                             _Host.EnqueueMsg(new InitComm(activePanel));
                         }
-                        
+                        */
+
                         return new IntPtr(1);
                     }
 
