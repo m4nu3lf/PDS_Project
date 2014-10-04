@@ -976,16 +976,6 @@ namespace PDS_Project_Common
         public HARDWAREINPUT hi;
     }
 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public struct KBDLLHOOKSTRUCT
-    {
-        public uint vkCode;
-        public uint scanCode;
-        public uint flags;
-        public uint time;
-        public long dwExtraInfo;
-    };
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
