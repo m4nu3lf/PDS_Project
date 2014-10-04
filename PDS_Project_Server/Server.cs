@@ -196,7 +196,7 @@ namespace PDS_Project_Server
 
                 if (_obj is StopComm)
                 {
-                    Server.State = new WaitingState();
+                    Server.State = new AuthenticatedState();
                 }
                 else if (_obj is KeyMsg)
                 {
@@ -284,8 +284,7 @@ namespace PDS_Project_Server
         public Server(OnStateChanged onStateChanged)
         {
             _onStateChanged = onStateChanged;
-            State = new DisconnectedState();
-            _state = new StateBase();
+            _state = new DisconnectedState();
             _state.Server = this;
             _serverThread = new Thread(this.Run);
             _serverThread.Start();
@@ -339,16 +338,22 @@ namespace PDS_Project_Server
 
         public void Stop()
         {
-            StateBase prevState = State;
             State = new DisconnectedState();
-            prevState.Signal();
+            lock (_stateLock)
+            {
+                if (!(State is DisconnectedState))
+                    State.Signal();
+            }
         }
 
         public void Terminate()
         {
-            StateBase prevState = State;
             State = null;
-            prevState.Signal();
+            lock (_stateLock)
+            {
+                if (State != null)
+                    State.Signal();
+            }
         }
 
         private Thread _serverThread;
