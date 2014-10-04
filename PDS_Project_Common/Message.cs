@@ -77,41 +77,33 @@ namespace PDS_Project_Common
     [Serializable]
     public class KeyMsg : Message
     {
-        private KEYBDINPUT _ki;
+        public VirtualKeyShort VirtualKey { get; set; }
+        public bool Pressed { get; set; }
+        public uint Time { get; set; }
+    }
 
-        public KeyMsg(KEYBDINPUT ki)
-        {
-            _ki = ki;
-        }
-
-
-        public KEYBDINPUT ki
-        {
-            get { return _ki; }
-            set { _ki = value; }
-        }
-
-
+    public enum MouseEventFlags : uint
+    {
+        LeftButtonDown = 1,
+        LeftButtonUp = 2,
+        RightButtonDown = 4,
+        RightButtonUp = 8,
+        MiddleButtonDown = 16,
+        MiddleButtonUp = 32,
+        Wheel = 64,
+        HWheel = 128,
+        MouseMoved = 256
     }
 
 
     [Serializable]
     public class MouseMsg : Message
     {
-        
-        private MOUSEINPUT _mi;
-
-        public MouseMsg(MOUSEINPUT mi)
-        {
-            _mi = mi;
-        }
-
-
-        public MOUSEINPUT mi
-        {
-            get { return _mi; }
-            set { _mi = value; }
-        }
+        public int Dx { get; set; }
+        public int Dy { get; set; }
+        public int MouseData { get; set; }
+        public int Flags { get; set; }
+        public uint Time { get; set; }
     }
 
 
