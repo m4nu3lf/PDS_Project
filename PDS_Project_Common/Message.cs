@@ -77,7 +77,7 @@ namespace PDS_Project_Common
     [Serializable]
     public class KeyMsg : Message
     {
-        public VirtualKeyShort VirtualKey { get; set; }
+        public short VirtualKey { get; set; }
         public bool Pressed { get; set; }
         public uint Time { get; set; }
     }

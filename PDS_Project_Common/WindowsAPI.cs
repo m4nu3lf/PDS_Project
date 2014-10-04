@@ -976,6 +976,39 @@ namespace PDS_Project_Common
         public HARDWAREINPUT hi;
     }
 
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public struct KBDLLHOOKSTRUCT
+    {
+        public uint vkCode;
+        public uint scanCode;
+        public uint flags;
+        public uint time;
+        public long dwExtraInfo;
+    };
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public struct KBDLLHOOKSTRUCT
+    {
+        public uint vkCode;
+        public uint scanCode;
+        public uint flags;
+        public uint time;
+        public UIntPtr dwExtraInfo;
+    };
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public struct MSLLHOOKSTRUCT
+    {
+        public uint dx;
+        public uint dy;
+        public uint mouseData;
+        public uint flags;
+        public uint time;
+        public UIntPtr dwExtraInfo;
+    }
 
     public delegate IntPtr HookCB(int nCode, IntPtr wParam, IntPtr LParam);
 
