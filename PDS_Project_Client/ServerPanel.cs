@@ -9,7 +9,7 @@ using PDS_Project_Common;
 
 namespace PDS_Project_Client
 {
-    class ServerPanel : System.Windows.Forms.Panel
+    public class ServerPanel : System.Windows.Forms.Panel
     {
 
         private System.Windows.Forms.Button connectB;

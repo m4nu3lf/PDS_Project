@@ -68,12 +68,9 @@ namespace PDS_Project_Client
         }
 
 
-        public void setPanel(ServerPanel sp0, ServerPanel sp1, ServerPanel sp2, ServerPanel sp3) 
+        public void setPanel(ServerPanel sp, int i) 
         { 
-            _sp[0] = sp0;
-            _sp[1] = sp1;
-            _sp[2] = sp2;
-            _sp[3] = sp3;
+            _sp[i] = sp;
         }
 
 

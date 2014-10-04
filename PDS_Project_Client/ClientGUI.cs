@@ -54,7 +54,10 @@ namespace PDS_Project_Client
             sp[2] = new ServerPanel(2, _Host);
             sp[3] = new ServerPanel(3, _Host);
 
-            _Host.setPanel(sp[0], sp[1], sp[2], sp[3]);
+            _Host.setPanel(sp[0], 0);
+            _Host.setPanel(sp[1], 1);
+            _Host.setPanel(sp[2], 2);
+            _Host.setPanel(sp[3], 3);
 
 
             _hostHK = VirtualKeyShort.KEY_Q;
@@ -70,7 +73,6 @@ namespace PDS_Project_Client
 
             Thread eThread = new Thread((new EventThread()).run);
             eThread.Start(_Host);
-
 
         }
 
@@ -95,15 +97,23 @@ namespace PDS_Project_Client
 
         public static IntPtr KeyboardCB(int nCode, IntPtr wParam, IntPtr LParam)
         {
+            
+            KeyMsg km = new KeyMsg(); 
 
             unsafe
             {
-                KEYBDINPUT* kp = (KEYBDINPUT*)LParam.ToPointer();
-                VirtualKeyShort vks = kp->wVk;
-                ScanCodeShort wsc = kp->wScan;
-                KEYEVENTF dwf = kp->dwFlags;
+                KBDLLHOOKSTRUCT* kp = (KBDLLHOOKSTRUCT*)LParam.ToPointer();
+                
+                km.VirtualKey = (short)kp->vkCode;
+                km.Time =  kp->time;
 
-                System.Console.WriteLine("tasto: " + vks.ToString() + "  " + dwf.ToString() + "  " + wsc.ToString());
+                km.Pressed = (wParam.ToInt32() == (int)ButtonEvent.WM_KEYDOWN) ;
+
+                if (wParam.ToInt32() != (int)ButtonEvent.WM_KEYUP) return new IntPtr(1);
+
+
+
+                System.Console.WriteLine("tasto: " + km.VirtualKey.ToString() + "  " + km.Pressed.ToString() + "  " + km.Time.ToString());
 
 
                     Console.WriteLine("CTRL and ALT pressed");
@@ -111,7 +121,7 @@ namespace PDS_Project_Client
 
                     //  HOT KEY HOST 
 
-                    if (vks == _hostHK)
+                    if ( km.VirtualKey == _hostHK)
                     {
 
                         WindowsAPI.UnhookWindowsHookEx(KEYhook);
@@ -129,7 +139,7 @@ namespace PDS_Project_Client
                     // SERVER
 
 
-                    if (vks == _sp0HK)
+                    if ( km.VirtualKey == _sp0HK)
                     {
 
                         System.Console.WriteLine("HOT KEY ACTIVATION: SERVER 0");
@@ -156,9 +166,12 @@ namespace PDS_Project_Client
                         return new IntPtr(1);
                     }
 
+
+
                 /* no hotkey identyfied , enqueing message */
 
-                _Host.EnqueueMsg(new KeyMsg(*kp));
+
+                _Host.EnqueueMsg(km);
 
                 return new IntPtr(1);
             }
@@ -168,14 +181,21 @@ namespace PDS_Project_Client
 
         public static IntPtr MouseCB(int nCode, IntPtr wParam, IntPtr LParam)
         {
+            /*
             unsafe
             {
-                MOUSEINPUT* kp = (MOUSEINPUT*)LParam.ToPointer();
+                MouseMsg mm = new MouseMsg();
 
-                _Host.EnqueueMsg(new MouseMsg(*kp));
+                mm.Dx = ;
+                mm.Dy = ;
+                mm.Flags = ;
+                mm.Time = ;
+                mm.MouseData = ;
+
+                _Host.EnqueueMsg(mm);
 
             }
-
+                */
             return new IntPtr(1);
         }
 
