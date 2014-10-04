@@ -53,10 +53,15 @@ namespace PDS_Project_Client
         /* Control datas */
 
 
-        private Thread cDeamon;
-        private Thread aDeamon;
+        private Thread cDeamon;     //Deamon used to connect
+        private Thread aDeamon;     //Deamon used to manage the Active Label
 
-        private bool c_flag;
+        private Thread dDeamon;     //Deamon used to disconnect
+
+        private bool c_flag;        //Connection flag
+
+
+
 
         private String IP;
         private String PSW;
@@ -65,7 +70,7 @@ namespace PDS_Project_Client
         private UInt16 DP;
 
 
-        delegate void UsefulDelegate();
+        delegate void UsefulDelegate(); //used to change labels
 
 
         public ServerPanel(int index, Host h)
@@ -518,9 +523,19 @@ namespace PDS_Project_Client
             this.connectionStatus.ForeColor = System.Drawing.Color.Orange;
             this.connectionStatus.Text = "Disconnecting...";
 
-            this.cDeamon = new Thread(new ThreadStart(this.Disconnect));
-            this.cDeamon.Start();
+            this.dDeamon = new Thread(new ThreadStart(this.Disconnect));
+            this.dDeamon.Start();
 
+        }
+
+        public void DisconnectionReq()
+        {
+
+            this.connectionStatus.ForeColor = System.Drawing.Color.Orange;
+            this.connectionStatus.Text = "Disconnecting...";
+
+            this.dDeamon = new Thread(new ThreadStart(this.Disconnect));
+            this.dDeamon.Start();
         }
 
 
@@ -533,6 +548,7 @@ namespace PDS_Project_Client
                 Console.WriteLine("Disconnecting From -> " + IP + ":" + EP.ToString());
                 tmp.Shutdown(SocketShutdown.Both);
                 tmp.Close();
+                _host.es(null, i);
             }
             catch (Exception)
             {
