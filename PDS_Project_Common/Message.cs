@@ -17,9 +17,18 @@ namespace PDS_Project_Common
 
     [Serializable]
     public class StopComm : Message
-    { 
+    {
+        private int _i;
 
-        public StopComm(){}
+        public StopComm(int index)
+        {
+            _i = index;
+        }
+
+        public int i
+        {
+            get { return _i; }
+        }
 
     }
 

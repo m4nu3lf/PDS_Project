@@ -78,7 +78,6 @@ namespace PDS_Project_Client
         {
 
             /* putting in the message into the queue */
-
             lock (_q)
             {
                 System.Console.WriteLine("Inserito Messaggio");
@@ -94,8 +93,8 @@ namespace PDS_Project_Client
         public void SendMsg()
         {
             Message m;
-
-            Console.WriteLine("Sending Message...");
+            Queue<Message> _qToSend = new Queue<Message>();
+            int i = 0;
 
             while (_e.WaitOne())
             {
@@ -104,60 +103,84 @@ namespace PDS_Project_Client
 
                 lock (_q)
                 {
-                    m = _q.Dequeue();
+                    while (true)
+                    {
+                        try
+                        {
+                            m = _q.Dequeue();
+                            _qToSend.Enqueue(m);
+                            i++;
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            break;
+                        }
+                    }
                 }
 
-                /* checking type */
-
-                if (m is InitComm)
+                while (i != 0)
                 {
 
-                    Console.WriteLine("InitComm Msg Found");
+                    m = _qToSend.Dequeue();
 
-                    if (_as == -1)
+                    /* checking type */
+
+
+                    if (m is StopComm)
                     {
-                        _as = ((InitComm)m).i; // changing active socket 
-                        _sp[_as].Activate();
+                        if (_as == ((StopComm)m).i)
+                        {
+                            Console.WriteLine("StopComm Msg Not Processed");
+                            return;
+                        }
                     }
-                    else
+
+                    if (m is InitComm)
                     {
-                        return;
+
+                        if (_as == -1)
+                        {
+                            Console.WriteLine("InitComm Msg Processed Well");
+                            _as = ((InitComm)m).i; // changing active socket 
+                            _sp[_as].Activate();
+                        }
+                        else
+                        {
+                            return;
+                        }
+
                     }
-                
+                    
+
+
+                    if ((_as != -1) && (_es[_as] != null))
+                    {
+                        try
+                        {
+                            MsgStream.Send(m, _es[_as]); //sending data
+                            Console.WriteLine("Sent");
+                        }
+                        catch (Exception)
+                        {
+                            Console.WriteLine("Errore nell'invio, chiusura socket.");
+                            _sp[_as].DisconnectionReq();
+                            _as = -1;
+                        }
+                    }
+
+
+                    if (m is StopComm)
+                    {
+                        if (_as != -1)
+                        {
+                            Console.WriteLine("StopComm Msg Processed Well");
+                            _sp[_as].Deactivate();
+                            _as = -1;  // no active socket from now till a new InitComm Message
+                        }
+                    }
+
+                    i--;
                 }
-
-
-
-                if ((_as != -1) && (_es[_as] != null))
-                {
-                    try
-                    {
-                        MsgStream.Send(m, _es[_as]); //sending data
-                        Console.WriteLine("Sent");
-
-                    }
-                    catch (Exception)
-                    {
-                        Console.WriteLine("Errore nell'invio, chiusura socket.");
-                        _es[_as].Close();
-                        _sp[_as].DisconnectionReq();
-                        _as = -1;
-                    }
-                }
-
-
-
-                if (m is StopComm)
-                {
-                    Console.WriteLine("StopComm Msg Found");
-                    if (_as != -1)
-                    {
-                        _sp[_as].Deactivate();
-                        _as = -1;  // no active socket from now till a new InitComm Message
-                    }
-                }
-
-
             }
         }
 

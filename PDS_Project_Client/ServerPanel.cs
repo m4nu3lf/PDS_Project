@@ -520,9 +520,6 @@ namespace PDS_Project_Client
         private void disconnectB_click(Object sender, EventArgs e)
         {
 
-            this.connectionStatus.ForeColor = System.Drawing.Color.Orange;
-            this.connectionStatus.Text = "Disconnecting...";
-
             this.dDeamon = new Thread(new ThreadStart(this.Disconnect));
             this.dDeamon.Start();
 
@@ -530,9 +527,6 @@ namespace PDS_Project_Client
 
         public void DisconnectionReq()
         {
-
-            this.connectionStatus.ForeColor = System.Drawing.Color.Orange;
-            this.connectionStatus.Text = "Disconnecting...";
 
             this.dDeamon = new Thread(new ThreadStart(this.Disconnect));
             this.dDeamon.Start();
@@ -545,6 +539,9 @@ namespace PDS_Project_Client
 
             try
             {
+
+                this.connectionStatus.ForeColor = System.Drawing.Color.Orange;
+                this.connectionStatus.Text = "Disconnecting...";
                 Console.WriteLine("Disconnecting From -> " + IP + ":" + EP.ToString());
                 tmp.Shutdown(SocketShutdown.Both);
                 tmp.Close();
