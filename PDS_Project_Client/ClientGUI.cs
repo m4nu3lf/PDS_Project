@@ -104,7 +104,7 @@ namespace PDS_Project_Client
             {
                 KBDLLHOOKSTRUCT* kp = (KBDLLHOOKSTRUCT*)LParam.ToPointer();
                 
-                km.VirtualKey = (short)kp->vkCode;
+                km.VirtualKey = kp->vkCode;
                 km.Time =  kp->time;
 
                 km.Pressed = (wParam.ToInt32() == (int)ButtonEvent.WM_KEYDOWN) ;
