@@ -939,7 +939,7 @@ namespace PDS_Project_Common
         public VirtualKeyShort wVk;
         public ScanCodeShort wScan;
         public KEYEVENTF dwFlags;
-        public int time;
+        public uint time;
         public UIntPtr dwExtraInfo;
     }
 
