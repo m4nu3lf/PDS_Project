@@ -293,7 +293,7 @@ namespace PDS_Project_Client
             this.hkLabel.Name = "hkLabel";
             this.hkLabel.Size = new System.Drawing.Size(94, 25);
             this.hkLabel.TabIndex = 0;
-            this.hkLabel.Text = "Switch Hotkey: ";
+            this.hkLabel.Text = "Switch HK: ";
 
 
 
@@ -305,7 +305,7 @@ namespace PDS_Project_Client
             this.hotkey.Name = "hotkey";
             this.hotkey.Size = new System.Drawing.Size(100, 25);
             this.hotkey.TabIndex = 0;
-            this.hotkey.Text =  "L.ctrl + L.alt + " + (i+1).ToString();
+            this.hotkey.Text =  hk.ToString();
             this.hotkey.ForeColor = System.Drawing.Color.Blue;
 
 
@@ -423,7 +423,6 @@ namespace PDS_Project_Client
 
             connectB.Click += new EventHandler(this.connectB_click);
             disconnectB.Click += new EventHandler(this.disconnectB_click);
-            sendCB.Click += new EventHandler(this.changeHK_click);
 
 
             //DEFAULT CONFIG
@@ -438,11 +437,10 @@ namespace PDS_Project_Client
 
 
 
-        private void changeHK_click(Object sender, EventArgs e)
+        public void ChangeHK(VirtualKeyShort nVKS)
         {
-
-            //ascolto tastiera;
-
+            hk = nVKS;
+            this.hotkey.Text = nVKS.ToString();
         }
 
 

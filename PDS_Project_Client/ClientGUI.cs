@@ -31,8 +31,11 @@ namespace PDS_Project_Client
         private Thread eThread;
 
         private static VirtualKeyShort _hostHK;
-        private static HookCB s_delegate = new HookCB(switchCB);
+        private static HookCB sk_delegate = new HookCB(KswitchCB);
+        private static HookCB sm_delegate = new HookCB(MswitchCB);
 
+        private static int HKindex;
+        private static VirtualKeyShort nVKS;
 
         /* Keyboard and Mouse events managing variables */
 
@@ -69,6 +72,8 @@ namespace PDS_Project_Client
             eThread = new Thread((new EventThread()).run);
             eThread.Start(_Host);
 
+            MessageBox.Show("Remember: to switch use L.ctrl + L.alt + 'HotKey'.", "How To Switch", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
         }
 
 
@@ -95,11 +100,41 @@ namespace PDS_Project_Client
 
         private void hotkeyB_click(Object sender, EventArgs e) 
         {
+            String s = ((Button)sender).Name;
 
-            MessageBox.Show("Press a Key to change the: " + ((Button)sender).Name + " Then Press Ok.", "Insert new HotKey", MessageBoxButtons.OK);
-            KEYhook = WindowsAPI.SetWindowsHookEx(WindowsAPI.WH_KEYBOARD_LL, s_delegate, IntPtr.Zero, 0); 
-        
+            switch (s)
+            {
+                case "Host HotKey":
+                    HKindex = -1;
+                    break;
+                case "Server1 HotKey":
+                    HKindex = 0;
+                    break;
+                case "Server2 HotKey":
+                    HKindex = 1;
+                    break;
+                case "Server3 HotKey":
+                    HKindex = 2;
+                    break;
+                case "Server4 HotKey":
+                    HKindex = 3;
+                    break;
+            }
+
+            KEYhook = WindowsAPI.SetWindowsHookEx(WindowsAPI.WH_KEYBOARD_LL, sk_delegate, IntPtr.Zero, 0);
+            MOUSEhook = WindowsAPI.SetWindowsHookEx(WindowsAPI.WH_MOUSE_LL, sm_delegate, IntPtr.Zero, 0);
+            if (MessageBox.Show("Press a Key to change the: " + s + ". Then Press Ok to Confirm.", "Capturing new HotKey") == DialogResult.OK)
+            {
+                if (HKindex == -1)
+                {
+                    _hostHK = nVKS;
+                    this.hotkey.Text = nVKS.ToString();
+                }
+                else sp[HKindex].ChangeHK(nVKS);
+            }
+            
         }
+
 
         private void exitB_click(Object sender, EventArgs e)
         {
@@ -108,6 +143,7 @@ namespace PDS_Project_Client
 
         private void continueB_click(Object sender, EventArgs e)
         {
+
             KEYhook = WindowsAPI.SetWindowsHookEx(WindowsAPI.WH_KEYBOARD_LL, k_delegate, IntPtr.Zero, 0);
             MOUSEhook = WindowsAPI.SetWindowsHookEx(WindowsAPI.WH_MOUSE_LL, m_delegate, IntPtr.Zero, 0);
 
@@ -119,13 +155,27 @@ namespace PDS_Project_Client
         /* switch callback */
 
 
-        public static IntPtr switchCB(int nCode, IntPtr wParam, IntPtr LParam)
+
+        public static IntPtr KswitchCB(int nCode, IntPtr wParam, IntPtr LParam)
         {
+
+            unsafe
+            {
+                nVKS = (VirtualKeyShort)((KBDLLHOOKSTRUCT*)LParam.ToPointer())->vkCode;
+            }
+
+
             WindowsAPI.UnhookWindowsHookEx(KEYhook);
+            WindowsAPI.UnhookWindowsHookEx(MOUSEhook);
+            
             return new IntPtr(1);
         }
 
 
+        public static IntPtr MswitchCB(int nCode, IntPtr wParam, IntPtr LParam)
+        {
+            return new IntPtr(1);
+        }
 
         /* Capture Events */
 
