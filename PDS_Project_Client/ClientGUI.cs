@@ -198,31 +198,31 @@ namespace PDS_Project_Client
 
                 switch(wParam.ToInt32()){
                     case (int)MouseEvent.WM_LBUTTONDOWN:
-                        mm.Flags = (int)MouseEventFlags.LeftButtonDown;
+                        mm.Flags = (uint)MouseEventFlags.LeftButtonDown;
                         break;
 
                     case (int)MouseEvent.WM_LBUTTONUP:
-                        mm.Flags = (int)MouseEventFlags.LeftButtonUp;
+                        mm.Flags = (uint)MouseEventFlags.LeftButtonUp;
                         break;
 
                     case (int)MouseEvent.WM_MOUSEMOVE:
-                        mm.Flags = (int)MouseEventFlags.MouseMoved;
+                        mm.Flags = (uint)MouseEventFlags.MouseMoved;
                         break;
 
                     case (int)MouseEvent.WM_MOUSEWHEEL:
-                        mm.Flags = (int)MouseEventFlags.Wheel;
+                        mm.Flags = (uint)MouseEventFlags.Wheel;
                         break;
 
                     case (int)MouseEvent.WM_MOUSEHWHEEL:
-                        mm.Flags = (int)MouseEventFlags.HWheel;
+                        mm.Flags = (uint)MouseEventFlags.HWheel;
                         break;
 
                     case (int)MouseEvent.WM_RBUTTONDOWN:
-                        mm.Flags = (int)MouseEventFlags.RightButtonDown;
+                        mm.Flags = (uint)MouseEventFlags.RightButtonDown;
                         break;
 
                     case (int)MouseEvent.WM_RBUTTONUP:
-                        mm.Flags = (int)MouseEventFlags.RightButtonUp;
+                        mm.Flags = (uint)MouseEventFlags.RightButtonUp;
                         break;
                 
                 }
