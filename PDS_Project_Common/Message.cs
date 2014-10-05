@@ -88,6 +88,14 @@ namespace PDS_Project_Common
     {
         public VirtualKeyShort VirtualKey { get; set; }
         public bool Pressed { get; set; }
+
+        public KeyMsg() { }
+
+        public KeyMsg(VirtualKeyShort vk, bool p)
+        {
+            VirtualKey = vk;
+            Pressed = p;
+        }
     }
 
     public enum MouseEventFlags : uint
@@ -109,7 +117,7 @@ namespace PDS_Project_Common
     {
         public int Dx { get; set; }
         public int Dy { get; set; }
-        public uint MouseData { get; set; }
+        public int MouseData { get; set; }
         public uint Flags { get; set; }
     }
 
