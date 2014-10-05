@@ -35,6 +35,7 @@ namespace PDS_Project_Client
 
         /* Keyboard and Mouse events managing variables */
 
+
         private static IntPtr KEYhook;
         private static IntPtr MOUSEhook;
 
@@ -61,26 +62,48 @@ namespace PDS_Project_Client
             _hostHK = VirtualKeyShort.KEY_Q;
 
             InitializeComponent();
-
-
-
+            
             eThread = new Thread((new EventThread()).run);
             eThread.Start(_Host);
 
         }
 
 
+        private void Quit()
+        {
+            if (MessageBox.Show("The program is going to quit, all the connections will be shutdown. Confirm?", "Closing Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+            {
+                for (int k = 0; k < 4; k++) sp[k].DisconnectionReq();
+                eThread.Abort();
+                Application.Exit();
+            }
+        }
+
+
         /* EVENTS HANDLERS */
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            e.Cancel = true;
+            base.OnClosing(e);
+            this.Quit();
+        }
+
 
         private void hotkeyB_click(Object sender, EventArgs e) { 
         
         }
 
+        private void exitB_click(Object sender, EventArgs e)
+        {
+            this.Quit();
+        }
+
         private void continueB_click(Object sender, EventArgs e)
         {
-
             KEYhook = WindowsAPI.SetWindowsHookEx(WindowsAPI.WH_KEYBOARD_LL, k_delegate, IntPtr.Zero, 0);
             MOUSEhook = WindowsAPI.SetWindowsHookEx(WindowsAPI.WH_MOUSE_LL, m_delegate, IntPtr.Zero, 0);
+          
         }
 
 
@@ -123,32 +146,31 @@ namespace PDS_Project_Client
                 }
              
 
-                    //  HOT KEY HOST 
+                //  HOT KEY HOST 
 
-                    if ( km.VirtualKey == _hostHK &&  !km.Pressed)
+                if ( km.VirtualKey == _hostHK &&  km.Pressed)
+                {
+
+                    WindowsAPI.UnhookWindowsHookEx(KEYhook);
+                    WindowsAPI.UnhookWindowsHookEx(MOUSEhook);
+
+                    //Console.WriteLine("Dectivating: SERVER");
+                    _Host.EnqueueMsg(new StopComm(-1));
+
+                    return new IntPtr(1);
+                }
+
+
+                for (int k = 0; k < 4; k++)
+                {
+                    if ((km.VirtualKey == sp[k].hk) && (km.Pressed))
                     {
-
-                        WindowsAPI.UnhookWindowsHookEx(KEYhook);
-                        WindowsAPI.UnhookWindowsHookEx(MOUSEhook);
-
-
-                        //Console.WriteLine("Dectivating: SERVER");
-                        _Host.EnqueueMsg(new StopComm(-1));
+                        _Host.EnqueueMsg(new StopComm(k));
+                        _Host.EnqueueMsg(new InitComm(k));
 
                         return new IntPtr(1);
                     }
-
-
-                    for (int k = 0; k < 4; k++)
-                    {
-                        if ((km.VirtualKey == sp[k].hk) && (!km.Pressed))
-                        {
-                            _Host.EnqueueMsg(new StopComm(k));
-                            _Host.EnqueueMsg(new InitComm(k));
-
-                            return new IntPtr(1);
-                        }
-                    }
+                }
 
                 /* no hotkey identyfied , enqueing message */
 

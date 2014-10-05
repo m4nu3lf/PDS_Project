@@ -75,6 +75,8 @@ namespace PDS_Project_Client
             this.exitB.Text = "Exit";
             this.exitB.UseVisualStyleBackColor = true;
 
+            this.exitB.Click += new EventHandler(this.exitB_click);
+
 
             // 
             // ContinueB
@@ -221,7 +223,7 @@ namespace PDS_Project_Client
             this.tlp_OUTER.ResumeLayout(false);
             this.panel.ResumeLayout(false);
             this.ResumeLayout(false);
-            
+
 
         }
 

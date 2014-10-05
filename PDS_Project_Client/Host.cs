@@ -128,15 +128,19 @@ namespace PDS_Project_Client
 
                     /* checking type */
 
-                    if ( (m is StopComm) && (_as == ((StopComm)m).i) ) continue;
 
-                    if ( m is InitComm )
+                    if ((m is StopComm) && (_as == ((StopComm)m).i) ) continue;
+
+                    if (m is InitComm)
                     {
-                        if (_as != -1) continue;
-                        else _as = ((InitComm)m).i; // changing active socket 
+                        if (_as != -1)
+                        {
+                            if ( _es[_as]== null ) _as = -1;
+                            else continue;
+                        }
+                        
+                        _as = ((InitComm)m).i; // changing active socket 
                     }
-                    
-
 
                     if ((_as != -1) && (_es[_as] != null))
                     {

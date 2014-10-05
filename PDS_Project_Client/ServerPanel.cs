@@ -404,6 +404,15 @@ namespace PDS_Project_Client
             connectB.Click += new EventHandler(this.connectB_click);
             disconnectB.Click += new EventHandler(this.disconnectB_click);
             chotkeyB.Click += new EventHandler(this.changeHK_click);
+
+
+            //DEFAULT CONFIG
+
+            this.tb_IP.Text = "192.168.1.104";
+            this.tb_EP.Text = "200" + i.ToString();
+            this.tb_DP.Text = "300" + i.ToString();
+            this.tb_PSW.Text = "12345";
+
         }
 
 
@@ -539,17 +548,21 @@ namespace PDS_Project_Client
 
         private void disconnectB_click(Object sender, EventArgs e)
         {
-
-            this.dDeamon = new Thread(new ThreadStart(this.Disconnect));
-            this.dDeamon.Start();
+            if (c_flag)
+            {
+                this.dDeamon = new Thread(new ThreadStart(this.Disconnect));
+                this.dDeamon.Start();
+            }
 
         }
 
         public void DisconnectionReq()
         {
-
-            this.dDeamon = new Thread(new ThreadStart(this.Disconnect));
-            this.dDeamon.Start();
+            if (c_flag)
+            {
+                this.dDeamon = new Thread(new ThreadStart(this.Disconnect));
+                this.dDeamon.Start();
+            }
         }
 
 
