@@ -110,7 +110,7 @@ namespace PDS_Project_Common
     {
         public int Dx { get; set; }
         public int Dy { get; set; }
-        public int MouseData { get; set; }
+        public uint MouseData { get; set; }
         public uint Flags { get; set; }
         public uint Time { get; set; }
     }
