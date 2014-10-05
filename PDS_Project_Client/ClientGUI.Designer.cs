@@ -25,7 +25,13 @@ namespace PDS_Project_Client
         private System.Windows.Forms.Panel panel;
 
 
-        private System.Windows.Forms.Button hotkeyB;
+        private System.Windows.Forms.Button hotkeyBH;
+        private System.Windows.Forms.Button hotkeyBS0;
+        private System.Windows.Forms.Button hotkeyBS1;
+        private System.Windows.Forms.Button hotkeyBS2;
+        private System.Windows.Forms.Button hotkeyBS3;
+
+        private System.Windows.Forms.Label hkLabel;
         private System.Windows.Forms.Label hotkey;
 
 
@@ -55,8 +61,15 @@ namespace PDS_Project_Client
 
 
 
-            this.hotkeyB = new System.Windows.Forms.Button();
+            this.hotkeyBH = new System.Windows.Forms.Button();
+
+            this.hotkeyBS0 = new System.Windows.Forms.Button();
+            this.hotkeyBS1 = new System.Windows.Forms.Button();
+            this.hotkeyBS2 = new System.Windows.Forms.Button();
+            this.hotkeyBS3 = new System.Windows.Forms.Button();
+
             this.hotkey = new System.Windows.Forms.Label();
+            this.hkLabel = new System.Windows.Forms.Label();
 
 
 
@@ -91,27 +104,87 @@ namespace PDS_Project_Client
             this.continueB.Click += new EventHandler(this.continueB_click);
 
             // 
-            // hotkeyB
+            // hotkeyBH
             // 
-            this.hotkeyB.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.hotkeyB.Name = "hotkeyB";
-            this.hotkeyB.Size = new System.Drawing.Size(150, 30);
-            this.hotkeyB.TabIndex = 0;
-            this.hotkeyB.Text = "Change Client HK";
-            this.hotkeyB.UseVisualStyleBackColor = true;
+            this.hotkeyBH.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.hotkeyBH.Name = "Host HotKey";
+            this.hotkeyBH.Size = new System.Drawing.Size(150, 30);
+            this.hotkeyBH.TabIndex = 0;
+            this.hotkeyBH.Text = "C.HK";
+            this.hotkeyBH.UseVisualStyleBackColor = true;
 
-            this.hotkeyB.Click += new EventHandler(this.hotkeyB_click);
+            this.hotkeyBH.Click += new EventHandler(this.hotkeyB_click);
+
+            // 
+            // hotkeyBS0
+            // 
+            this.hotkeyBS0.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.hotkeyBS0.Name = "Server1 HotKey";
+            this.hotkeyBS0.Size = new System.Drawing.Size(150, 30);
+            this.hotkeyBS0.TabIndex = 0;
+            this.hotkeyBS0.Text = "S1.HK";
+            this.hotkeyBS0.UseVisualStyleBackColor = true;
+
+            this.hotkeyBS0.Click += new EventHandler(this.hotkeyB_click);
+
+            // 
+            // hotkeyBS1
+            // 
+            this.hotkeyBS1.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.hotkeyBS1.Name = "Server2 HotKey";
+            this.hotkeyBS1.Size = new System.Drawing.Size(150, 30);
+            this.hotkeyBS1.TabIndex = 0;
+            this.hotkeyBS1.Text = "S2.HK";
+            this.hotkeyBS1.UseVisualStyleBackColor = true;
+
+            this.hotkeyBS1.Click += new EventHandler(this.hotkeyB_click);
+
+            // 
+            // hotkeyBS2
+            // 
+            this.hotkeyBS2.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.hotkeyBS2.Name = "Server3 HotKey";
+            this.hotkeyBS2.Size = new System.Drawing.Size(150, 30);
+            this.hotkeyBS2.TabIndex = 0;
+            this.hotkeyBS2.Text = "S3.HK";
+            this.hotkeyBS2.UseVisualStyleBackColor = true;
+
+            this.hotkeyBS2.Click += new EventHandler(this.hotkeyB_click);
+
+            // 
+            // hotkeyBS3
+            // 
+            this.hotkeyBS3.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.hotkeyBS3.Name = "Server4 HotKey";
+            this.hotkeyBS3.Size = new System.Drawing.Size(150, 30);
+            this.hotkeyBS3.TabIndex = 0;
+            this.hotkeyBS3.Text = "S4.HK";
+            this.hotkeyBS3.UseVisualStyleBackColor = true;
+
+            this.hotkeyBS3.Click += new EventHandler(this.hotkeyB_click);
 
 
+            // 
+            // hkLabel
+            // 
+            this.hkLabel.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.hkLabel.Location = new System.Drawing.Point(3, 50);
+            this.hkLabel.Name = "hkLabel";
+            this.hkLabel.Size = new System.Drawing.Size(94, 30);
+            this.hkLabel.TabIndex = 0;
+            this.hkLabel.Padding = new System.Windows.Forms.Padding(0, 8, 0, 0);
+            this.hkLabel.Text = "Switch Hotkey: ";
 
             // 
             // hotkey
             // 
             this.hotkey.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.hotkey.Name = "hotkey";
-            this.hotkey.Size = new System.Drawing.Size(300, 30);
+            this.hotkey.Size = new System.Drawing.Size(110, 30);
             this.hotkey.TabIndex = 0;
-            this.hotkey.Text = "Actual Client Switch Hotkey: ctrl + alt + Q";
+            this.hotkey.ForeColor = System.Drawing.Color.Blue;
+            this.hotkey.Padding = new System.Windows.Forms.Padding(0, 8, 8, 0);
+            this.hotkey.Text = "L.ctrl + L.alt + Q";
 
 
             // 
@@ -123,17 +196,28 @@ namespace PDS_Project_Client
 
             this.tlp_PANEL.AutoSize = true;
 
-            this.tlp_PANEL.ColumnCount = 5;
-            this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15F));
-            this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 30F));
-            this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 35F));
+            this.tlp_PANEL.ColumnCount = 11;
+            this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8F));
+            this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8F));
+            this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8F));
+            this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8F));
+            this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8F));
+            this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.tlp_PANEL.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
 
-            this.tlp_PANEL.Controls.Add(this.hotkeyB, 0, 0);
+            this.tlp_PANEL.Controls.Add(this.hkLabel, 0, 0);
             this.tlp_PANEL.Controls.Add(this.hotkey, 1, 0);
-            this.tlp_PANEL.Controls.Add(this.continueB, 3, 0);
-            this.tlp_PANEL.Controls.Add(this.exitB, 4, 0);
+            this.tlp_PANEL.Controls.Add(this.hotkeyBH, 3, 0);
+            this.tlp_PANEL.Controls.Add(this.hotkeyBS0, 4, 0);
+            this.tlp_PANEL.Controls.Add(this.hotkeyBS1, 5, 0);
+            this.tlp_PANEL.Controls.Add(this.hotkeyBS2, 6, 0);
+            this.tlp_PANEL.Controls.Add(this.hotkeyBS3, 7, 0);
+            this.tlp_PANEL.Controls.Add(this.continueB, 9, 0);
+            this.tlp_PANEL.Controls.Add(this.exitB, 10, 0);
 
             this.tlp_PANEL.Location = new System.Drawing.Point(0, 0); ;
             this.tlp_PANEL.Name = "tlp_PANEL";

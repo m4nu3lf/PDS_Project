@@ -16,7 +16,8 @@ namespace PDS_Project_Client
 
         private System.Windows.Forms.Button connectB;
         private System.Windows.Forms.Button disconnectB;
-        private System.Windows.Forms.Button chotkeyB;
+        private System.Windows.Forms.Button sendCB;
+        private System.Windows.Forms.Button getCB;
 
         private System.Windows.Forms.Label serverActive;
         private System.Windows.Forms.Label connectionStatus;
@@ -83,19 +84,19 @@ namespace PDS_Project_Client
             switch (i)
             {
                 case 0:
-                    hk = VirtualKeyShort.KEY_0;
-                    break;
-
-                case 1:
                     hk = VirtualKeyShort.KEY_1;
                     break;
 
-                case 2:
+                case 1:
                     hk = VirtualKeyShort.KEY_2;
                     break;
 
-                case 3:
+                case 2:
                     hk = VirtualKeyShort.KEY_3;
+                    break;
+
+                case 3:
+                    hk = VirtualKeyShort.KEY_4;
                     break;
             }
 
@@ -127,7 +128,9 @@ namespace PDS_Project_Client
 
             this.connectB = new System.Windows.Forms.Button();
             this.disconnectB = new System.Windows.Forms.Button();
-            this.chotkeyB = new System.Windows.Forms.Button();
+
+            this.sendCB = new System.Windows.Forms.Button();
+            this.getCB = new System.Windows.Forms.Button();
 
             this.tlp.SuspendLayout();
             this.SuspendLayout();
@@ -244,7 +247,7 @@ namespace PDS_Project_Client
             this.serverIndex.Name = "serverIndex";
             this.serverIndex.Size = new System.Drawing.Size(94, 25);
             this.serverIndex.TabIndex = 0;
-            this.serverIndex.Text = "Server " + i.ToString() + " :";
+            this.serverIndex.Text = "Server " + (i+1).ToString() + " :";
 
 
             // 
@@ -300,9 +303,10 @@ namespace PDS_Project_Client
             this.hotkey.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.hotkey.Location = new System.Drawing.Point(3, 50);
             this.hotkey.Name = "hotkey";
-            this.hotkey.Size = new System.Drawing.Size(94, 30);
+            this.hotkey.Size = new System.Drawing.Size(100, 25);
             this.hotkey.TabIndex = 0;
-            this.hotkey.Text =  "ctrl + alt + " + i.ToString();
+            this.hotkey.Text =  "L.ctrl + L.alt + " + (i+1).ToString();
+            this.hotkey.ForeColor = System.Drawing.Color.Blue;
 
 
 
@@ -330,15 +334,30 @@ namespace PDS_Project_Client
             this.disconnectB.UseVisualStyleBackColor = true;
 
             // 
-            // chotkeyB
+            // sendCB
             // 
-            this.chotkeyB.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.chotkeyB.Location = new System.Drawing.Point(677, 9);
-            this.chotkeyB.Name = "chotkeyB";
-            this.chotkeyB.Size = new System.Drawing.Size(94, 25);
-            this.chotkeyB.TabIndex = 0;
-            this.chotkeyB.Text = "Change HK";
-            this.chotkeyB.UseVisualStyleBackColor = true;
+            this.sendCB.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.sendCB.Location = new System.Drawing.Point(677, 9);
+            this.sendCB.Name = "sendCB";
+            this.sendCB.Size = new System.Drawing.Size(94, 25);
+            this.sendCB.TabIndex = 0;
+            this.sendCB.Text = "Send CB";
+            this.sendCB.Enabled = false;
+            this.sendCB.UseVisualStyleBackColor = true;
+
+
+            // 
+            // getB
+            // 
+            this.getCB.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.getCB.Location = new System.Drawing.Point(677, 9);
+            this.getCB.Name = "chotkeyB";
+            this.getCB.Size = new System.Drawing.Size(94, 25);
+            this.getCB.TabIndex = 0;
+            this.getCB.Text = "Get CB";
+            this.getCB.Enabled = false;
+            this.getCB.UseVisualStyleBackColor = true;
+
 
 
             // 
@@ -391,7 +410,8 @@ namespace PDS_Project_Client
             this.tlp.Controls.Add(this.eportLabel, 0, 4);
             this.tlp.Controls.Add(this.dportLabel, 0, 5);
 
-            this.tlp.Controls.Add(this.chotkeyB, 0, 7);
+            this.tlp.Controls.Add(this.sendCB, 0, 7);
+            this.tlp.Controls.Add(this.getCB, 1, 7);
 
             this.tlp.Controls.Add(this.hkLabel, 0, 6);
             this.tlp.Controls.Add(this.hotkey, 1, 6);
@@ -403,7 +423,7 @@ namespace PDS_Project_Client
 
             connectB.Click += new EventHandler(this.connectB_click);
             disconnectB.Click += new EventHandler(this.disconnectB_click);
-            chotkeyB.Click += new EventHandler(this.changeHK_click);
+            sendCB.Click += new EventHandler(this.changeHK_click);
 
 
             //DEFAULT CONFIG
@@ -535,6 +555,8 @@ namespace PDS_Project_Client
                 tb_EP.Enabled = false;
                 tb_DP.Enabled = false;
                 this.disconnectB.Enabled = true;
+                this.getCB.Enabled = true;
+                this.sendCB.Enabled = true;
                 this.connectB.Enabled = false;
             }
 
@@ -619,6 +641,8 @@ namespace PDS_Project_Client
                 tb_EP.Enabled = true;
                 tb_DP.Enabled = true;
                 this.disconnectB.Enabled = false;
+                this.getCB.Enabled = false;
+                this.sendCB.Enabled = false;
                 this.connectB.Enabled = true;
             }
 

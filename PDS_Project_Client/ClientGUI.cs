@@ -31,6 +31,7 @@ namespace PDS_Project_Client
         private Thread eThread;
 
         private static VirtualKeyShort _hostHK;
+        private static HookCB s_delegate = new HookCB(switchCB);
 
 
         /* Keyboard and Mouse events managing variables */
@@ -92,7 +93,11 @@ namespace PDS_Project_Client
         }
 
 
-        private void hotkeyB_click(Object sender, EventArgs e) { 
+        private void hotkeyB_click(Object sender, EventArgs e) 
+        {
+
+            MessageBox.Show("Press a Key to change the: " + ((Button)sender).Name + " Then Press Ok.", "Insert new HotKey", MessageBoxButtons.OK);
+            KEYhook = WindowsAPI.SetWindowsHookEx(WindowsAPI.WH_KEYBOARD_LL, s_delegate, IntPtr.Zero, 0); 
         
         }
 
@@ -108,6 +113,16 @@ namespace PDS_Project_Client
 
             m_pos = MousePosition;
             
+        }
+
+
+        /* switch callback */
+
+
+        public static IntPtr switchCB(int nCode, IntPtr wParam, IntPtr LParam)
+        {
+            WindowsAPI.UnhookWindowsHookEx(KEYhook);
+            return new IntPtr(1);
         }
 
 
