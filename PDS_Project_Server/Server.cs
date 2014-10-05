@@ -210,7 +210,8 @@ namespace PDS_Project_Server
                         inputs[0].U.ki.dwFlags = KEYEVENTF.KEYUP;
                     else
                         inputs[0].U.ki.dwFlags = 0;
-                    inputs[0].U.ki.time = kMsg.Time;
+                    inputs[0].U.ki.time = 0;
+                    inputs[0].U.ki.dwExtraInfo = (UIntPtr)(UInt64)0;
                     WindowsAPI.SendInput(1, inputs, System.Runtime.InteropServices.Marshal.SizeOf(inputs[0]));
                 }
                 else if (_obj is MouseMsg)
@@ -239,9 +240,12 @@ namespace PDS_Project_Server
                         dwFlags |= MOUSEEVENTF.HWHEEL;
                     if ((mMsg.Flags & (int)MouseEventFlags.MouseMoved) != 0)
                         dwFlags |= MOUSEEVENTF.MOVE;
+                    Console.WriteLine("dx: " + mMsg.Dx);
+                    Console.WriteLine("dy: " + mMsg.Dy);
                     inputs[0].U.mi.dwFlags = dwFlags;
                     inputs[0].U.mi.mouseData = mMsg.MouseData;
-                    inputs[0].U.mi.time = mMsg.Time;
+                    inputs[0].U.mi.time = 0;
+                    inputs[0].U.mi.dwExtraInfo = (UIntPtr)(UInt64)0;
                     WindowsAPI.SendInput(1, inputs, System.Runtime.InteropServices.Marshal.SizeOf(inputs[0]));
                 }
             }
