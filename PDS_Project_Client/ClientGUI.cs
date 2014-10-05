@@ -184,21 +184,53 @@ namespace PDS_Project_Client
 
         public static IntPtr MouseCB(int nCode, IntPtr wParam, IntPtr LParam)
         {
-            /*
+            
             unsafe
             {
                 MouseMsg mm = new MouseMsg();
+                
+                MSLLHOOKSTRUCT* mp = (MSLLHOOKSTRUCT*)LParam.ToPointer();
 
-                mm.Dx = ;
-                mm.Dy = ;
-                mm.Flags = ;
-                mm.Time = ;
-                mm.MouseData = ;
+                mm.Dx = mp->dx;
+                mm.Dy = mp->dy;
+                mm.Time = mp->time;
+                mm.MouseData = mp->mouseData;
+
+                switch(wParam.ToInt32()){
+                    case (int)MouseEvent.WM_LBUTTONDOWN:
+                        mm.Flags = (int)MouseEventFlags.LeftButtonDown;
+                        break;
+
+                    case (int)MouseEvent.WM_LBUTTONUP:
+                        mm.Flags = (int)MouseEventFlags.LeftButtonUp;
+                        break;
+
+                    case (int)MouseEvent.WM_MOUSEMOVE:
+                        mm.Flags = (int)MouseEventFlags.MouseMoved;
+                        break;
+
+                    case (int)MouseEvent.WM_MOUSEWHEEL:
+                        mm.Flags = (int)MouseEventFlags.Wheel;
+                        break;
+
+                    case (int)MouseEvent.WM_MOUSEHWHEEL:
+                        mm.Flags = (int)MouseEventFlags.HWheel;
+                        break;
+
+                    case (int)MouseEvent.WM_RBUTTONDOWN:
+                        mm.Flags = (int)MouseEventFlags.RightButtonDown;
+                        break;
+
+                    case (int)MouseEvent.WM_RBUTTONUP:
+                        mm.Flags = (int)MouseEventFlags.RightButtonUp;
+                        break;
+                
+                }
 
                 _Host.EnqueueMsg(mm);
 
             }
-                */
+            
             return new IntPtr(1);
         }
 

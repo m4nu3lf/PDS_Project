@@ -1002,9 +1002,9 @@ namespace PDS_Project_Common
     [StructLayout(LayoutKind.Sequential)]
     public struct MSLLHOOKSTRUCT
     {
-        public uint dx;
-        public uint dy;
-        public uint mouseData;
+        public int dx;
+        public int dy;
+        public int mouseData;
         public uint flags;
         public uint time;
         public UIntPtr dwExtraInfo;
