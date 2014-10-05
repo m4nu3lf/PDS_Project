@@ -54,9 +54,10 @@ namespace PDS_Project_Server
             _bottomBorder.BackColor = Color.Yellow;
             _topBorder.BackColor = Color.Yellow;
 
-            while (_running)
+            while (true)
             {
                 _blinkEvnt.WaitOne();
+                if (!_running) break;
                 for (int i = 0; i < 3; i++)
                 {
                     Show();
@@ -118,6 +119,7 @@ namespace PDS_Project_Server
         public void Terminate()
         {
             _running = false;
+            _blinkEvnt.Set();
         }
     }
 }

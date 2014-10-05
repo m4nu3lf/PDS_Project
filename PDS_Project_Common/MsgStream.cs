@@ -25,9 +25,15 @@ namespace PDS_Project_Common
 
         public static object Receive(Socket s)
         {
-            int len = BitConverter.ToInt32(ReceiveN(s, 4), 0);
+            byte[] res = ReceiveN(s, 4);
+            if (res == null)
+                return null;
+            int len = BitConverter.ToInt32(res, 0);
             BinaryFormatter bf = new BinaryFormatter();
-            Stream stream = new MemoryStream(ReceiveN(s, len));
+            res = ReceiveN(s, len);
+            if (res == null)
+                return null;
+            Stream stream = new MemoryStream(res);
             return bf.Deserialize(stream);
         }
 
@@ -37,7 +43,10 @@ namespace PDS_Project_Common
             int readBytes = 0;
             while (readBytes < len)
             {
-                readBytes += s.Receive(buffer, readBytes, len - readBytes, SocketFlags.None);
+                int res = s.Receive(buffer, readBytes, len - readBytes, SocketFlags.None);
+                if (res == 0)
+                    return null;
+                readBytes += res;
             }
             return buffer;
         }

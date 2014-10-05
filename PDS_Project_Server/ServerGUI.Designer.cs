@@ -18,8 +18,9 @@
                 components.Dispose();
             }
             base.Dispose(disposing);
-            System.Console.WriteLine("here");
-            _server.Terminate();
+            if (_server != null)
+                _server.Terminate();
+            _blinking.Terminate();
         }
 
         #region Codice generato da Progettazione Windows Form
@@ -53,6 +54,8 @@
             this.psswBox.Name = "psswBox";
             this.psswBox.Size = new System.Drawing.Size(162, 20);
             this.psswBox.TabIndex = 0;
+            this.psswBox.Text = "12345";
+            this.psswBox.TextChanged += new System.EventHandler(this.psswBox_TextChanged);
             // 
             // label1
             // 
@@ -121,10 +124,11 @@
             this.eventsPortUpDown.TabIndex = 8;
             this.eventsPortUpDown.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.eventsPortUpDown.Value = new decimal(new int[] {
-            1024,
+            2000,
             0,
             0,
             0});
+            this.eventsPortUpDown.ValueChanged += new System.EventHandler(this.eventsPortUpDown_ValueChanged);
             // 
             // clipboardUpDown
             // 
@@ -145,7 +149,7 @@
             this.clipboardUpDown.TabIndex = 9;
             this.clipboardUpDown.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.clipboardUpDown.Value = new decimal(new int[] {
-            1024,
+            3000,
             0,
             0,
             0});

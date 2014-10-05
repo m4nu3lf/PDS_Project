@@ -119,6 +119,8 @@ namespace PDS_Project_Server
                 try
                 {
                     _obj = MsgStream.Receive(Server._commSocket);
+                    if (_obj == null)
+                        Server.State = new WaitingState();
                 }
                 catch (SocketException)
                 {
@@ -283,6 +285,7 @@ namespace PDS_Project_Server
 
         public Server(OnStateChanged onStateChanged)
         {
+            _running = true;
             _onStateChanged = onStateChanged;
             _state = new DisconnectedState();
             _state.Server = this;
@@ -292,7 +295,7 @@ namespace PDS_Project_Server
 
         public void Run()
         {
-            while (_state != null)
+            while (_running)
             {
                 _state.Update();
 
@@ -348,12 +351,8 @@ namespace PDS_Project_Server
 
         public void Terminate()
         {
-            State = null;
-            lock (_stateLock)
-            {
-                if (State != null)
-                    State.Signal();
-            }
+            _running = false;
+            State.Signal();
         }
 
         private Thread _serverThread;
@@ -365,5 +364,7 @@ namespace PDS_Project_Server
         private StateBase _newState;
         private Object _newStateLock = new Object();
         private OnStateChanged _onStateChanged;
+
+        private bool _running;
     }
 }

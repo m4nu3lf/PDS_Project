@@ -37,12 +37,32 @@ namespace PDS_Project_Server
             _notifyIcon.Icon = _inactiveIcon;
             _notifyIcon.DoubleClick += notifyIcon_DoubleClick;
 
-            // Get local IP address
-            IPAddress[] ipAs = Dns.GetHostAddresses(Dns.GetHostName());
-            ipBox.Text = (ipAs[1]).ToString();
-            _serverAddress = ipAs[1];
+            // Look for an IPv4 address
+            foreach (IPAddress address in Dns.GetHostAddresses(Dns.GetHostName()))
+            {
+                if (address.AddressFamily == AddressFamily.InterNetwork
+                    && address.ToString() != "127.0.0.1")
+                    _serverAddress = address;
+            }
 
-            _server = new Server(this.server_StateChange);
+            // Check if no IPv4 available
+            if (_serverAddress == null)
+                foreach (IPAddress address in Dns.GetHostAddresses(Dns.GetHostName()))
+                {
+                    if (address.AddressFamily == AddressFamily.InterNetworkV6
+                        && address.ToString() !=  "::1")
+                        _serverAddress = address;
+                }
+
+            if (_serverAddress != null)
+            {
+                ipBox.Text = _serverAddress.ToString();
+                _server = new Server(this.server_StateChange);
+            }
+            else
+            {
+                ipBox.Text = "Error: No interface found!";
+            }
 
             _blinking = new Blinking();
         }
@@ -149,6 +169,16 @@ namespace PDS_Project_Server
                 if (newState != null)
                     statusLabel.Text = newState.ToString();
             }
+        }
+
+        private void psswBox_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void eventsPortUpDown_ValueChanged(object sender, EventArgs e)
+        {
+
         }
 
     }
