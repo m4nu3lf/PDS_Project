@@ -42,6 +42,8 @@ namespace PDS_Project_Client
         private static HookCB k_delegate = new HookCB(KeyboardCB);
         private static HookCB m_delegate = new HookCB(MouseCB);
 
+        private static Point m_pos;
+        private static bool CTRL, ALT;
 
         public ClientGUI()
         {
@@ -103,7 +105,8 @@ namespace PDS_Project_Client
         {
             KEYhook = WindowsAPI.SetWindowsHookEx(WindowsAPI.WH_KEYBOARD_LL, k_delegate, IntPtr.Zero, 0);
             MOUSEhook = WindowsAPI.SetWindowsHookEx(WindowsAPI.WH_MOUSE_LL, m_delegate, IntPtr.Zero, 0);
-          
+
+            m_pos = MousePosition;
         }
 
 
@@ -114,14 +117,13 @@ namespace PDS_Project_Client
         public static IntPtr KeyboardCB(int nCode, IntPtr wParam, IntPtr LParam)
         {
             
-            KeyMsg km = new KeyMsg(); 
+            KeyMsg km = new KeyMsg();
 
             unsafe
             {
                 KBDLLHOOKSTRUCT* kp = (KBDLLHOOKSTRUCT*)LParam.ToPointer();
                 
                 km.VirtualKey = (VirtualKeyShort) kp->vkCode;
-                km.Time =  kp->time;
 
 
                 switch(wParam.ToInt32()){
@@ -144,31 +146,39 @@ namespace PDS_Project_Client
                     default: return new IntPtr(1);
                 
                 }
-             
 
-                //  HOT KEY HOST 
+                if (km.VirtualKey == VirtualKeyShort.LMENU) ALT = km.Pressed;
+                if (km.VirtualKey == VirtualKeyShort.LCONTROL) CTRL = km.Pressed;
+                if (km.VirtualKey == VirtualKeyShort.RMENU) ALT = km.Pressed;
+                if (km.VirtualKey == VirtualKeyShort.RCONTROL) CTRL = km.Pressed;
 
-                if ( km.VirtualKey == _hostHK &&  km.Pressed)
+                if (CTRL && ALT)
                 {
 
-                    WindowsAPI.UnhookWindowsHookEx(KEYhook);
-                    WindowsAPI.UnhookWindowsHookEx(MOUSEhook);
+                    //  HOT KEY HOST 
 
-                    //Console.WriteLine("Dectivating: SERVER");
-                    _Host.EnqueueMsg(new StopComm(-1));
-
-                    return new IntPtr(1);
-                }
-
-
-                for (int k = 0; k < 4; k++)
-                {
-                    if ((km.VirtualKey == sp[k].hk) && (km.Pressed))
+                    if (km.VirtualKey == _hostHK && km.Pressed)
                     {
-                        _Host.EnqueueMsg(new StopComm(k));
-                        _Host.EnqueueMsg(new InitComm(k));
+
+                        WindowsAPI.UnhookWindowsHookEx(KEYhook);
+                        WindowsAPI.UnhookWindowsHookEx(MOUSEhook);
+
+                        //Console.WriteLine("Dectivating: SERVER");
+                        _Host.EnqueueMsg(new StopComm(-1));
 
                         return new IntPtr(1);
+                    }
+
+
+                    for (int k = 0; k < 4; k++)
+                    {
+                        if ((km.VirtualKey == sp[k].hk) && (km.Pressed))
+                        {
+                            _Host.EnqueueMsg(new StopComm(k));
+                            _Host.EnqueueMsg(new InitComm(k));
+
+                            return new IntPtr(1);
+                        }
                     }
                 }
 
@@ -191,9 +201,8 @@ namespace PDS_Project_Client
                 
                 MSLLHOOKSTRUCT* mp = (MSLLHOOKSTRUCT*)LParam.ToPointer();
 
-                mm.Dx = mp->dx;
-                mm.Dy = mp->dy;
-                mm.Time = mp->time;
+                mm.Dx = (mp->dx) - m_pos.X;
+                mm.Dy = (mp->dy) - m_pos.Y;
                 mm.MouseData = mp->mouseData;
 
                 switch(wParam.ToInt32()){

@@ -596,8 +596,15 @@ namespace PDS_Project_Client
 
             if (this.disconnectB.InvokeRequired)
             {
-                UsefulDelegate md = new UsefulDelegate(Disconnected);
-                this.Invoke(md);
+                try
+                {
+                    UsefulDelegate md = new UsefulDelegate(Disconnected);
+                    this.Invoke(md);
+                }
+                catch (System.ObjectDisposedException)
+                {
+                    Console.WriteLine("Errore nell'uscita.");
+                }
             }
             else
             {
