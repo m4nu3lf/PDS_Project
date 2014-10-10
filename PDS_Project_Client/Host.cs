@@ -136,7 +136,7 @@ namespace PDS_Project_Client
                             }
                             catch (Exception)
                             {
-                                Console.WriteLine("Errore nell'invio: chiusura socket.");
+                                Console.WriteLine("Errore nell'invio: chiusura sockets.");
                                 _sp[_eas].DisconnectionReq();
                                 _eas = -1;
                                 continue;
@@ -175,24 +175,52 @@ namespace PDS_Project_Client
             _de.Set(); // setting the event to wake the thread
         }
 
-        public void SendCBMsg()
+
+        public void ReceiveCBMsg()
         {
+
             Message m;
             int i = 0;
 
             while (true)
             {
-                while (_ee.WaitOne())
+
+                while (_de.WaitOne())
                 {
-                }
-            }
-        }
 
-        public String ReceiveClipboard()
-        {
-            return "prova";
-        }
+                    lock (_dq) { m = _dq.Dequeue(); }
+                    i = ((GetMsgCBP)m).i;
 
+                    if (_ds[i] != null)
+                    {
+
+                        try
+                        {
+                            MsgStream.Send(m, _ds[i]);
+                            m = (Message)MsgStream.Receive(_ds[i]);
+
+                            if (m is TextMsgCBP) //TEXTMSG
+                            { 
+                            }
+
+                            if (m is TextMsgCBP) //TEXTMSG
+                            {
+                            }
+
+                        }
+                        catch (Exception)
+                        {
+                            Console.WriteLine("Errore nella richiesta CB: chiusura sockets e disconnessione.");
+                            _sp[i].DisconnectionReq();
+                        }
+
+                    }//end checking socket nullity
+
+                }//end wait condition
+
+            }//end infinite loop
+
+        }//end ReceiveCBMsg
 
 
 

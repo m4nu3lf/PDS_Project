@@ -162,6 +162,8 @@ namespace PDS_Project_Common
         private int _i;
 
         public GetMsgCBP(int index) { _i = index; }
+
+        public int i { get { return _i; } }
             
     }
 

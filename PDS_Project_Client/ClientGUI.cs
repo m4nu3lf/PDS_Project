@@ -83,7 +83,7 @@ namespace PDS_Project_Client
 
         private void Quit()
         {
-            if (MessageBox.Show("The program is going to quit, all the connections will be shutdown. Confirm?", "Closing Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+            if (MessageBox.Show("The program is going to quit, all the connections will be shutdown.\nConfirm?", "Closing Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
                 for (int k = 0; k < 4; k++) _sp[k].DisconnectionReq();
                 eThread.Abort();
@@ -133,7 +133,7 @@ namespace PDS_Project_Client
 
             KEYhook = WindowsAPI.SetWindowsHookEx(WindowsAPI.WH_KEYBOARD_LL, sk_delegate, IntPtr.Zero, 0);
             MOUSEhook = WindowsAPI.SetWindowsHookEx(WindowsAPI.WH_MOUSE_LL, sm_delegate, IntPtr.Zero, 0);
-            if (MessageBox.Show("Press a Key to change the: " + s + ". Then Press Ok to Confirm.", "Capturing new HotKey") == DialogResult.OK)
+            if (MessageBox.Show("Press a Key to change the: " + s + ".\nThen Press Ok to Confirm.", "Capturing new HotKey") == DialogResult.OK)
             {
                 if (_HKindex == -1)
                 {
