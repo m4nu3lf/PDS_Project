@@ -167,17 +167,11 @@ namespace PDS_Project_Common
     [Serializable]
     public class InitFileMsgCBP : Message
     {
-        private int _i;
         private StringCollection _sc;
 
-        public InitFileMsgCBP(int index, StringCollection sc)
-        { 
-            _i = index;
-            _sc = sc;
-        }
+        public InitFileMsgCBP(StringCollection sc){ _sc = sc; }
 
-        public int i { get { return _i; } }
-        public StringEnumerator sc { get { return _sc.GetEnumerator(); } }
+        public StringCollection sc { get { return _sc; } }
             
     }
 
@@ -196,7 +190,11 @@ namespace PDS_Project_Common
         public string name { get; set; }
         public Byte[] content { get; set; }
 
-        public FileMsgCBP(string n){ name = n; }
+        public FileMsgCBP(string n, Byte[] c)
+        {
+            content = c;
+            name = n; 
+        }
 
     }
 
