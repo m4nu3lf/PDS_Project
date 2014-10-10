@@ -193,18 +193,39 @@ namespace PDS_Project_Client
 
                     if (_ds[i] != null)
                     {
-
+                        
                         try
                         {
                             MsgStream.Send(m, _ds[i]);
                             m = (Message)MsgStream.Receive(_ds[i]);
 
-                            if (m is TextMsgCBP) //TEXTMSG
-                            { 
-                            }
 
                             if (m is TextMsgCBP) //TEXTMSG
                             {
+                                string content = ((TextMsgCBP)m).content;
+                                System.Windows.Forms.Clipboard.SetText(content);
+                            }
+
+                            if (m is InitFileMsgCBP) //FILEMSG
+                            {
+
+                                System.Windows.Forms.MessageBox.Show("Receiving file/s from server: " + i.ToString()
+                                    + " .\nYou will be advised when the transfer is completed.", "Starting Transfer",
+                                    System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
+
+                                //chiamo il metodo
+
+                                System.Windows.Forms.MessageBox.Show("File/s received from server: " + i.ToString()
+                                    + " .", "Transfer completed",
+                                    System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
+                            
+                            }
+
+                            if (m is MaxSizeMsgCBP) 
+                            { 
+                                //se confermo
+                                //chiamo metodo per ricevere file
+                                //se non confermo esco
                             }
 
                         }

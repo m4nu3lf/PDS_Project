@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using PDS_Project_Common;
+using System.IO;
 
 namespace PDS_Project_Client
 {
@@ -433,7 +434,7 @@ namespace PDS_Project_Client
             //DEFAULT CONFIG
 
             //this.tb_IP.Text = "169.254.162.184";
-            this.tb_IP.Text = "172.20.90.43";
+            this.tb_IP.Text = "172.20.90.244";
             this.tb_EP.Text = "200" + i.ToString();
             this.tb_DP.Text = "300" + i.ToString();
             this.tb_PSW.Text = "12345";
@@ -748,21 +749,36 @@ namespace PDS_Project_Client
         
         private void sendClipboardDatas()
         {
-            MessageBox.Show("Sending clipboard to server:" + i.ToString() + ". \nYou will be advised when the transfer is completed.", "Starting Transfer", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-            if (Clipboard.ContainsData(DataFormats.Text))
+            //MessageBox.Show("Sending clipboard to server:" + i.ToString() + " .\nYou will be advised when the transfer is completed.", "Starting Transfer", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            
+            try
             {
-                string txt = Clipboard.GetText();
-                Console.WriteLine("2.Testo ritirato dalla CB: " + txt);
-                try
+
+                if (Clipboard.ContainsData(DataFormats.Text))
                 {
-                    MsgStream.Send(new TextMsgCBP(txt), _host.ds(i));
-                    MessageBox.Show("Clipboard sent to server:" + i.ToString() + ". \nCheck on it.", "Transfer Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    string txt = Clipboard.GetText();
+                        MsgStream.Send(new TextMsgCBP(txt), _host.ds(i));
+                        //MessageBox.Show("Clipboard sent to server:" + i.ToString() + " .\nCheck on it.", "Transfer Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        
                 }
-                catch (Exception)
+
+                if (Clipboard.ContainsFileDropList()) 
                 {
-                    MessageBox.Show("Unable to send clipboard to server:" + i.ToString() + ".", "Transfer Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+                    //chiamo il metodo per inviare.
+                    FileAttributes attr = File.GetAttributes("c:\\Temp");
+
+
+                    if ( (attr & FileAttributes.Directory) == FileAttributes.Directory )
+                        MessageBox.Show("Its a directory");
+                    else
+                        MessageBox.Show("Its a file");
                 }
+
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Clipboard Transfer Error.");
             }
 
             EnableCBTransfers();

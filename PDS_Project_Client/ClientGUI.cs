@@ -74,6 +74,7 @@ namespace PDS_Project_Client
             eThread.Start(_Host);
 
             dThread = new Thread((new DataThread()).run);
+            dThread.SetApartmentState(ApartmentState.STA);
             dThread.Start(_Host);
 
             MessageBox.Show("Remember: to switch use L.ctrl + L.alt + 'HotKey'.", "How To Switch", MessageBoxButtons.OK, MessageBoxIcon.Warning);
