@@ -144,14 +144,14 @@ namespace PDS_Project_Client
 
                             if (m is InitComm)
                             {
-                                _sp[_eas].Activate();
+                                _sp[_eas].Activation();
                                 continue;
                             }
 
                             if (m is StopComm)
                             {
                                 //Console.WriteLine("StopComm Msg Processed Well");
-                                _sp[_eas].Deactivate();
+                                _sp[_eas].Deactivation();
                                 _eas = -1;  // no active socket from now till a new InitComm Message
                             }
 

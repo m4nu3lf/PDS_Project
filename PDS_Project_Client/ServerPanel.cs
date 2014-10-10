@@ -552,8 +552,8 @@ namespace PDS_Project_Client
 
             if (this.disconnectB.InvokeRequired)
             {
-                UsefulDelegate md = new UsefulDelegate(Connected);
-                this.Invoke(md);
+                UsefulDelegate ud = new UsefulDelegate(Connected);
+                this.Invoke(ud);
             }
             else
             {
@@ -638,8 +638,8 @@ namespace PDS_Project_Client
             {
                 try
                 {
-                    UsefulDelegate md = new UsefulDelegate(Disconnected);
-                    this.Invoke(md);
+                    UsefulDelegate ud = new UsefulDelegate(Disconnected);
+                    this.Invoke(ud);
                 }
                 catch (System.ObjectDisposedException)
                 {
@@ -691,12 +691,12 @@ namespace PDS_Project_Client
         }
 
 
-        private void Deactivation()
+        public void Deactivation()
         {
             if (this.serverActive.InvokeRequired)
             {
-                UsefulDelegate ad = new UsefulDelegate(Deactivation);
-                this.Invoke(ad);
+                UsefulDelegate ud = new UsefulDelegate(Deactivation);
+                this.Invoke(ud);
             }
             else
             {
@@ -707,13 +707,13 @@ namespace PDS_Project_Client
         }
 
 
-        private void Activation()
+        public void Activation()
         {
 
             if (this.serverActive.InvokeRequired)
             {
-                UsefulDelegate ad = new UsefulDelegate(Activation);
-                this.Invoke(ad);
+                UsefulDelegate ud = new UsefulDelegate(Activation);
+                this.Invoke(ud);
             }
             else
             {
@@ -739,30 +739,50 @@ namespace PDS_Project_Client
         private void sendCB_click(Object o, EventArgs e)
         {
             sendCBB.Enabled = false;
+
             CBDeamon = new Thread(sendClipboardDatas);
+            CBDeamon.SetApartmentState(ApartmentState.STA);
             CBDeamon.Start();
         }
 
+        
         private void sendClipboardDatas()
         {
-            MessageBox.Show("Sending clipboard to server:" + i.ToString() +". \nYou will be advised when the transfer is completed.", "Starting Transfer", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Sending clipboard to server:" + i.ToString() + ". \nYou will be advised when the transfer is completed.", "Starting Transfer", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-            if (Clipboard.ContainsText())
+            if (Clipboard.ContainsData(DataFormats.Text))
             {
                 string txt = Clipboard.GetText();
+                Console.WriteLine("2.Testo ritirato dalla CB: " + txt);
                 try
                 {
                     MsgStream.Send(new TextMsgCBP(txt), _host.ds(i));
+                    MessageBox.Show("Clipboard sent to server:" + i.ToString() + ". \nCheck on it.", "Transfer Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception)
                 {
-                    MessageBox.Show("Unable to send clipboard to server:" + i.ToString() + ". \nCheck on it.", "Starting Transfer", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
+                    MessageBox.Show("Unable to send clipboard to server:" + i.ToString() + ".", "Transfer Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
-
             }
 
-            MessageBox.Show("Clipboard sent to server:" + i.ToString() + ". \nCheck on it.", "Starting Transfer", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            EnableCBTransfers();
+            return;
+
+        }
+
+
+        private void EnableCBTransfers()
+        {
+
+            if (this.serverActive.InvokeRequired)
+            {
+                UsefulDelegate ud = new UsefulDelegate(EnableCBTransfers);
+                this.Invoke(ud);
+            }
+            else
+            {
+                sendCBB.Enabled = true;
+            }
 
         }
 
