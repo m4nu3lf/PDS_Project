@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.Specialized;
 
 namespace PDS_Project_Common
 {
@@ -10,6 +11,7 @@ namespace PDS_Project_Common
     [Serializable]
     public class Message
     {
+        static int MaxSize = 1024*1024*1024;
         public Message() { }
 
     }
@@ -127,8 +129,25 @@ namespace PDS_Project_Common
     }
 
 
+
+
     /* CLIPBOARD MSG PROTOCOL */
 
+
+    [Serializable]
+    public class GetMsgCBP : Message
+    {
+        private int _i;
+
+        public GetMsgCBP(int index) { _i = index; }
+
+        public int i { get { return _i; } }
+
+    }
+
+
+
+    /* TEXT PROTOCOL */
 
     [Serializable]
     public class TextMsgCBP : Message
@@ -141,30 +160,63 @@ namespace PDS_Project_Common
 
     }
 
+
+
+    /* FILE PROTOCOL */
+    
+    [Serializable]
+    public class InitFileMsgCBP : Message
+    {
+        private int _i;
+        private StringCollection _sc;
+
+        public InitFileMsgCBP(int index, StringCollection sc)
+        { 
+            _i = index;
+            _sc = sc;
+        }
+
+        public int i { get { return _i; } }
+        public StringEnumerator sc { get { return _sc.GetEnumerator(); } }
+            
+    }
+
+    [Serializable]
+    public class DirMsgCBP : Message
+    {
+        public string name { get; set; }
+
+        public DirMsgCBP(string n) { name = n; }
+
+    }
+
     [Serializable]
     public class FileMsgCBP : Message
     {
         public string name { get; set; }
-        public Byte[] content;
+        public Byte[] content { get; set; }
 
-        public FileMsgCBP(string n, Byte[] c) 
-        {
-            name = n;
-            content = c;
-        }
+        public FileMsgCBP(string n){ name = n; }
 
     }
 
 
     [Serializable]
-    public class GetMsgCBP : Message
+    public class StopMsgCBP : Message
     {
-        private int _i;
+        public StopMsgCBP() { }
+    }
 
-        public GetMsgCBP(int index) { _i = index; }
+    [Serializable]
+    public class ConfirmMsgCBP : Message
+    {
+        public ConfirmMsgCBP() { }
+    }
 
-        public int i { get { return _i; } }
-            
+    [Serializable]
+    public class MaxSizeMsgCBP : Message
+    {
+        public MaxSizeMsgCBP() { }
     }
 
 
