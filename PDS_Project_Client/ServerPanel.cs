@@ -751,35 +751,22 @@ namespace PDS_Project_Client
         {
             //MessageBox.Show("Sending clipboard to server:" + i.ToString() + " .\nYou will be advised when the transfer is completed.", "Starting Transfer", MessageBoxButtons.OK, MessageBoxIcon.Information);
             
-            try
-            {
 
-                if (Clipboard.ContainsData(DataFormats.Text))
-                {
-                    string txt = Clipboard.GetText();
-                        MsgStream.Send(new TextMsgCBP(txt), _host.ds(i));
-                        //MessageBox.Show("Clipboard sent to server:" + i.ToString() + " .\nCheck on it.", "Transfer Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if (Clipboard.ContainsData(DataFormats.Text))
+            {
+                string txt = Clipboard.GetText();
+                    MsgStream.Send(new TextMsgCBP(txt), _host.ds(i));
+                    //MessageBox.Show("Clipboard sent to server:" + i.ToString() + " .\nCheck on it.", "Transfer Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         
-                }
-
-                if (Clipboard.ContainsFileDropList()) 
-                {
-
-                    //chiamo il metodo per inviare.
-                    FileAttributes attr = File.GetAttributes("c:\\Temp");
-
-
-                    if ( (attr & FileAttributes.Directory) == FileAttributes.Directory )
-                        MessageBox.Show("Its a directory");
-                    else
-                        MessageBox.Show("Its a file");
-                }
-
             }
-            catch (Exception)
+
+            if (Clipboard.ContainsFileDropList()) 
             {
-                Console.WriteLine("Clipboard Transfer Error.");
+
+                //chiamo il metodo per inviare.
+                ClipboardFiles.SendClipboardFiles(null);
             }
+
 
             EnableCBTransfers();
             return;

@@ -32,7 +32,6 @@ namespace PDS_Project_Server
 
                     }
                 }
-                else if()
             }
 
             public override string GetMsg()
