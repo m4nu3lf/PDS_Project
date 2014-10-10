@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,8 +17,8 @@ namespace PDS_Project_Client
 
         private System.Windows.Forms.Button connectB;
         private System.Windows.Forms.Button disconnectB;
-        private System.Windows.Forms.Button sendCB;
-        private System.Windows.Forms.Button getCB;
+        private System.Windows.Forms.Button sendCBB;
+        private System.Windows.Forms.Button getCBB;
 
         private System.Windows.Forms.Label serverActive;
         private System.Windows.Forms.Label connectionStatus;
@@ -62,6 +63,7 @@ namespace PDS_Project_Client
         private Thread dDeamon;     //Deamon used to disconnect
         private Thread aDeamon;     //Deamon used to manage the Active Label
 
+        private Thread CBDeamon;    //Deamon used to send Clipboard Datas
 
         private bool c_flag;        //Connection flag
 
@@ -129,8 +131,8 @@ namespace PDS_Project_Client
             this.connectB = new System.Windows.Forms.Button();
             this.disconnectB = new System.Windows.Forms.Button();
 
-            this.sendCB = new System.Windows.Forms.Button();
-            this.getCB = new System.Windows.Forms.Button();
+            this.sendCBB = new System.Windows.Forms.Button();
+            this.getCBB = new System.Windows.Forms.Button();
 
             this.tlp.SuspendLayout();
             this.SuspendLayout();
@@ -336,27 +338,27 @@ namespace PDS_Project_Client
             // 
             // sendCB
             // 
-            this.sendCB.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.sendCB.Location = new System.Drawing.Point(677, 9);
-            this.sendCB.Name = "sendCB";
-            this.sendCB.Size = new System.Drawing.Size(94, 25);
-            this.sendCB.TabIndex = 0;
-            this.sendCB.Text = "Send CB";
-            this.sendCB.Enabled = false;
-            this.sendCB.UseVisualStyleBackColor = true;
+            this.sendCBB.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.sendCBB.Location = new System.Drawing.Point(677, 9);
+            this.sendCBB.Name = "sendCBB";
+            this.sendCBB.Size = new System.Drawing.Size(94, 25);
+            this.sendCBB.TabIndex = 0;
+            this.sendCBB.Text = "Send CB";
+            this.sendCBB.Enabled = false;
+            this.sendCBB.UseVisualStyleBackColor = true;
 
 
             // 
             // getB
             // 
-            this.getCB.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.getCB.Location = new System.Drawing.Point(677, 9);
-            this.getCB.Name = "chotkeyB";
-            this.getCB.Size = new System.Drawing.Size(94, 25);
-            this.getCB.TabIndex = 0;
-            this.getCB.Text = "Get CB";
-            this.getCB.Enabled = false;
-            this.getCB.UseVisualStyleBackColor = true;
+            this.getCBB.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.getCBB.Location = new System.Drawing.Point(677, 9);
+            this.getCBB.Name = "getCBB";
+            this.getCBB.Size = new System.Drawing.Size(94, 25);
+            this.getCBB.TabIndex = 0;
+            this.getCBB.Text = "Get CB";
+            this.getCBB.Enabled = false;
+            this.getCBB.UseVisualStyleBackColor = true;
 
 
 
@@ -410,8 +412,8 @@ namespace PDS_Project_Client
             this.tlp.Controls.Add(this.eportLabel, 0, 4);
             this.tlp.Controls.Add(this.dportLabel, 0, 5);
 
-            this.tlp.Controls.Add(this.sendCB, 0, 7);
-            this.tlp.Controls.Add(this.getCB, 1, 7);
+            this.tlp.Controls.Add(this.sendCBB, 0, 7);
+            this.tlp.Controls.Add(this.getCBB, 1, 7);
 
             this.tlp.Controls.Add(this.hkLabel, 0, 6);
             this.tlp.Controls.Add(this.hotkey, 1, 6);
@@ -424,10 +426,14 @@ namespace PDS_Project_Client
             connectB.Click += new EventHandler(this.connectB_click);
             disconnectB.Click += new EventHandler(this.disconnectB_click);
 
+            sendCBB.Click += new EventHandler(this.sendCB_click);
+            getCBB.Click += new EventHandler(this.getCB_click);
+
 
             //DEFAULT CONFIG
 
-            this.tb_IP.Text = "192.168.1.104";
+            //this.tb_IP.Text = "169.254.162.184";
+            this.tb_IP.Text = "172.20.90.43";
             this.tb_EP.Text = "200" + i.ToString();
             this.tb_DP.Text = "300" + i.ToString();
             this.tb_PSW.Text = "12345";
@@ -435,7 +441,7 @@ namespace PDS_Project_Client
         }
 
 
-
+        /* Updating the hotkey */
 
         public void ChangeHK(VirtualKeyShort nVKS)
         {
@@ -496,37 +502,45 @@ namespace PDS_Project_Client
         }
 
         private void Connect() {
-            Socket tmp = new Socket(SocketType.Stream, ProtocolType.Tcp); //data socket
+            Socket tmpE = new Socket(SocketType.Stream, ProtocolType.Tcp); //event socket
+            Socket tmpD = new Socket(SocketType.Stream, ProtocolType.Tcp); //clipboard socket
+            object o = null;
 
             try
             {
 
-                Console.WriteLine("Connecting To -> " + IP + ":" + EP.ToString());
-                tmp.Connect(IP, EP);
+                Console.WriteLine("Connecting EventSocket To -> " + IP + ":" + EP.ToString());
+                tmpE.Connect(IP, EP);
 
-                /* Authentication */
+                /* Authentication on EventSocket*/
 
-                MsgStream.Send(new AuthMsg(PSW), tmp);
-                object o = MsgStream.Receive(tmp);
+                MsgStream.Send(new AuthMsg(PSW), tmpE);
+                o = MsgStream.Receive(tmpE);
 
-                if (o is AckMsg)
-                {
-                    if ( ((AckMsg)o).ack )
-                    {
-                        _host.es(tmp, i);
-                        this.Connected();
-                    }
-                    else
-                    {
-                        tmp.Close();
-                        this.Disconnected();
-                    }
-                }
+                if ((o is AckMsg) && (((AckMsg)o).ack)) Console.WriteLine("Connection completed successful on EventSocket.");
+                else throw new Exception();
+
+
+                Console.WriteLine("Connecting DataSocket To -> " + IP + ":" + DP.ToString());
+                tmpD.Connect(IP, DP);
+
+                /* Authentication on DataSocket */
+                Console.WriteLine("Starting authentication protocol.");
+                MsgStream.Send(new AuthMsg(PSW), tmpD);
+                o = MsgStream.Receive(tmpD);
+
+                if ((o is AckMsg) && (((AckMsg)o).ack)) Console.WriteLine("Connection completed successful on DataSocket.");
+                else throw new Exception();
+
+                _host.es(tmpE, i);
+                _host.ds(tmpD, i);
+                this.Connected();
 
             }
             catch(Exception)
             {
-                tmp.Close();
+                tmpE.Close();
+                tmpD.Close(); 
                 this.Disconnected();
             }
             
@@ -553,18 +567,17 @@ namespace PDS_Project_Client
                 tb_EP.Enabled = false;
                 tb_DP.Enabled = false;
                 this.disconnectB.Enabled = true;
-                this.getCB.Enabled = true;
-                this.sendCB.Enabled = true;
+                this.getCBB.Enabled = true;
+                this.sendCBB.Enabled = true;
                 this.connectB.Enabled = false;
             }
 
         }
 
 
+
         /* GESTIONE DISCONNESSIONE */
 
-
-        
 
         private void disconnectB_click(Object sender, EventArgs e)
         {
@@ -588,22 +601,29 @@ namespace PDS_Project_Client
 
         private void Disconnect()
         {
-            Socket tmp = _host.es(i);
+            Socket tmpE = _host.es(i);
+            Socket tmpD = _host.ds(i);
             _host.es(null, i);
+            _host.ds(null, i);
 
             try
             {
-                Console.WriteLine("Disconnecting From -> " + IP + ":" + EP.ToString());
-                tmp.Shutdown(SocketShutdown.Both);
-                tmp.Close();
+                Console.WriteLine("Disconnecting EventSocket -> " + IP + ":" + EP.ToString());
+                tmpE.Shutdown(SocketShutdown.Both);
+                tmpE.Close();
+
+                Console.WriteLine("Disconnecting DataSocket-> " + IP + ":" + DP.ToString());
+                tmpD.Shutdown(SocketShutdown.Both);
+                tmpD.Close();
             }
             catch (Exception)
             {
-                if (tmp.Connected)
+                if ((tmpE != null) && (tmpE.Connected) && (tmpD != null) && (tmpD.Connected))
                 {
-                    _host.es(tmp, i);
+                    _host.es(tmpE, i);
+                    _host.ds(tmpD, i);
                     return;
-                }
+                } 
             }
 
             this.Disconnected();
@@ -623,7 +643,7 @@ namespace PDS_Project_Client
                 }
                 catch (System.ObjectDisposedException)
                 {
-                    Console.WriteLine("Errore nell'uscita.");
+                    Console.WriteLine("Error while disconnecting.");
                 }
             }
             else
@@ -639,8 +659,8 @@ namespace PDS_Project_Client
                 tb_EP.Enabled = true;
                 tb_DP.Enabled = true;
                 this.disconnectB.Enabled = false;
-                this.getCB.Enabled = false;
-                this.sendCB.Enabled = false;
+                this.getCBB.Enabled = false;
+                this.sendCBB.Enabled = false;
                 this.connectB.Enabled = true;
             }
 
@@ -703,6 +723,49 @@ namespace PDS_Project_Client
             }
 
         }
+
+
+
+
+
+        /* CLIPBOARD: Buttons' Events and Managing */
+
+
+        private void getCB_click(Object o, EventArgs e)
+        {
+            _host.EnqueueCBMsg(new GetMsgCBP(i));
+        }
+
+        private void sendCB_click(Object o, EventArgs e)
+        {
+            sendCBB.Enabled = false;
+            CBDeamon = new Thread(sendClipboardDatas);
+            CBDeamon.Start();
+        }
+
+        private void sendClipboardDatas()
+        {
+            MessageBox.Show("Sending clipboard to server:" + i.ToString() +". \nYou will be advised when the transfer is completed.", "Starting Transfer", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            if (Clipboard.ContainsText())
+            {
+                string txt = Clipboard.GetText();
+                try
+                {
+                    MsgStream.Send(new TextMsgCBP(txt), _host.ds(i));
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Unable to send clipboard to server:" + i.ToString() + ". \nCheck on it.", "Starting Transfer", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                }
+
+            }
+
+            MessageBox.Show("Clipboard sent to server:" + i.ToString() + ". \nCheck on it.", "Starting Transfer", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+        }
+
 
 
 

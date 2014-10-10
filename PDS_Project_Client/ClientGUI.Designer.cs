@@ -109,7 +109,7 @@ namespace PDS_Project_Client
             // hotkeyBH
             // 
             this.hotkeyBH.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.hotkeyBH.Name = "Host HotKey";
+            this.hotkeyBH.Name = "Client HotKey";
             this.hotkeyBH.Size = new System.Drawing.Size(90, 30);
             this.hotkeyBH.TabIndex = 0;
             this.hotkeyBH.Text = "C.HK";
@@ -296,10 +296,10 @@ namespace PDS_Project_Client
             /* adding ServerPanels */
 
 
-            this.tlp_INNER.Controls.Add(sp[0], 0, 0);
-            this.tlp_INNER.Controls.Add(sp[1], 1, 0);
-            this.tlp_INNER.Controls.Add(sp[2], 2, 0);
-            this.tlp_INNER.Controls.Add(sp[3], 3, 0);
+            this.tlp_INNER.Controls.Add(_sp[0], 0, 0);
+            this.tlp_INNER.Controls.Add(_sp[1], 1, 0);
+            this.tlp_INNER.Controls.Add(_sp[2], 2, 0);
+            this.tlp_INNER.Controls.Add(_sp[3], 3, 0);
 
 
             // 

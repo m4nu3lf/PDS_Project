@@ -14,14 +14,19 @@ namespace PDS_Project_Client
     {
         public void run(object param)
         {
+            Host _host = (Host)param;
+            _host.SendMsg();
+        }
 
-            Host _host = (Host) param;
 
-            while (true)
-            {
-                _host.SendMsg();
-            }
+    }
 
+    public class DataThread
+    {
+        public void run(object param)
+        {
+            Host _host = (Host)param;
+            _host.SendCBMsg();
         }
 
     }

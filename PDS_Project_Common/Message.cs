@@ -14,6 +14,45 @@ namespace PDS_Project_Common
 
     }
 
+    /* AUTHENTICATION MSG PROTOCOL */
+
+    [Serializable]
+    public class AuthMsg : Message
+    {
+        String _psw;
+
+        public AuthMsg(String p)
+        {
+            _psw = p;
+        }
+
+        public String psw
+        {
+            get { return _psw; }
+        }
+
+    }
+
+
+    [Serializable]
+    public class AckMsg : Message
+    {
+        bool _ack;
+
+        public AckMsg(bool b)
+        {
+            _ack = b;
+        }
+
+        public bool ack
+        {
+            get { return _ack; }
+        }
+    }
+
+
+
+    /* EVENT MSG PROTOCOL */
 
     [Serializable]
     public class StopComm : Message
@@ -45,40 +84,6 @@ namespace PDS_Project_Common
         public int i
         {
             get { return _i; }
-        }
-    }
-
-    [Serializable]
-    public class AuthMsg : Message
-    {
-        String _psw;
-
-        public AuthMsg(String p)
-        {
-            _psw = p;
-        }
-
-        public String psw
-        {
-            get { return _psw; }
-        }
-
-    }
-
-
-    [Serializable]
-    public class AckMsg : Message
-    {
-        bool _ack;
-
-        public AckMsg(bool b)
-        {
-             _ack = b ;
-        }
-
-        public bool ack
-        {
-            get { return _ack; }
         }
     }
 
@@ -122,21 +127,42 @@ namespace PDS_Project_Common
     }
 
 
+    /* CLIPBOARD MSG PROTOCOL */
+
+
     [Serializable]
-    public class DataMsg : Message
+    public class TextMsgCBP : Message
     {
-        private String clipboard;
-
-        public DataMsg(String clb)
+        public string content { set; get; }
+        public TextMsgCBP(string c) 
         {
-            clipboard = clb;
+            content = c;
         }
 
-        public String clb
+    }
+
+    [Serializable]
+    public class FileMsgCBP : Message
+    {
+        public string name { get; set; }
+        public Byte[] content;
+
+        public FileMsgCBP(string n, Byte[] c) 
         {
-            get { return clipboard; }
+            name = n;
+            content = c;
         }
 
+    }
+
+
+    [Serializable]
+    public class GetMsgCBP : Message
+    {
+        private int _i;
+
+        public GetMsgCBP(int index) { _i = index; }
+            
     }
 
 

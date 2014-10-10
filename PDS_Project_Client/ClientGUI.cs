@@ -26,16 +26,17 @@ namespace PDS_Project_Client
     {
 
         private static Host _Host;
-        private static ServerPanel[] sp = new ServerPanel[4];
+        private static ServerPanel[] _sp = new ServerPanel[4];
 
         private Thread eThread;
+        private Thread dThread;
 
         private static VirtualKeyShort _hostHK;
         private static HookCB sk_delegate = new HookCB(KswitchCB);
         private static HookCB sm_delegate = new HookCB(MswitchCB);
 
-        private static int HKindex;
-        private static VirtualKeyShort nVKS;
+        private static int _HKindex;
+        private static VirtualKeyShort _nVKS;
 
         /* Keyboard and Mouse events managing variables */
 
@@ -54,15 +55,15 @@ namespace PDS_Project_Client
 
             _Host = new Host();
 
-            sp[0] = new ServerPanel(0, _Host);
-            sp[1] = new ServerPanel(1, _Host);
-            sp[2] = new ServerPanel(2, _Host);
-            sp[3] = new ServerPanel(3, _Host);
+            _sp[0] = new ServerPanel(0, _Host);
+            _sp[1] = new ServerPanel(1, _Host);
+            _sp[2] = new ServerPanel(2, _Host);
+            _sp[3] = new ServerPanel(3, _Host);
 
-            _Host.setPanel(sp[0], 0);
-            _Host.setPanel(sp[1], 1);
-            _Host.setPanel(sp[2], 2);
-            _Host.setPanel(sp[3], 3);
+            _Host.setPanel(_sp[0], 0);
+            _Host.setPanel(_sp[1], 1);
+            _Host.setPanel(_sp[2], 2);
+            _Host.setPanel(_sp[3], 3);
 
 
             _hostHK = VirtualKeyShort.KEY_Q;
@@ -71,6 +72,9 @@ namespace PDS_Project_Client
             
             eThread = new Thread((new EventThread()).run);
             eThread.Start(_Host);
+
+            dThread = new Thread((new DataThread()).run);
+            dThread.Start(_Host);
 
             MessageBox.Show("Remember: to switch use L.ctrl + L.alt + 'HotKey'.", "How To Switch", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
@@ -81,8 +85,9 @@ namespace PDS_Project_Client
         {
             if (MessageBox.Show("The program is going to quit, all the connections will be shutdown. Confirm?", "Closing Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
-                for (int k = 0; k < 4; k++) sp[k].DisconnectionReq();
+                for (int k = 0; k < 4; k++) _sp[k].DisconnectionReq();
                 eThread.Abort();
+                dThread.Abort();
                 Application.Exit();
             }
         }
@@ -97,6 +102,11 @@ namespace PDS_Project_Client
             this.Quit();
         }
 
+        private void exitB_click(Object sender, EventArgs e)
+        {
+            this.Quit();
+        }
+
 
         private void hotkeyB_click(Object sender, EventArgs e) 
         {
@@ -104,20 +114,20 @@ namespace PDS_Project_Client
 
             switch (s)
             {
-                case "Host HotKey":
-                    HKindex = -1;
+                case "Client HotKey":
+                    _HKindex = -1;
                     break;
                 case "Server1 HotKey":
-                    HKindex = 0;
+                    _HKindex = 0;
                     break;
                 case "Server2 HotKey":
-                    HKindex = 1;
+                    _HKindex = 1;
                     break;
                 case "Server3 HotKey":
-                    HKindex = 2;
+                    _HKindex = 2;
                     break;
                 case "Server4 HotKey":
-                    HKindex = 3;
+                    _HKindex = 3;
                     break;
             }
 
@@ -125,21 +135,16 @@ namespace PDS_Project_Client
             MOUSEhook = WindowsAPI.SetWindowsHookEx(WindowsAPI.WH_MOUSE_LL, sm_delegate, IntPtr.Zero, 0);
             if (MessageBox.Show("Press a Key to change the: " + s + ". Then Press Ok to Confirm.", "Capturing new HotKey") == DialogResult.OK)
             {
-                if (HKindex == -1)
+                if (_HKindex == -1)
                 {
-                    _hostHK = nVKS;
-                    this.hotkey.Text = nVKS.ToString();
+                    _hostHK = _nVKS;
+                    this.hotkey.Text = _nVKS.ToString();
                 }
-                else sp[HKindex].ChangeHK(nVKS);
+                else _sp[_HKindex].ChangeHK(_nVKS);
             }
             
         }
 
-
-        private void exitB_click(Object sender, EventArgs e)
-        {
-            this.Quit();
-        }
 
         private void continueB_click(Object sender, EventArgs e)
         {
@@ -161,7 +166,7 @@ namespace PDS_Project_Client
 
             unsafe
             {
-                nVKS = (VirtualKeyShort)((KBDLLHOOKSTRUCT*)LParam.ToPointer())->vkCode;
+                _nVKS = (VirtualKeyShort)((KBDLLHOOKSTRUCT*)LParam.ToPointer())->vkCode;
             }
 
 
@@ -227,10 +232,10 @@ namespace PDS_Project_Client
                         WindowsAPI.UnhookWindowsHookEx(KEYhook);
                         WindowsAPI.UnhookWindowsHookEx(MOUSEhook);
 
-                        _Host.EnqueueMsg(new KeyMsg(VirtualKeyShort.LMENU, false));
-                        _Host.EnqueueMsg(new KeyMsg(VirtualKeyShort.LCONTROL, false));
+                        _Host.EnqueueEventMsg(new KeyMsg(VirtualKeyShort.LMENU, false));
+                        _Host.EnqueueEventMsg(new KeyMsg(VirtualKeyShort.LCONTROL, false));
 
-                        _Host.EnqueueMsg(new StopComm(-1));
+                        _Host.EnqueueEventMsg(new StopComm(-1));
 
                         return new IntPtr(1);
                     }
@@ -238,14 +243,14 @@ namespace PDS_Project_Client
 
                     for (int k = 0; k < 4; k++)
                     {
-                        if ((km.VirtualKey == sp[k].hk) && (km.Pressed))
+                        if ((km.VirtualKey == _sp[k].hk) && (km.Pressed))
                         {
 
-                            _Host.EnqueueMsg(new KeyMsg(VirtualKeyShort.LMENU, false));
-                            _Host.EnqueueMsg(new KeyMsg(VirtualKeyShort.LCONTROL, false));
+                            _Host.EnqueueEventMsg(new KeyMsg(VirtualKeyShort.LMENU, false));
+                            _Host.EnqueueEventMsg(new KeyMsg(VirtualKeyShort.LCONTROL, false));
 
-                            _Host.EnqueueMsg(new StopComm(k));
-                            _Host.EnqueueMsg(new InitComm(k));
+                            _Host.EnqueueEventMsg(new StopComm(k));
+                            _Host.EnqueueEventMsg(new InitComm(k));
 
                             return new IntPtr(1);
                         }
@@ -254,7 +259,7 @@ namespace PDS_Project_Client
 
                 /* no hotkey identyfied , enqueing message */
 
-                _Host.EnqueueMsg(km);
+                _Host.EnqueueEventMsg(km);
 
                 return new IntPtr(1);
             }
@@ -306,7 +311,7 @@ namespace PDS_Project_Client
                 
                 }
 
-                _Host.EnqueueMsg(mm);
+                _Host.EnqueueEventMsg(mm);
 
             }
             

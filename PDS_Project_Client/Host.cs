@@ -14,85 +14,69 @@ namespace PDS_Project_Client
 
     public class Host
     {
-        private Socket[] _es;        //event socket vector
-        private Socket[] _cs;        //clipboard socket vector
-
         private ServerPanel[] _sp;
 
-        private AutoResetEvent _e;
-        private Queue<Message> _q;
-        private Queue<Message> _qToSend;
+        /* variables for managing events */
 
-        private int _as;
+        private Socket[] _es;        //event socket vector
+        private AutoResetEvent _ee;
+        private Queue<Message> _eq;
+        private Queue<Message> _eqToSend;
+
+        private int _eas;       //event socket active
+
+        /* variables for managing clipboard protocol */
+
+        private Socket[] _ds;        //clipboard socket vector
+        private AutoResetEvent _de;
+        private Queue<Message> _dq; 
 
 
         public Host() {
             _es = new Socket[4];
-            _cs = new Socket[4];
-
+            _ds = new Socket[4];
             _sp = new ServerPanel[4];
 
-            _q = new Queue<Message>();
-            _e = new AutoResetEvent(false);
 
-            _qToSend = new Queue<Message>();
+            _eq = new Queue<Message>();
+            _ee = new AutoResetEvent(false);
+            _eqToSend = new Queue<Message>();
 
-            _as = -1;
 
+            _dq = new Queue<Message>();
+            _de = new AutoResetEvent(false);
+
+            _eas = -1;
         }
         
 
         /* GET A SOCKET */
 
-        public Socket es(int i)
-        {
-            return _es[i];
-        }
-
-        public Socket cs(int i)
-        {
-            return _cs[i];
-        }
+        public Socket es(int i){ return _es[i]; }
+        public Socket ds(int i){ return _ds[i]; }
 
 
         /* SET A SOCKET */
 
-
-        public void es(Socket es, int i)
-        {
-            _es[i] = es;
-        }
-
-        public void cs(Socket cs, int i)
-        {
-            _cs[i] = cs;
-        }
+        public void es(Socket es, int i){ _es[i] = es; }
+        public void ds(Socket ds, int i){ _ds[i] = ds; }
 
 
         /* PANEL SETTING */
 
-        public void setPanel(ServerPanel sp, int i) 
-        { 
-            _sp[i] = sp;
-        }
+        public void setPanel(ServerPanel sp, int i) { _sp[i] = sp; }
+
+
+
 
 
         /* MSG MANAGING FUNCTION */
 
 
-        public void EnqueueMsg(Message m)
+        public void EnqueueEventMsg(Message m)
         {
-
-            /* putting in the message into the queue */
-            lock (_q)
-            {
-                //System.Console.WriteLine("Inserito Messaggio");
-               _q.Enqueue(m);
-            }
-
-            /* setting the event to wake the thread */
-
-            _e.Set();
+            lock (_eq) { _eq.Enqueue(m); }    //enqueueing MSG
+            _ee.Set(); // setting the event to wake the thread
         }
 
 
@@ -102,79 +86,82 @@ namespace PDS_Project_Client
             Message m;
             int i = 0;
 
-            while (_e.WaitOne())
+            while (true)
             {
-                lock (_q)
+                while (_ee.WaitOne())
                 {
-                    while (true)
+                    lock (_eq)
                     {
-                        try
+                        while (true)
                         {
-                            m = _q.Dequeue();
-                            _qToSend.Enqueue(m);
-                            i++;
-                        }
-                        catch (InvalidOperationException)
-                        {
-                            break;
+                            try
+                            {
+                                m = _eq.Dequeue();
+                                _eqToSend.Enqueue(m);
+                                i++;
+                            }
+                            catch (InvalidOperationException)
+                            {
+                                break;
+                            }
                         }
                     }
-                }
 
-                while (i != 0)
-                {
-                    m = _qToSend.Dequeue();
-                    i--;
-
-                    /* checking type */
-
-
-                    if ((m is StopComm) && (_as == ((StopComm)m).i) ) continue;
-
-                    if (m is InitComm)
+                    while (i != 0)
                     {
-                        if (_as != -1)
-                        {
-                            if ( _es[_as]== null ) _as = -1;
-                            else continue;
-                        }
-                        
-                        _as = ((InitComm)m).i; // changing active socket 
-                    }
+                        m = _eqToSend.Dequeue();
+                        i--;
 
-                    if ((_as != -1) && (_es[_as] != null))
-                    {
-                        try
-                        {
-                            MsgStream.Send(m, _es[_as]); //sending data
-                            //Console.WriteLine("Sent");
-                        }
-                        catch (Exception)
-                        {
-                            Console.WriteLine("Errore nell'invio: chiusura socket.");
-                            _sp[_as].DisconnectionReq();
-                            _as = -1;
-                            continue;
-                        }
+                        /* checking type */
+
+                        if ((m is StopComm) && (_eas == ((StopComm)m).i)) continue;
 
                         if (m is InitComm)
                         {
-                            _sp[_as].Activate();
-                            continue;
+                            if (_eas != -1)
+                            {
+                                if (_es[_eas] == null) _eas = -1;
+                                else continue;
+                            }
+
+                            _eas = ((InitComm)m).i; // changing active socket 
                         }
 
-                        if (m is StopComm)
+                        if ((_eas != -1) && (_es[_eas] != null))
                         {
-                            //Console.WriteLine("StopComm Msg Processed Well");
-                            _sp[_as].Deactivate();
-                            _as = -1;  // no active socket from now till a new InitComm Message
+                            try
+                            {
+                                MsgStream.Send(m, _es[_eas]); //sending data
+                                //Console.WriteLine("Sent");
+                            }
+                            catch (Exception)
+                            {
+                                Console.WriteLine("Errore nell'invio: chiusura socket.");
+                                _sp[_eas].DisconnectionReq();
+                                _eas = -1;
+                                continue;
+                            }
+
+                            if (m is InitComm)
+                            {
+                                _sp[_eas].Activate();
+                                continue;
+                            }
+
+                            if (m is StopComm)
+                            {
+                                //Console.WriteLine("StopComm Msg Processed Well");
+                                _sp[_eas].Deactivate();
+                                _eas = -1;  // no active socket from now till a new InitComm Message
+                            }
+
                         }
 
-                    }
+                    }//end sending loop
 
-                }//end sending loop
+                }//end wait on event
 
-            }//end wait on event
+            }//end infinite loop
 
         }//end SendMsg
 
@@ -182,11 +169,23 @@ namespace PDS_Project_Client
 
         /* clipboard managing */
 
-
-
-        public void SendClipboard()
+        public void EnqueueCBMsg(Message m)
         {
+            lock (_dq) { _dq.Enqueue(m); }    //enqueueing MSG
+            _de.Set(); // setting the event to wake the thread
+        }
 
+        public void SendCBMsg()
+        {
+            Message m;
+            int i = 0;
+
+            while (true)
+            {
+                while (_ee.WaitOne())
+                {
+                }
+            }
         }
 
         public String ReceiveClipboard()
