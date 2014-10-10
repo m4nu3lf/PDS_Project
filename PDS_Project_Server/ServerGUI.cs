@@ -150,7 +150,7 @@ namespace PDS_Project_Server
                     psswBox.Enabled = false;
                     startButton.Enabled = false;
                     stopButton.Enabled = true;
-                    if (newState is Server.WaitingState)
+                    if (_evtServer.State is Server.WaitingState)
                         statusLabel.ForeColor = Color.Orange;
                     else
                         statusLabel.ForeColor = Color.Green;

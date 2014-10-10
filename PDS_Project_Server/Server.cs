@@ -219,6 +219,8 @@ namespace PDS_Project_Server
 
         public void Start(IPAddress address, int port, String password)
         {
+            if (_serverThread.ThreadState == ThreadState.Unstarted)
+                _serverThread.Start();
             lock (_stateLock)
             {
                 if (!(_state is DisconnectedState))
@@ -287,17 +289,24 @@ namespace PDS_Project_Server
             }
         }
 
+        public Socket CommSocket
+        {
+            get
+            {
+                return _commSocket;
+            }
+        }
+
         abstract protected void SetAuthenticated();
 
         public Server(OnStateChanged onStateChanged)
         {
             _running = true;
             _onStateChanged = onStateChanged;
-            _state = null;
+            _state = new StateBase();
             _newState = new DisconnectedState();
             _newState.Server = this;
             _serverThread = new Thread(this.Run);
-            _serverThread.Start();
         }
 
         public delegate void OnStateChanged(StateBase newState = null); 
