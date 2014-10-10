@@ -6,17 +6,24 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Net;
 using System.Net.Sockets;
+using System.Windows.Forms;
 using PDS_Project_Common;
 
 namespace PDS_Project_Server
 {
-    public class Server
+    public abstract class Server
     {
         public class StateBase
         {
             public Server Server
             {
-                set; get;
+                set;
+                get;
+            }
+
+            virtual public String GetMsg()
+            {
+                return "None";
             }
 
             /// <summary>
@@ -55,6 +62,13 @@ namespace PDS_Project_Server
         {
             public override void Update()
             {
+                // Ensure previous socket is closed correctly
+                if (Server._commSocket != null && Server._commSocket.Connected)
+                {
+                    Server._commSocket.Shutdown(SocketShutdown.Both);
+                    Server._commSocket.Close();
+                }
+
                 _startEvent.WaitOne();
                 Server.State = new WaitingState();
             }
@@ -64,7 +78,7 @@ namespace PDS_Project_Server
                 _startEvent.Set();
             }
 
-            public override string ToString()
+            public override string GetMsg()
             {
                 return "Disconnected";
             }
@@ -105,7 +119,7 @@ namespace PDS_Project_Server
                 }
             }
 
-            public override string ToString()
+            public override string GetMsg()
             {
                 return "Waiting For Connection";
             }
@@ -124,8 +138,7 @@ namespace PDS_Project_Server
                 }
                 catch (SocketException)
                 {
-                    Server.State = new WaitingState();
-                    _obj = null;
+
                 }
             }
 
@@ -155,7 +168,7 @@ namespace PDS_Project_Server
                     if (authMsg.psw == Server._password)
                     {
                         MsgStream.Send(new AckMsg(true), Server._commSocket);
-                        Server.State = new AuthenticatedState();
+                        Server.SetAuthenticated();
                     }
                     else
                     {
@@ -165,95 +178,84 @@ namespace PDS_Project_Server
                 }
             }
 
-            public override string ToString()
+            public override string GetMsg()
             {
                 return "Waiting For Authentication";
             }
         }
 
-        public class AuthenticatedState : ReceivingState
+        public void Run()
         {
-            public override void Update()
+            while (_running)
             {
-                base.Update();
-                
-                if (_obj is InitComm)
-                {
-                    Server.State = new ActiveState();
-                }
-            }
+                if (_state != null)
+                    _state.Update();
 
-            public override string ToString()
-            {
-                return "Connected";
+                if (_newState != _state)
+                {
+                    if (_state != null)
+                        _state.Exit();
+
+                    StateBase tmpState;
+                    lock (_newStateLock)
+                    {
+                        tmpState = _newState;
+                    }
+
+                    lock (_stateLock)
+                    {
+                        _state = tmpState;
+                    }
+
+                    if (_state != null)
+                        _state.Enter();
+
+                    if (_onStateChanged != null)
+                        _onStateChanged(_state);
+                }
             }
 
         }
 
-        public class ActiveState : ReceivingState
+        public void Start(IPAddress address, int port, String password)
         {
-            public override void Update()
+            lock (_stateLock)
             {
-                base.Update();
+                if (!(_state is DisconnectedState))
+                    return;
 
-                if (_obj is StopComm)
+                _welcomeSocket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+                try
                 {
-                    Server.State = new AuthenticatedState();
+                    _welcomeSocket.Bind(new IPEndPoint(address, port));
                 }
-                else if (_obj is KeyMsg)
+                catch (SocketException e)
                 {
-                    KeyMsg kMsg = (KeyMsg)_obj;
-                    INPUT[] inputs = new INPUT[1];
-                    inputs[0].type = (uint)InputType.INPUT_KEYBOARD;
-                    inputs[0].U.ki.wVk = kMsg.VirtualKey;
-                    if (!kMsg.Pressed)
-                        inputs[0].U.ki.dwFlags = KEYEVENTF.KEYUP;
-                    else
-                        inputs[0].U.ki.dwFlags = 0;
-                    inputs[0].U.ki.time = 0;
-                    inputs[0].U.ki.dwExtraInfo = (UIntPtr)(UInt64)0;
-                    WindowsAPI.SendInput(1, inputs, System.Runtime.InteropServices.Marshal.SizeOf(inputs[0]));
+                    MessageBox.Show("The specified address and port couple is already in use "
+                                    + "or it has not yet been freed by the system!",
+                                    "Address Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Exclamation);
+                    return;
                 }
-                else if (_obj is MouseMsg)
-                {
-                    MouseMsg mMsg = (MouseMsg)_obj; 
-                    INPUT[] inputs = new INPUT[1];
-                    inputs[0].type = (uint)InputType.INPUT_MOUSE;
-                    inputs[0].U.mi.dx = mMsg.Dx;
-                    inputs[0].U.mi.dy = mMsg.Dy;
-                    MOUSEEVENTF dwFlags = 0;
-                    if ((mMsg.Flags & (int)MouseEventFlags.LeftButtonDown) != 0)
-                        dwFlags |= MOUSEEVENTF.LEFTDOWN;
-                    if ((mMsg.Flags & (int)MouseEventFlags.LeftButtonUp) != 0)
-                        dwFlags |= MOUSEEVENTF.LEFTUP;
-                    if ((mMsg.Flags & (int)MouseEventFlags.RightButtonDown) != 0)
-                        dwFlags |= MOUSEEVENTF.RIGHTDOWN;
-                    if ((mMsg.Flags & (int)MouseEventFlags.RightButtonUp) != 0)
-                        dwFlags |= MOUSEEVENTF.RIGHTUP;
-                    if ((mMsg.Flags & (int)MouseEventFlags.MiddleButtonDown) != 0)
-                        dwFlags |= MOUSEEVENTF.MIDDLEDOWN;
-                    if ((mMsg.Flags & (int)MouseEventFlags.MiddleButtonUp) != 0)
-                        dwFlags |= MOUSEEVENTF.MIDDLEUP;
-                    if ((mMsg.Flags & (int)MouseEventFlags.Wheel) != 0)
-                        dwFlags |= MOUSEEVENTF.WHEEL;
-                    if ((mMsg.Flags & (int)MouseEventFlags.HWheel) != 0)
-                        dwFlags |= MOUSEEVENTF.HWHEEL;
-                    if ((mMsg.Flags & (int)MouseEventFlags.MouseMoved) != 0)
-                        dwFlags |= MOUSEEVENTF.MOVE;
-                    Console.WriteLine("dx: " + mMsg.Dx);
-                    Console.WriteLine("dy: " + mMsg.Dy);
-                    inputs[0].U.mi.dwFlags = dwFlags;
-                    inputs[0].U.mi.mouseData = mMsg.MouseData;
-                    inputs[0].U.mi.time = 0;
-                    inputs[0].U.mi.dwExtraInfo = (UIntPtr)(UInt64)0;
-                    WindowsAPI.SendInput(1, inputs, System.Runtime.InteropServices.Marshal.SizeOf(inputs[0]));
-                }
-            }
+                _welcomeSocket.Listen(1);
+                _password = password;
 
-            public override string ToString()
-            {
-                return "Active";
+                State.Signal();
             }
+        }
+
+        public void Stop()
+        {
+            StateBase prevState = State;
+            State = new DisconnectedState();
+            prevState.Signal();
+        }
+
+        public void Terminate()
+        {
+            _running = false;
+            State.Signal();
         }
 
         public StateBase State
@@ -277,7 +279,7 @@ namespace PDS_Project_Server
             get
             {
                 StateBase tmpState;
-                lock(_stateLock)
+                lock (_stateLock)
                 {
                     tmpState = _state;
                 }
@@ -285,90 +287,31 @@ namespace PDS_Project_Server
             }
         }
 
-        public delegate void OnStateChanged(StateBase newState); 
+        abstract protected void SetAuthenticated();
 
         public Server(OnStateChanged onStateChanged)
         {
             _running = true;
             _onStateChanged = onStateChanged;
-            _state = new DisconnectedState();
-            _state.Server = this;
+            _state = null;
+            _newState = new DisconnectedState();
+            _newState.Server = this;
             _serverThread = new Thread(this.Run);
             _serverThread.Start();
         }
 
-        public void Run()
-        {
-            while (_running)
-            {
-                _state.Update();
+        public delegate void OnStateChanged(StateBase newState = null); 
 
-                if (_newState != _state)
-                {
-                    _state.Exit();
+        protected Thread _serverThread;
+        protected Socket _welcomeSocket;
+        protected Socket _commSocket;
+        protected String _password;
+        protected StateBase _state;
+        protected Object _stateLock = new Object();
+        protected StateBase _newState;
+        protected Object _newStateLock = new Object();
+        protected OnStateChanged _onStateChanged;
 
-                    StateBase tmpState;
-                    lock (_newStateLock)
-                    {
-                        tmpState = _newState;
-                    }
-
-                    lock (_stateLock)
-                    {
-                        _state = tmpState;
-                    }
-
-                    if (_state != null)
-                        _state.Enter();
-
-                    _onStateChanged(_state);
-                }
-            }
-
-        }
-
-        public void Start(IPAddress address, int port, String password)
-        {
-            lock (State)
-            {
-                if (! (State is DisconnectedState))
-                    return;
-
-                _welcomeSocket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-                _welcomeSocket.Bind(new IPEndPoint(address, port));
-                _welcomeSocket.Listen(1);
-                _password = password;
-
-                State.Signal();
-            }
-        }
-
-        public void Stop()
-        {
-            State = new DisconnectedState();
-            lock (_stateLock)
-            {
-                if (!(State is DisconnectedState))
-                    State.Signal();
-            }
-        }
-
-        public void Terminate()
-        {
-            _running = false;
-            State.Signal();
-        }
-
-        private Thread _serverThread;
-        private Socket _welcomeSocket;
-        private Socket _commSocket;
-        private String _password;
-        private StateBase _state;
-        private Object _stateLock = new Object();
-        private StateBase _newState;
-        private Object _newStateLock = new Object();
-        private OnStateChanged _onStateChanged;
-
-        private bool _running;
+        protected bool _running;
     }
 }

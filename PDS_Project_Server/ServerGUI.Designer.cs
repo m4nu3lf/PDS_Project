@@ -18,8 +18,10 @@
                 components.Dispose();
             }
             base.Dispose(disposing);
-            if (_server != null)
-                _server.Terminate();
+            if (_evtServer != null)
+                _evtServer.Terminate();
+            if (_clpbServer != null)
+                _clpbServer.Terminate();
             _blinking.Terminate();
         }
 

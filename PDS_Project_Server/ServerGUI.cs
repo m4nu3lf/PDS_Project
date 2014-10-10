@@ -16,13 +16,12 @@ namespace PDS_Project_Server
     public partial class ServerGUI : Form
     {
         private IPAddress _serverAddress;
-        private int _eventsPort;
         private NotifyIcon _notifyIcon;
-        private Server _server;
+        private EventServer _evtServer;
+        private ClipboardServer _clpbServer;
         private Icon _inactiveIcon;
         private Icon _activeIcon;
         private Blinking _blinking;
-        private Thread _blinkingThread;
 
         public ServerGUI()
         {
@@ -57,7 +56,8 @@ namespace PDS_Project_Server
             if (_serverAddress != null)
             {
                 ipBox.Text = _serverAddress.ToString();
-                _server = new Server(this.server_StateChange);
+                _evtServer = new EventServer(this.server_StateChange);
+                _clpbServer = new ClipboardServer(this.server_StateChange);
             }
             else
             {
@@ -84,7 +84,8 @@ namespace PDS_Project_Server
 
         private void button1_Click(object sender, EventArgs e)
         {
-            _server.Start(_serverAddress, (int)eventsPortUpDown.Value, psswBox.Text);
+            _evtServer.Start(_serverAddress, (int)eventsPortUpDown.Value, psswBox.Text);
+            _clpbServer.Start(_serverAddress, (int)clipboardUpDown.Value, psswBox.Text);
         }
 
         private void ServerGUI_Resize(object sender, EventArgs e)
@@ -122,11 +123,12 @@ namespace PDS_Project_Server
 
         private void stopButton_Click(object sender, EventArgs e)
         {
-            _server.Stop();
+            _evtServer.Stop();
+            _clpbServer.Stop();
         }
 
-        delegate void stateChangedCallback(Server.StateBase newState);
-        private void server_StateChange(Server.StateBase newState)
+        delegate void stateChangedCallback(EventServer.StateBase newState);
+        private void server_StateChange(EventServer.StateBase newState)
         {
             if (this.InvokeRequired)
             {
@@ -135,9 +137,12 @@ namespace PDS_Project_Server
             }
             else
             {
-                if ((newState is Server.WaitingState) ||
-                    (newState is Server.ConnectedState) ||
-                    (newState is Server.AuthenticatedState))
+                if ((_evtServer.State is Server.WaitingState
+                    && _clpbServer.State is Server.WaitingState) ||
+                    (_evtServer.State is Server.ConnectedState
+                    && _clpbServer.State is Server.ConnectedState) ||
+                    (_evtServer.State is EventServer.AuthenticatedState
+                    && _clpbServer.State is ClipboardServer.AuthenticatedState))
                 {
                     ipBox.Enabled = false;
                     eventsPortUpDown.Enabled = false;
@@ -150,7 +155,8 @@ namespace PDS_Project_Server
                     else
                         statusLabel.ForeColor = Color.Green;
                 }
-                else if (newState is Server.DisconnectedState)
+                else if (_evtServer.State is Server.DisconnectedState
+                        && _clpbServer.State is Server.DisconnectedState)
                 {
                     statusLabel.ForeColor = Color.Red;
                     ipBox.Enabled = true;
@@ -160,14 +166,14 @@ namespace PDS_Project_Server
                     startButton.Enabled = true;
                     stopButton.Enabled = false;
                 }
-                else if (newState is Server.ActiveState)
+                else if (_evtServer.State is EventServer.ActiveState)
                 {
                     _blinking.Blink();
                     statusLabel.ForeColor = Color.Blue;
                     _notifyIcon.Icon = _activeIcon;
                 }
-                if (newState != null)
-                    statusLabel.Text = newState.ToString();
+                if (_evtServer.State != null)
+                    statusLabel.Text = _evtServer.State.GetMsg();
             }
         }
 
