@@ -75,7 +75,7 @@ namespace PDS_Project_Common
 
 
             o = (Message)MsgStream.Receive(socket);
-
+            
             while (!(o is StopFileCBP))
             {
                 o = (Message)MsgStream.Receive(socket);
@@ -102,7 +102,11 @@ namespace PDS_Project_Common
 
         }
 
-
+        public static void FreeTmpResources()
+        {
+            string tmpdir = Path.GetTempPath() + "PDS_project";
+            if (Directory.Exists(tmpdir)) Directory.Delete(tmpdir);
+        }
 
         public static long GetCBFilesSize()
         {
