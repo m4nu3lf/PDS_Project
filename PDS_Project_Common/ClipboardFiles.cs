@@ -54,7 +54,7 @@ namespace PDS_Project_Common
             {
                 name = dir.Substring(toCut);
                 Console.WriteLine("Try to sending Dir: " + name);
-                MsgStream.Send(new DirMsgCBP(dir, false), socket);
+                MsgStream.Send(new DirMsgCBP(name, false), socket);
                 SeekAndSend(socket, dir, toCut);
             }
 
@@ -62,7 +62,7 @@ namespace PDS_Project_Common
             {
                 name = file.Substring(toCut);
                 Console.WriteLine("Try to sending File: " + name);
-                MsgStream.Send(new FileMsgCBP(file, File.ReadAllBytes(file), false), socket);
+                MsgStream.Send(new FileMsgCBP(name, File.ReadAllBytes(file), false), socket);
             }
 
         }
@@ -75,7 +75,7 @@ namespace PDS_Project_Common
             StringCollection sc = new StringCollection(); 
 
             string path = null;
-            string tmpdir = Path.GetTempPath() + "PDS_project";
+            string tmpdir = Path.GetTempPath() + "PDS_project\\";
 
             Console.WriteLine("Files stored in: "  + tmpdir);
             
