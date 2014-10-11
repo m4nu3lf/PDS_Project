@@ -79,13 +79,11 @@ namespace PDS_Project_Common
 
             Console.WriteLine("Files stored in: "  + tmpdir);
             
-            if( Directory.Exists(tmpdir) ) Directory.Delete(tmpdir);
+            if( Directory.Exists(tmpdir) )
+                Directory.Delete(tmpdir, true);
             Directory.CreateDirectory(tmpdir);
-
-
-            o = (Message)MsgStream.Receive(socket);
             
-            while (!(o is StopFileCBP))
+            do
             {
                 o = (Message)MsgStream.Receive(socket);
 
@@ -105,16 +103,17 @@ namespace PDS_Project_Common
                     Console.WriteLine("Craeted new Dir: " + path);
                 }
             }
-
+            while (!(o is StopFileCBP));
+            foreach (String s in sc)
+                Console.WriteLine("Clipboard content: " + s);
             Clipboard.SetFileDropList(sc);
-
-
         }
 
         public static void FreeTmpResources()
         {
             string tmpdir = Path.GetTempPath() + "PDS_project";
-            if (Directory.Exists(tmpdir)) Directory.Delete(tmpdir);
+            if (Directory.Exists(tmpdir))
+                Directory.Delete(tmpdir, true);
         }
 
         public static long GetCBFilesSize()
