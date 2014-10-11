@@ -213,7 +213,7 @@ namespace PDS_Project_Client
                                     + " .\nYou will be advised when the transfer is completed.", "Starting Transfer",
                                     System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
 
-                                //chiamo il metodo
+                                ClipboardFiles.RecvClipboardFiles(_ds[i]);
 
                                 System.Windows.Forms.MessageBox.Show("File/s received from server: " + i.ToString()
                                     + " .", "Transfer completed",
@@ -222,10 +222,27 @@ namespace PDS_Project_Client
                             }
 
                             if (m is MaxSizeCBP) 
-                            { 
-                                //se confermo
-                                //chiamo metodo per ricevere file
-                                //se non confermo esco
+                            {
+                                if (System.Windows.Forms.MessageBox.Show("The size of clipboard's content is greater than MaxSize: " + ClipboardFiles.MaxSize
+                                        + " \nConfirm the transfer?", "Closing Warning", System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Warning) == System.Windows.Forms.DialogResult.Yes)
+                                {
+
+
+                                    System.Windows.Forms.MessageBox.Show("Receiving file/s from server: " + i.ToString()
+                                        + " .\nYou will be advised when the transfer is completed.", "Starting Transfer",
+                                        System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
+
+                                    MsgStream.Send(new ConfirmCBP(), _ds[i]);
+                                    ClipboardFiles.RecvClipboardFiles(_ds[i]);
+
+                                    System.Windows.Forms.MessageBox.Show("File/s received from server: " + i.ToString()
+                                        + " .", "Transfer completed",
+                                        System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
+                                }
+                                else
+                                {
+                                    MsgStream.Send(new StopFileCBP(), _ds[i]);
+                                }
                             }
 
                         }

@@ -433,8 +433,8 @@ namespace PDS_Project_Client
 
             //DEFAULT CONFIG
 
-            //this.tb_IP.Text = "169.254.162.184";
-            this.tb_IP.Text = "172.20.90.244";
+            this.tb_IP.Text = "169.254.162.184";
+            //this.tb_IP.Text = "172.20.90.244";
             this.tb_EP.Text = "200" + i.ToString();
             this.tb_DP.Text = "300" + i.ToString();
             this.tb_PSW.Text = "12345";
