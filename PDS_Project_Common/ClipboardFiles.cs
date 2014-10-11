@@ -43,11 +43,10 @@ namespace PDS_Project_Common
                  }
             }
 
-            //MsgStream.Send(new StopFileCBP(), socket);
             
         }
 
-        public static void SeekAndSend(Socket socket, string path) 
+        private static void SeekAndSend(Socket socket, string path) 
         {
             FileInfo fi;
             DirectoryInfo di;
