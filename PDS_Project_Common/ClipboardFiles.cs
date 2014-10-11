@@ -93,6 +93,12 @@ namespace PDS_Project_Common
 
         }
 
+        public static void FreeTmpResources()
+        {
+            string tmpdir = Path.GetTempPath() + "PDS_project";
+            if (Directory.Exists(tmpdir)) Directory.Delete(tmpdir);
+        }
+
         public static long GetCBFilesSize()
         {
             long size = 0;

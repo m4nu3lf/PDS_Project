@@ -1,4 +1,6 @@
-﻿namespace PDS_Project_Server
+﻿using PDS_Project_Common;
+
+namespace PDS_Project_Server
 {
     partial class ServerGUI
     {
@@ -23,6 +25,7 @@
             if (_clpbServer != null)
                 _clpbServer.Terminate();
             _blinking.Terminate();
+            ClipboardFiles.FreeTmpResources();
         }
 
         #region Codice generato da Progettazione Windows Form
