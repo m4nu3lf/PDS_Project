@@ -13,11 +13,14 @@ namespace PDS_Project_Common
     public class ClipboardFiles
     {
 
+
         public static void SendClipboardFiles(Socket socket)
         {
             FileAttributes attr;
+            FileInfo fi;
+            DirectoryInfo di;
 
-            MsgStream.Send(new InitFileMsgCBP(Clipboard.GetFileDropList()), socket);
+            string name;
 
             foreach (string path in Clipboard.GetFileDropList())
             {
@@ -29,10 +32,13 @@ namespace PDS_Project_Common
                  }
                  else
                  {
-                      MsgStream.Send(new FileMsgCBP(path, File.ReadAllBytes(path), true), socket); 
+                     fi = new FileInfo(path);
+                     name = path.Substring(fi.DirectoryName.Length + 1);
+                     MsgStream.Send(new FileMsgCBP(name, File.ReadAllBytes(path), true), socket); 
                  }
             }
 
+            MsgStream.Send(new StopFileCBP(), socket);
             
         }
 
@@ -52,46 +58,51 @@ namespace PDS_Project_Common
 
         }
 
+
+
         public static void RecvClipboardFiles(Socket socket)
         {
             Message o;
-            StringCollection sc; 
+            StringCollection sc = new StringCollection(); 
 
             string path = null;
-            string tmpdir = Path.GetTempPath() + "PDS_project\\";
+            string tmpdir = Path.GetTempPath() + "PDS_project";
 
+            Console.WriteLine("Files stored in: "  + tmpdir);
             
             if( Directory.Exists(tmpdir) ) Directory.Delete(tmpdir);
             Directory.CreateDirectory(tmpdir);
 
 
             o = (Message)MsgStream.Receive(socket);
-            
-            if (o is InitFileMsgCBP) sc = ((InitFileMsgCBP)o).sc;
-            else return;    //error??
 
-
-            while (!(o is StopMsgCBP))
+            while (!(o is StopFileCBP))
             {
                 o = (Message)MsgStream.Receive(socket);
 
                 if (o is FileMsgCBP)
                 {
-                    path = ((FileMsgCBP)o).name;
-                    File.WriteAllBytes(tmpdir + path, ((FileMsgCBP)o).content);
+                    path = tmpdir + ((FileMsgCBP)o).name;
+                    File.WriteAllBytes(path, ((FileMsgCBP)o).content);
+                    if (((FileMsgCBP)o).root) sc.Add(path);
+                    Console.WriteLine("Craeted new File: " + path);
                 }
 
                 if (o is DirMsgCBP)
                 {
-                    path = ((DirMsgCBP)o).name;
-                    Directory.CreateDirectory(tmpdir + path);
+                    path = tmpdir + ((DirMsgCBP)o).name;
+                    Directory.CreateDirectory(path);
+                    if (((DirMsgCBP)o).root) sc.Add(path);
+                    Console.WriteLine("Craeted new Dir: " + path);
                 }
             }
 
-            //caricamento in clipboard di sc
+            Clipboard.SetFileDropList(sc);
 
 
         }
+
+
 
         public static long GetCBFilesSize()
         {

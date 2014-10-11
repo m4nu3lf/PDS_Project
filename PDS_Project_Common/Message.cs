@@ -165,15 +165,11 @@ namespace PDS_Project_Common
     /* FILE PROTOCOL */
     
     [Serializable]
-    public class InitFileMsgCBP : Message
+    public class InitFileCBP : Message
     {
-        private StringCollection _sc;
-
-        public InitFileMsgCBP(StringCollection sc){ _sc = sc; }
-
-        public StringCollection sc { get { return _sc; } }
-            
+        public InitFileCBP(){ }
     }
+
 
     [Serializable]
     public class DirMsgCBP : Message
@@ -207,21 +203,21 @@ namespace PDS_Project_Common
 
 
     [Serializable]
-    public class StopMsgCBP : Message
+    public class StopFileCBP : Message
     {
-        public StopMsgCBP() { }
+        public StopFileCBP() { }
     }
 
     [Serializable]
-    public class ConfirmMsgCBP : Message
+    public class ConfirmCBP : Message
     {
-        public ConfirmMsgCBP() { }
+        public ConfirmCBP() { }
     }
 
     [Serializable]
-    public class MaxSizeMsgCBP : Message
+    public class MaxSizeCBP : Message
     {
-        public MaxSizeMsgCBP() { }
+        public MaxSizeCBP() { }
     }
 
 
