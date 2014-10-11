@@ -11,9 +11,7 @@ namespace PDS_Project_Common
     [Serializable]
     public class Message
     {
-        static int MaxSize = 1024*1024*1024;
         public Message() { }
-
     }
 
     /* AUTHENTICATION MSG PROTOCOL */

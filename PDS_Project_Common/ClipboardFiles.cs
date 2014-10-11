@@ -13,6 +13,7 @@ namespace PDS_Project_Common
     public class ClipboardFiles
     {
 
+        static int MaxSize = 1024 * 1024 * 1024;
 
         public static void SendClipboardFiles(Socket socket)
         {
@@ -27,33 +28,46 @@ namespace PDS_Project_Common
                  attr = File.GetAttributes(path);
                  if ((attr & FileAttributes.Directory) == FileAttributes.Directory) 
                  {
-                     MsgStream.Send(new DirMsgCBP(path, true), socket);
+                     di = new DirectoryInfo(path);
+                     name = path.Substring(di.Parent.Name.Length + 1);
+                     Console.WriteLine("Try to sending: " + name);
+                     //MsgStream.Send(new DirMsgCBP(name, true), socket);
                      SeekAndSend(socket, path);
                  }
                  else
                  {
                      fi = new FileInfo(path);
                      name = path.Substring(fi.DirectoryName.Length + 1);
-                     MsgStream.Send(new FileMsgCBP(name, File.ReadAllBytes(path), true), socket); 
+                     Console.WriteLine("Try to sending: " + name);
+                     //MsgStream.Send(new FileMsgCBP(name, File.ReadAllBytes(path), true), socket); 
                  }
             }
 
-            MsgStream.Send(new StopFileCBP(), socket);
+            //MsgStream.Send(new StopFileCBP(), socket);
             
         }
 
         public static void SeekAndSend(Socket socket, string path) 
         {
+            FileInfo fi;
+            DirectoryInfo di;
+            string name;
 
             foreach (string dir in Directory.GetDirectories(path))
             {
-                MsgStream.Send(new DirMsgCBP(dir, false), socket);
+                di = new DirectoryInfo(path);
+                name = path.Substring(di.Parent.Name.Length + 1);
+                Console.WriteLine("Try to sending Dir: " + name);
+                //MsgStream.Send(new DirMsgCBP(dir, false), socket);
                 SeekAndSend(socket, dir);
             }
 
             foreach (string file in Directory.EnumerateFiles(path))
             {
-                MsgStream.Send(new FileMsgCBP(file, File.ReadAllBytes(file), false), socket);
+                fi = new FileInfo(path);
+                name = path.Substring(fi.DirectoryName.Length + 1);
+                Console.WriteLine("Try to sending File: " + name);
+                //MsgStream.Send(new FileMsgCBP(file, File.ReadAllBytes(file), false), socket);
             }
 
         }

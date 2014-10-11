@@ -206,7 +206,7 @@ namespace PDS_Project_Client
                                 System.Windows.Forms.Clipboard.SetText(content);
                             }
 
-                            if (m is InitFileMsgCBP) //FILEMSG
+                            if (m is InitFileCBP) //FILEMSG
                             {
 
                                 System.Windows.Forms.MessageBox.Show("Receiving file/s from server: " + i.ToString()
@@ -221,7 +221,7 @@ namespace PDS_Project_Client
                             
                             }
 
-                            if (m is MaxSizeMsgCBP) 
+                            if (m is MaxSizeCBP) 
                             { 
                                 //se confermo
                                 //chiamo metodo per ricevere file
