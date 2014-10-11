@@ -751,20 +751,32 @@ namespace PDS_Project_Client
         {
             //MessageBox.Show("Sending clipboard to server:" + i.ToString() + " .\nYou will be advised when the transfer is completed.", "Starting Transfer", MessageBoxButtons.OK, MessageBoxIcon.Information);
             
+            Socket s = _host.ds(i);
+            if( s == null ) return;
 
             if (Clipboard.ContainsData(DataFormats.Text))
             {
                 string txt = Clipboard.GetText();
-                    MsgStream.Send(new TextMsgCBP(txt), _host.ds(i));
-                    //MessageBox.Show("Clipboard sent to server:" + i.ToString() + " .\nCheck on it.", "Transfer Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MsgStream.Send(new TextMsgCBP(txt), _host.ds(i));
+                //MessageBox.Show("Clipboard sent to server:" + i.ToString() + " .\nCheck on it.", "Transfer Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         
             }
 
             if (Clipboard.ContainsFileDropList()) 
             {
+                long size = ClipboardFiles.GetCBFilesSize();
+                if (size > ClipboardFiles.MaxSize)
+                {
+                    if (MessageBox.Show("The size of clipboard's content is greater than MaxSize: " + ClipboardFiles.MaxSize  
+                        + " \nConfirm the transfer?", "Closing Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No) 
+                    {
+                        return;
+                    }
+                }
 
-                //chiamo il metodo per inviare.
-                ClipboardFiles.SendClipboardFiles(null);
+                MsgStream.Send(new InitFileCBP(), s);
+                ClipboardFiles.SendClipboardFiles(s);
+                MsgStream.Send(new StopFileCBP(), s);
             }
 
 

@@ -89,6 +89,7 @@ namespace PDS_Project_Client
                 for (int k = 0; k < 4; k++) _sp[k].DisconnectionReq();
                 eThread.Abort();
                 dThread.Abort();
+                ClipboardFiles.FreeTmpResources();
                 Application.Exit();
             }
         }
