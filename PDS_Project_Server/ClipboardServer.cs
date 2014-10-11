@@ -21,6 +21,10 @@ namespace PDS_Project_Server
                 {
                     Clipboard.SetText(((TextMsgCBP)_obj).content);
                 }
+                else if (_obj is InitFileCBP)
+                {
+                    ClipboardFiles.RecvClipboardFiles(Server.CommSocket);
+                }
                 else if (_obj is GetMsgCBP)
                 {
                     if (Clipboard.ContainsText())
@@ -29,7 +33,17 @@ namespace PDS_Project_Server
                     }
                     if (Clipboard.ContainsFileDropList())
                     {
-
+                        if (ClipboardFiles.GetCBFilesSize() > ClipboardFiles.MaxSize)
+                        {
+                            MsgStream.Send(new MaxSizeCBP(), Server.CommSocket);
+                            Object response = MsgStream.Receive(Server.CommSocket);
+                            if (response is ConfirmCBP)
+                            {
+                                MsgStream.Send(new InitFileCBP(), Server.CommSocket);
+                                ClipboardFiles.SendClipboardFiles(Server.CommSocket);
+                                MsgStream.Send(new StopFileCBP(), Server.CommSocket);
+                            }
+                        }
                     }
                 }
             }
