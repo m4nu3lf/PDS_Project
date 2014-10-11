@@ -132,6 +132,7 @@ namespace PDS_Project_Server
             {
                 try
                 {
+                    _obj = null;
                     _obj = MsgStream.Receive(Server._commSocket);
                     if (_obj == null)
                         Server.State = new WaitingState();
