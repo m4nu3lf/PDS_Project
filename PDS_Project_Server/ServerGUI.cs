@@ -154,11 +154,13 @@ namespace PDS_Project_Server
                         statusLabel.ForeColor = Color.Orange;
                     else
                         statusLabel.ForeColor = Color.Green;
+                    statusLabel.Text = _evtServer.State.GetMsg();
                 }
                 else if (_evtServer.State is Server.DisconnectedState
                         && _clpbServer.State is Server.DisconnectedState)
                 {
                     statusLabel.ForeColor = Color.Red;
+                    statusLabel.Text = _evtServer.State.GetMsg();
                     ipBox.Enabled = true;
                     eventsPortUpDown.Enabled = true;
                     clipboardUpDown.Enabled = true;
@@ -169,11 +171,10 @@ namespace PDS_Project_Server
                 else if (_evtServer.State is EventServer.ActiveState)
                 {
                     _blinking.Blink();
-                    statusLabel.ForeColor = Color.Blue;
                     _notifyIcon.Icon = _activeIcon;
-                }
-                if (_evtServer.State != null)
+                    statusLabel.ForeColor = Color.Blue;
                     statusLabel.Text = _evtServer.State.GetMsg();
+                }
             }
         }
 
