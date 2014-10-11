@@ -179,8 +179,13 @@ namespace PDS_Project_Common
     public class DirMsgCBP : Message
     {
         public string name { get; set; }
+        public bool root { get; set; }
 
-        public DirMsgCBP(string n) { name = n; }
+        public DirMsgCBP(string n, bool r)
+        {
+            name = n;
+            root = r;
+        }
 
     }
 
@@ -189,11 +194,13 @@ namespace PDS_Project_Common
     {
         public string name { get; set; }
         public Byte[] content { get; set; }
+        public bool root { get; set; }
 
-        public FileMsgCBP(string n, Byte[] c)
+        public FileMsgCBP(string n, Byte[] c, bool r)
         {
             content = c;
-            name = n; 
+            name = n;
+            root = r;
         }
 
     }

@@ -24,12 +24,12 @@ namespace PDS_Project_Common
                  attr = File.GetAttributes(path);
                  if ((attr & FileAttributes.Directory) == FileAttributes.Directory) 
                  {
-                     MsgStream.Send(new DirMsgCBP(path), socket);
+                     MsgStream.Send(new DirMsgCBP(path, true), socket);
                      SeekAndSend(socket, path);
                  }
                  else
                  {
-                      MsgStream.Send(new FileMsgCBP(path, File.ReadAllBytes(path)), socket); 
+                      MsgStream.Send(new FileMsgCBP(path, File.ReadAllBytes(path), true), socket); 
                  }
             }
 
@@ -41,13 +41,13 @@ namespace PDS_Project_Common
 
             foreach (string dir in Directory.GetDirectories(path))
             {
-                MsgStream.Send(new DirMsgCBP(dir), socket);
+                MsgStream.Send(new DirMsgCBP(dir, false), socket);
                 SeekAndSend(socket, dir);
             }
 
             foreach (string file in Directory.EnumerateFiles(path))
             {
-                MsgStream.Send(new FileMsgCBP(file, File.ReadAllBytes(file)), socket);
+                MsgStream.Send(new FileMsgCBP(file, File.ReadAllBytes(file), false), socket);
             }
 
         }
