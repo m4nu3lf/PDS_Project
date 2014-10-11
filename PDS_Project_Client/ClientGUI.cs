@@ -235,9 +235,9 @@ namespace PDS_Project_Client
                         _Host.SendCB();
                     }
 
-                    //  HOT KEY HOST 
                     if(ALT){
 
+                        //  HOT KEY HOST 
                         if (km.VirtualKey == _hostHK && km.Pressed)
                         {
 

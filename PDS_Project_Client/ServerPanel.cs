@@ -759,31 +759,49 @@ namespace PDS_Project_Client
             Socket s = _host.ds(i);
             if( s == null ) return;
 
-            if (Clipboard.ContainsData(DataFormats.Text))
+            try
             {
-                string txt = Clipboard.GetText();
-                MsgStream.Send(new TextMsgCBP(txt), _host.ds(i));
-                Console.WriteLine("CBP : Sent TXT.");
-                //MessageBox.Show("Clipboard sent to server:" + i.ToString() + " .\nCheck on it.", "Transfer Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        
-            }
 
-            if (Clipboard.ContainsFileDropList()) 
-            {
-                long size = ClipboardFiles.GetCBFilesSize();
-                if (size > ClipboardFiles.MaxSize)
+
+                /* SENDING TEXT TYPE */
+
+                if (Clipboard.ContainsData(DataFormats.Text))
                 {
-                    if (MessageBox.Show("The size of clipboard's content is greater than MaxSize: " + ClipboardFiles.MaxSize  
-                        + " \nConfirm the transfer?", "Closing Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No) 
-                    {
-                        return;
-                    }
+                    string txt = Clipboard.GetText();
+                    MsgStream.Send(new TextMsgCBP(txt), _host.ds(i));
+                    //Console.WriteLine("CBP : Sent TXT.");
+                    //MessageBox.Show("Clipboard sent to server:" + i.ToString() + " .\nCheck on it.", "Transfer Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
                 }
 
-                MsgStream.Send(new InitFileCBP(), s);
-                ClipboardFiles.SendClipboardFiles(s);
-                Console.WriteLine("CBP : Sent Files.");
-                MsgStream.Send(new StopFileCBP(), s);
+
+
+                /* SENDING FILE TYPE */
+
+                if (Clipboard.ContainsFileDropList())
+                {
+                    long size = ClipboardFiles.GetCBFilesSize();
+                    if (size > ClipboardFiles.MaxSize)
+                    {
+                        if (MessageBox.Show("The size of clipboard's content is greater than MaxSize: " + ClipboardFiles.MaxSize
+                            + " \nConfirm the transfer?", "Closing Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
+                        {
+                            return;
+                        }
+                    }
+
+                    MsgStream.Send(new InitFileCBP(), s);
+                    ClipboardFiles.SendClipboardFiles(s);
+                    //Console.WriteLine("CBP : Sent Files.");
+                    MsgStream.Send(new StopFileCBP(), s);
+                }
+            }
+            catch (Exception e)
+            {
+                System.Windows.Forms.MessageBox.Show("Ops...\nSomething goes wrong during Clipboard Transfer[on Sending].\nThe connection will be closed.\nTry again later.",
+                    "Clipboard Transfer Error!", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
+                this.DisconnectionReq();
+                Console.WriteLine("Clipboard file transfer error: " + e.Message);
             }
 
 
