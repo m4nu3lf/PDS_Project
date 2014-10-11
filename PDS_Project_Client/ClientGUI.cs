@@ -223,40 +223,53 @@ namespace PDS_Project_Client
                 if (km.VirtualKey == VirtualKeyShort.LMENU) ALT = km.Pressed;
                 if (km.VirtualKey == VirtualKeyShort.LCONTROL) CTRL = km.Pressed;
 
-                if (CTRL && ALT)
+                if (CTRL)
                 {
-
-                    //  HOT KEY HOST 
-
-                    if (km.VirtualKey == _hostHK && km.Pressed)
+                    if ( ( km.VirtualKey == VirtualKeyShort.KEY_C || km.VirtualKey == VirtualKeyShort.KEY_X ) && km.Pressed)
                     {
-
-                        WindowsAPI.UnhookWindowsHookEx(KEYhook);
-                        WindowsAPI.UnhookWindowsHookEx(MOUSEhook);
-
-                        _Host.EnqueueEventMsg(new KeyMsg(VirtualKeyShort.LMENU, false));
-                        _Host.EnqueueEventMsg(new KeyMsg(VirtualKeyShort.LCONTROL, false));
-
-                        _Host.EnqueueEventMsg(new StopComm(-1));
-
-                        return new IntPtr(1);
+                        _Host.EnqueueCBMsg();
                     }
 
-
-                    for (int k = 0; k < 4; k++)
+                    if (km.VirtualKey == VirtualKeyShort.KEY_V && km.Pressed)
                     {
-                        if ((km.VirtualKey == _sp[k].hk) && (km.Pressed))
+                        _Host.SendCB();
+                    }
+
+                    //  HOT KEY HOST 
+                    if(ALT){
+
+                        if (km.VirtualKey == _hostHK && km.Pressed)
                         {
+
+                            WindowsAPI.UnhookWindowsHookEx(KEYhook);
+                            WindowsAPI.UnhookWindowsHookEx(MOUSEhook);
 
                             _Host.EnqueueEventMsg(new KeyMsg(VirtualKeyShort.LMENU, false));
                             _Host.EnqueueEventMsg(new KeyMsg(VirtualKeyShort.LCONTROL, false));
 
-                            _Host.EnqueueEventMsg(new StopComm(k));
-                            _Host.EnqueueEventMsg(new InitComm(k));
+                            _Host.EnqueueEventMsg(new StopComm(-1));
 
                             return new IntPtr(1);
                         }
+
+
+                        for (int k = 0; k < 4; k++)
+                        {
+                            if ((km.VirtualKey == _sp[k].hk) && (km.Pressed))
+                            {
+
+                                _Host.EnqueueEventMsg(new KeyMsg(VirtualKeyShort.LMENU, false));
+                                _Host.EnqueueEventMsg(new KeyMsg(VirtualKeyShort.LCONTROL, false));
+
+                                _Host.EnqueueEventMsg(new StopComm(k));
+                                _Host.EnqueueEventMsg(new InitComm(k));
+
+                                return new IntPtr(1);
+                            }
+                        }
+
                     }
+
                 }
 
                 /* no hotkey identyfied , enqueing message */

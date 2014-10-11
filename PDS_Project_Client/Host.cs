@@ -169,12 +169,25 @@ namespace PDS_Project_Client
 
         /* clipboard managing */
 
+        public void SendCB()
+        {
+            if (_eas != -1) _sp[_eas].StartSendingCB();
+        }
+
         public void EnqueueCBMsg(Message m)
         {
             lock (_dq) { _dq.Enqueue(m); }    //enqueueing MSG
             _de.Set(); // setting the event to wake the thread
         }
 
+        public void EnqueueCBMsg()
+        {
+            lock (_dq) {
+                if (_eas != -1) _dq.Enqueue(new GetMsgCBP(_eas)); //enqueueing MSG
+            }    
+
+            _de.Set(); // setting the event to wake the thread
+        }
 
         public void ReceiveCBMsg()
         {
@@ -204,17 +217,20 @@ namespace PDS_Project_Client
                             {
                                 string content = ((TextMsgCBP)m).content;
                                 System.Windows.Forms.Clipboard.SetText(content);
+                                Console.WriteLine("CBP : Received TXT.");
                             }
 
                             if (m is InitFileCBP) //FILEMSG
                             {
-
+                                if( _eas == -1 )
                                 System.Windows.Forms.MessageBox.Show("Receiving file/s from server: " + i.ToString()
                                     + " .\nYou will be advised when the transfer is completed.", "Starting Transfer",
                                     System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
 
                                 ClipboardFiles.RecvClipboardFiles(_ds[i]);
+                                Console.WriteLine("CBP : Received Files.");
 
+                                if (_eas == -1)
                                 System.Windows.Forms.MessageBox.Show("File/s received from server: " + i.ToString()
                                     + " .", "Transfer completed",
                                     System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);

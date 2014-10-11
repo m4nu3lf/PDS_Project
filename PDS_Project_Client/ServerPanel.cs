@@ -741,6 +741,11 @@ namespace PDS_Project_Client
         {
             sendCBB.Enabled = false;
 
+            StartSendingCB();
+        }
+
+        public void StartSendingCB()
+        {
             CBDeamon = new Thread(sendClipboardDatas);
             CBDeamon.SetApartmentState(ApartmentState.STA);
             CBDeamon.Start();
@@ -758,6 +763,7 @@ namespace PDS_Project_Client
             {
                 string txt = Clipboard.GetText();
                 MsgStream.Send(new TextMsgCBP(txt), _host.ds(i));
+                Console.WriteLine("CBP : Sent TXT.");
                 //MessageBox.Show("Clipboard sent to server:" + i.ToString() + " .\nCheck on it.", "Transfer Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         
             }
@@ -776,6 +782,7 @@ namespace PDS_Project_Client
 
                 MsgStream.Send(new InitFileCBP(), s);
                 ClipboardFiles.SendClipboardFiles(s);
+                Console.WriteLine("CBP : Sent Files.");
                 MsgStream.Send(new StopFileCBP(), s);
             }
 
