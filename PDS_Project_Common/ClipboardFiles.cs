@@ -13,7 +13,7 @@ namespace PDS_Project_Common
     public class ClipboardFiles
     {
 
-        static int MaxSize = 1024 * 1024 * 1024;
+        public const int MaxSize = 1024 * 1024 * 1024;
 
         public static void SendClipboardFiles(Socket socket)
         {
