@@ -879,8 +879,6 @@ namespace PDS_Project_Client
 
                     MsgStream.Send(new InitFileCBP(), s);
                     ClipboardFiles.SendClipboardFiles(s);
-                    //Console.WriteLine("CBP : Sent Files.");
-                    MsgStream.Send(new StopFileCBP(), s);
                 }
             }
             catch (Exception e)

@@ -66,6 +66,7 @@ namespace PDS_Project_Common
                  }
             }
 
+            MsgStream.Send(new StopFileCBP(), socket);
             ConfirmCBP m = (ConfirmCBP)MsgStream.Receive(socket);
             
         }
@@ -129,9 +130,6 @@ namespace PDS_Project_Common
             }
             while (!(o is StopFileCBP));
             
-            //foreach (String s in sc) Console.WriteLine("Clipboard content: " + s);
-            
-            //Clipboard.SetFileDropList(sc);
 
             CBloader = new Thread((new CBLoaderThread()).run);
             CBloader.SetApartmentState(ApartmentState.STA);
