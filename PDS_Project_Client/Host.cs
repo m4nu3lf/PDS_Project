@@ -257,7 +257,6 @@ namespace PDS_Project_Client
                                         + " .", "Transfer completed",
                                         System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
                                     */
-                                    
                                     _sp[i].EnableCB();
                                     break;
                                 }

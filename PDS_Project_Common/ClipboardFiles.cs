@@ -66,8 +66,6 @@ namespace PDS_Project_Common
                  }
             }
 
-            MsgStream.Send(new StopFileCBP(), socket);
-            ConfirmCBP m = (ConfirmCBP)MsgStream.Receive(socket);
             
         }
 

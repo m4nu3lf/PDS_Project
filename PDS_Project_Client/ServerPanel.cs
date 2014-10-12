@@ -676,15 +676,8 @@ namespace PDS_Project_Client
 
             if (this.disconnectB.InvokeRequired)
             {
-                try
-                {
-                    UsefulDelegate ud = new UsefulDelegate(Disconnected);
-                    this.Invoke(ud);
-                }
-                catch (System.ObjectDisposedException)
-                {
-                    Console.WriteLine("Error while disconnecting.");
-                }
+                UsefulDelegate ud = new UsefulDelegate(Disconnected);
+                this.Invoke(ud);
             }
             else
             {
@@ -692,6 +685,9 @@ namespace PDS_Project_Client
                 this.connectionStatus.Text = "Disconnected";
                 this.serverActive.ForeColor = System.Drawing.Color.Red;
                 serverActive.Text = "Not Active";
+                statusCB.ForeColor = System.Drawing.Color.Red;
+                statusCB.Text = "Not Ready";
+
                 c_flag = false;
 
                 tb_IP.Enabled = true;
@@ -703,8 +699,6 @@ namespace PDS_Project_Client
                 this.sendCBB.Enabled = false;
                 this.connectB.Enabled = true;
 
-                statusCB.ForeColor = System.Drawing.Color.Red;
-                statusCB.Text = "Not Ready";
             }
 
         }
@@ -879,6 +873,8 @@ namespace PDS_Project_Client
 
                     MsgStream.Send(new InitFileCBP(), s);
                     ClipboardFiles.SendClipboardFiles(s);
+                    MsgStream.Send(new StopFileCBP(), s);
+                    ConfirmCBP m = (ConfirmCBP)MsgStream.Receive(s);
                 }
             }
             catch (Exception e)
