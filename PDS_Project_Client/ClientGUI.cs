@@ -69,8 +69,9 @@ namespace PDS_Project_Client
             _hostHK = VirtualKeyShort.KEY_Q;
 
             InitializeComponent();
-            
+
             eThread = new Thread((new EventThread()).run);
+            eThread.SetApartmentState(ApartmentState.STA);
             eThread.Start(_Host);
 
             dThread = new Thread((new DataThread()).run);

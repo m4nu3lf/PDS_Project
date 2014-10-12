@@ -433,7 +433,8 @@ namespace PDS_Project_Client
 
             //DEFAULT CONFIG
 
-            this.tb_IP.Text = "169.254.162.184";
+            this.tb_IP.Text = "192.168.0.5";
+            //this.tb_IP.Text = "169.254.162.184";
             //this.tb_IP.Text = "172.20.90.244";
             this.tb_EP.Text = "200" + i.ToString();
             this.tb_DP.Text = "300" + i.ToString();
@@ -761,43 +762,44 @@ namespace PDS_Project_Client
 
             IDataObject clipboardData = Clipboard.GetDataObject();
             string[] formats = clipboardData.GetFormats();
-            foreach (string format in formats)
-            {
-                if (format == DataFormats.FileDrop)
-                    continue;
-                MsgStream.Send(new DataMsgCBP(format, clipboardData.GetData(format)),
-                    _host.ds(i));
-            }
 
-            /*if (Clipboard.ContainsData(DataFormats.Text))
-            {
-                string txt = Clipboard.GetText();
-                MsgStream.Send(new TextMsgCBP(txt), );
-                //MessageBox.Show("Clipboard sent to server:" + i.ToString() + " .\nCheck on it.", "Transfer Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        
-            }*/
+            try{
 
-
-
-                /* SENDING FILE TYPE */
-
-            if (Clipboard.ContainsFileDropList()) 
-            {
-                long size = ClipboardFiles.GetCBFilesSize();
-                if (size > ClipboardFiles.MaxSize)
+                foreach (string format in formats)
                 {
-                    if (MessageBox.Show("The size of clipboard's content is greater than MaxSize: " + ClipboardFiles.MaxSize  
-                        + " \nConfirm the transfer?", "Closing Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No) 
-                    {
-                        return;
-                    }
+                    Console.WriteLine("Analizing clipboard. FORMAT FOUND: " + format);
+                    if (format == DataFormats.FileDrop) continue;
+                    MsgStream.Send(new DataMsgCBP(format, clipboardData.GetData(format)), _host.ds(i));
                 }
 
-                MsgStream.Send(new InitFileCBP(), s);
-                ClipboardFiles.SendClipboardFiles(s);
-                    //Console.WriteLine("CBP : Sent Files.");
-                MsgStream.Send(new StopFileCBP(), s);
-            }
+                /*if (Clipboard.ContainsData(DataFormats.Text))
+                {
+                    string txt = Clipboard.GetText();
+                    MsgStream.Send(new TextMsgCBP(txt), );
+                    //MessageBox.Show("Clipboard sent to server:" + i.ToString() + " .\nCheck on it.", "Transfer Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        
+                }*/
+
+
+                    /* SENDING FILE TYPE */
+
+                if (Clipboard.ContainsFileDropList()) 
+                {
+                    long size = ClipboardFiles.GetCBFilesSize();
+                    if (size > ClipboardFiles.MaxSize)
+                    {
+                        if (MessageBox.Show("The size of clipboard's content is greater than MaxSize: " + ClipboardFiles.MaxSize  
+                            + " \nConfirm the transfer?", "Closing Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No) 
+                        {
+                            return;
+                        }
+                    }
+
+                    MsgStream.Send(new InitFileCBP(), s);
+                    ClipboardFiles.SendClipboardFiles(s);
+                        //Console.WriteLine("CBP : Sent Files.");
+                    MsgStream.Send(new StopFileCBP(), s);
+                }
             }
             catch (Exception e)
             {

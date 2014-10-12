@@ -186,6 +186,7 @@ namespace PDS_Project_Client
         {
             lock (_dq) {
                 if (_eas != -1) _dq.Enqueue(new GetMsgCBP(_eas)); //enqueueing MSG
+                else return;
             }    
 
             _de.Set(); // setting the event to wake the thread
@@ -197,9 +198,8 @@ namespace PDS_Project_Client
             Message m;
             int i = 0;
 
-            while (true)
-            {
-
+            while(true){ 
+            
                 while (_de.WaitOne())
                 {
 
@@ -212,60 +212,72 @@ namespace PDS_Project_Client
                         try
                         {
                             MsgStream.Send(m, _ds[i]);
-                            m = (Message)MsgStream.Receive(_ds[i]);
+                            Console.WriteLine("richiesta di ricezione inviata");
 
-                            if (m is DataMsgCBP)
-                            {
-                                DataMsgCBP dataMsgCBP = (DataMsgCBP)m;
-                                System.Windows.Forms.Clipboard.SetData(dataMsgCBP.format, dataMsgCBP.content);
-                            }
+                            do{
 
-                            /*if (m is TextMsgCBP) //TEXTMSG
-                            {
-                                string content = ((TextMsgCBP)m).content;
-                                System.Windows.Forms.Clipboard.SetText(content);
-                            }*/
+                                m = (Message)MsgStream.Receive(_ds[i]);
 
-                            if (m is InitFileCBP) //FILEMSG
-                            {
-                                if( _eas == -1 )
-                                System.Windows.Forms.MessageBox.Show("Receiving file/s from server: " + i.ToString()
-                                    + " .\nYou will be advised when the transfer is completed.", "Starting File/s Transfer",
-                                    System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
-
-                                ClipboardFiles.RecvClipboardFiles(_ds[i]);
-                                Console.WriteLine("CBP : Received Files.");
-
-                                if (_eas == -1)
-                                System.Windows.Forms.MessageBox.Show("File/s received from server: " + i.ToString()
-                                    + " .", "Transfer completed",
-                                    System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
-                            
-                            }
-
-                            if (m is MaxSizeCBP) 
-                            {
-                                if (System.Windows.Forms.MessageBox.Show("The size of clipboard's content is greater than MaxSize: " + ClipboardFiles.MaxSize
-                                        + " \nConfirm the transfer?", "File size exceeding", System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Warning) == System.Windows.Forms.DialogResult.Yes)
+                                if (m is DataMsgCBP)
                                 {
+                                    DataMsgCBP dataMsgCBP = (DataMsgCBP)m;
+                                    Console.WriteLine("ricevuto pacchetto: " + dataMsgCBP.format);
+                                    System.Windows.Forms.Clipboard.SetData(dataMsgCBP.format, dataMsgCBP.content);
+                                }
 
+                                /*if (m is TextMsgCBP) //TEXTMSG
+                                {
+                                    string content = ((TextMsgCBP)m).content;
+                                    System.Windows.Forms.Clipboard.SetText(content);
+                                }*/
 
+                                if (m is InitFileCBP) //FILEMSG
+                                {
+                                    Console.WriteLine("Arrivato l'INIT FILE CBP");
+
+                                    if( _eas == -1 )
                                     System.Windows.Forms.MessageBox.Show("Receiving file/s from server: " + i.ToString()
                                         + " .\nYou will be advised when the transfer is completed.", "Starting File/s Transfer",
                                         System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
 
-                                    MsgStream.Send(new ConfirmCBP(), _ds[i]);
                                     ClipboardFiles.RecvClipboardFiles(_ds[i]);
+                                    Console.WriteLine("CBP : Received Files.");
 
+                                    if (_eas == -1)
                                     System.Windows.Forms.MessageBox.Show("File/s received from server: " + i.ToString()
                                         + " .", "Transfer completed",
                                         System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
+                                    
                                 }
-                                else
+
+                                if (m is MaxSizeCBP) 
                                 {
-                                    MsgStream.Send(new StopFileCBP(), _ds[i]);
+                                    if (System.Windows.Forms.MessageBox.Show("The size of clipboard's content is greater than MaxSize: " + ClipboardFiles.MaxSize
+                                            + " \nConfirm the transfer?", "File size exceeding", System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Warning) == System.Windows.Forms.DialogResult.Yes)
+                                    {
+
+
+                                        System.Windows.Forms.MessageBox.Show("Receiving file/s from server: " + i.ToString()
+                                            + " .\nYou will be advised when the transfer is completed.", "Starting File/s Transfer",
+                                            System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
+
+                                        MsgStream.Send(new ConfirmCBP(), _ds[i]);
+                                        ClipboardFiles.RecvClipboardFiles(_ds[i]);
+
+                                        System.Windows.Forms.MessageBox.Show("File/s received from server: " + i.ToString()
+                                            + " .", "Transfer completed",
+                                            System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
+
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        MsgStream.Send(new StopFileCBP(), _ds[i]);
+                                        break;
+                                    }
                                 }
-                            }
+
+                            }while(!(m is StopFileCBP));
 
                         }
                         catch (Exception e)

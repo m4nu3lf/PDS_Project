@@ -4,16 +4,40 @@ using System.Linq;
 using System.Text;
 using System.Net.Sockets;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Collections.Specialized;
 
 namespace PDS_Project_Common
 {
+
+
+    public class CBLoaderThread
+    {
+        public void run(object param)
+        {
+            StringCollection _sc= (StringCollection)param;
+            Clipboard.SetFileDropList(_sc);
+            Console.WriteLine("Update CB Done!");
+            //Thread.CurrentThread.Abort();
+            return;
+        }
+
+
+    }
+
+
+
+
     public class ClipboardFiles
     {
 
         public const int MaxSize = 1024 * 1024 * 1024;
+
+        static Thread CBloader;
+
+
 
         public static void SendClipboardFiles(Socket socket)
         {
@@ -107,7 +131,14 @@ namespace PDS_Project_Common
             
             //foreach (String s in sc) Console.WriteLine("Clipboard content: " + s);
             
-            Clipboard.SetFileDropList(sc);
+            //Clipboard.SetFileDropList(sc);
+
+            CBloader = new Thread((new CBLoaderThread()).run);
+            CBloader.SetApartmentState(ApartmentState.STA);
+            CBloader.Start(sc);
+
+            CBloader.Join();
+
         }
 
         public static void FreeTmpResources()
