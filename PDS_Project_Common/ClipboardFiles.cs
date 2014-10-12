@@ -19,8 +19,7 @@ namespace PDS_Project_Common
         {
             StringCollection _sc= (StringCollection)param;
             Clipboard.SetFileDropList(_sc);
-            Console.WriteLine("Update CB Done!");
-            //Thread.CurrentThread.Abort();
+            //Console.WriteLine("Update CB Done!");
             return;
         }
 
@@ -67,6 +66,7 @@ namespace PDS_Project_Common
                  }
             }
 
+            ConfirmCBP m = (ConfirmCBP)MsgStream.Receive(socket);
             
         }
 
@@ -138,6 +138,8 @@ namespace PDS_Project_Common
             CBloader.Start(sc);
 
             CBloader.Join();
+
+            MsgStream.Send(new ConfirmCBP(), socket);
 
         }
 

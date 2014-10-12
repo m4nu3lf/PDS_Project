@@ -31,6 +31,10 @@ namespace PDS_Project_Client
         private System.Windows.Forms.Label hotkey;
         private System.Windows.Forms.Label hkLabel;
 
+
+        private System.Windows.Forms.Label statusCB;
+        private System.Windows.Forms.Label clipboard;
+
         /* datas */
 
         private System.Windows.Forms.Label ipLabel;
@@ -128,6 +132,8 @@ namespace PDS_Project_Client
             this.connectionStatus = new System.Windows.Forms.Label();
             this.status = new System.Windows.Forms.Label();
             this.serverActive = new System.Windows.Forms.Label();
+            this.statusCB = new System.Windows.Forms.Label();
+            this.clipboard = new System.Windows.Forms.Label();
 
             this.connectB = new System.Windows.Forms.Button();
             this.disconnectB = new System.Windows.Forms.Button();
@@ -273,7 +279,7 @@ namespace PDS_Project_Client
             this.status.Name = "statusLabel";
             this.status.Size = new System.Drawing.Size(94, 25);
             this.status.TabIndex = 0;
-            this.status.Text = "Status: ";
+            this.status.Text = "Events: ";
 
 
             // 
@@ -362,6 +368,29 @@ namespace PDS_Project_Client
             this.getCBB.UseVisualStyleBackColor = true;
 
 
+            // 
+            // clipboard
+            // 
+            this.clipboard.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.clipboard.Location = new System.Drawing.Point(3, 50);
+            this.clipboard.Name = "clipboard";
+            this.clipboard.Size = new System.Drawing.Size(94, 25);
+            this.clipboard.TabIndex = 0;
+            this.clipboard.Text = "Clipboard:";
+
+
+            // 
+            // statusCB
+            // 
+            this.statusCB.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.statusCB.Location = new System.Drawing.Point(3, 50);
+            this.statusCB.Name = "statusCB";
+            this.statusCB.Size = new System.Drawing.Size(94, 25);
+            this.statusCB.ForeColor = System.Drawing.Color.Red;
+            this.statusCB.TabIndex = 0;
+            this.statusCB.Text = "Not Ready";
+
+
 
             // 
             // tlp init
@@ -378,16 +407,17 @@ namespace PDS_Project_Client
 
             this.tlp.Location = new System.Drawing.Point(0, 0);
             this.tlp.Name = "tlp";
-            this.tlp.RowCount = 9;
-            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11F));
-            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11F));
-            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11F));
-            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11F));
-            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11F));
-            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11F));
-            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11F));
-            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11F));
-            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11F));
+            this.tlp.RowCount = 10;
+            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.tlp.Size = new System.Drawing.Size(200, 100);
             this.tlp.TabIndex = 0;
             this.tlp.ResumeLayout(false);
@@ -399,28 +429,33 @@ namespace PDS_Project_Client
 
             this.tlp.Controls.Add(this.serverIndex, 0, 0);
             this.tlp.Controls.Add(this.connectionStatus, 1, 0);
+
             this.tlp.Controls.Add(this.status, 0, 1);
             this.tlp.Controls.Add(this.serverActive, 1, 1);
 
+            this.tlp.Controls.Add(this.clipboard, 0, 2);
+            this.tlp.Controls.Add(this.statusCB, 1, 2);
 
-            this.tlp.Controls.Add(this.tb_IP, 1, 2);
-            this.tlp.Controls.Add(this.tb_PSW, 1, 3);
-            this.tlp.Controls.Add(this.tb_EP, 1, 4);
-            this.tlp.Controls.Add(this.tb_DP, 1, 5);
+            this.tlp.Controls.Add(this.ipLabel, 0, 3);
+            this.tlp.Controls.Add(this.tb_IP, 1, 3);
 
-            this.tlp.Controls.Add(this.ipLabel, 0, 2);
-            this.tlp.Controls.Add(this.pswLabel, 0, 3);
-            this.tlp.Controls.Add(this.eportLabel, 0, 4);
-            this.tlp.Controls.Add(this.dportLabel, 0, 5);
+            this.tlp.Controls.Add(this.pswLabel, 0, 4);
+            this.tlp.Controls.Add(this.tb_PSW, 1, 4);
+
+            this.tlp.Controls.Add(this.eportLabel, 0, 5);
+            this.tlp.Controls.Add(this.tb_EP, 1, 5);
+
+            this.tlp.Controls.Add(this.dportLabel, 0, 6);
+            this.tlp.Controls.Add(this.tb_DP, 1, 6);
 
             this.tlp.Controls.Add(this.sendCBB, 0, 7);
             this.tlp.Controls.Add(this.getCBB, 1, 7);
 
-            this.tlp.Controls.Add(this.hkLabel, 0, 6);
-            this.tlp.Controls.Add(this.hotkey, 1, 6);
-
             this.tlp.Controls.Add(this.connectB, 0, 8);
             this.tlp.Controls.Add(this.disconnectB, 1, 8);
+
+            this.tlp.Controls.Add(this.hkLabel, 0, 9);
+            this.tlp.Controls.Add(this.hotkey, 1, 9);
 
             /* Events */
 
@@ -572,6 +607,9 @@ namespace PDS_Project_Client
                 this.getCBB.Enabled = true;
                 this.sendCBB.Enabled = true;
                 this.connectB.Enabled = false;
+
+                statusCB.ForeColor = System.Drawing.Color.Green;
+                statusCB.Text = "Ready";
             }
 
         }
@@ -664,6 +702,9 @@ namespace PDS_Project_Client
                 this.getCBB.Enabled = false;
                 this.sendCBB.Enabled = false;
                 this.connectB.Enabled = true;
+
+                statusCB.ForeColor = System.Drawing.Color.Red;
+                statusCB.Text = "Not Ready";
             }
 
         }
@@ -735,10 +776,12 @@ namespace PDS_Project_Client
 
         private void getCB_click(Object o, EventArgs e)
         {
-            _host.EnqueueCBMsg(new GetMsgCBP(i));
-            getCBB.ForeColor = System.Drawing.Color.Orange;
+            sendCBB.Enabled = false;
             getCBB.Enabled = false;
-            getCBB.Text = "On queue...";
+
+            _host.EnqueueCBMsg(new GetMsgCBP(i));
+            statusCB.ForeColor = System.Drawing.Color.Red;
+            statusCB.Text = "On queue...";
         }
 
         public void StartCBGetting()
@@ -751,9 +794,11 @@ namespace PDS_Project_Client
             }
             else
             {
-                getCBB.ForeColor = System.Drawing.Color.Orange;
+                sendCBB.Enabled = false;
                 getCBB.Enabled = false;
-                getCBB.Text = "On queue...";
+
+                statusCB.ForeColor = System.Drawing.Color.Red;
+                statusCB.Text = "On queue...";
             }
 
         }
@@ -768,8 +813,8 @@ namespace PDS_Project_Client
             }
             else
             {
-                getCBB.ForeColor = System.Drawing.Color.Red;
-                getCBB.Text = "Getting...";
+                statusCB.ForeColor = System.Drawing.Color.Orange;
+                statusCB.Text = "Receiving...";
             }
 
         }
@@ -782,9 +827,11 @@ namespace PDS_Project_Client
         public void StartSendingCB()
         {
 
-            sendCBB.ForeColor = System.Drawing.Color.Red;
-            sendCBB.Text = "Sending...";
+            statusCB.ForeColor = System.Drawing.Color.Orange;
+            statusCB.Text = "Sending...";
+
             sendCBB.Enabled = false;
+            getCBB.Enabled = false;
 
             CBDeamon = new Thread(sendClipboardDatas);
             CBDeamon.SetApartmentState(ApartmentState.STA);
@@ -799,7 +846,7 @@ namespace PDS_Project_Client
             Socket s = _host.ds(i);
             if (s == null)
             {
-                EnableCBSending();
+                EnableCB();
                 return;
             }
 
@@ -810,19 +857,10 @@ namespace PDS_Project_Client
 
                 foreach (string format in formats)
                 {
-                    Console.WriteLine("Analizing clipboard. FORMAT FOUND: " + format);
+                    //Console.WriteLine("Analizing clipboard. FORMAT FOUND: " + format);
                     if (format == DataFormats.FileDrop) continue;
                     MsgStream.Send(new DataMsgCBP(format, clipboardData.GetData(format)), _host.ds(i));
                 }
-
-                /*if (Clipboard.ContainsData(DataFormats.Text))
-                {
-                    string txt = Clipboard.GetText();
-                    MsgStream.Send(new TextMsgCBP(txt), );
-                    //MessageBox.Show("Clipboard sent to server:" + i.ToString() + " .\nCheck on it.", "Transfer Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        
-                }*/
-
 
                     /* SENDING FILE TYPE */
 
@@ -834,14 +872,14 @@ namespace PDS_Project_Client
                         if (MessageBox.Show("The size of clipboard's content is greater than MaxSize: " + ClipboardFiles.MaxSize  
                             + " \nConfirm the transfer?", "Closing Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
                         {
-                            EnableCBSending();
+                            EnableCB();
                             return;
                         }
                     }
 
                     MsgStream.Send(new InitFileCBP(), s);
                     ClipboardFiles.SendClipboardFiles(s);
-                        //Console.WriteLine("CBP : Sent Files.");
+                    //Console.WriteLine("CBP : Sent Files.");
                     MsgStream.Send(new StopFileCBP(), s);
                 }
             }
@@ -854,43 +892,26 @@ namespace PDS_Project_Client
             }
 
 
-            EnableCBSending();
+            EnableCB();
             return;
 
         }
 
-
-
-        public void EnableCBSending()
+        public void EnableCB()
         {
 
             if (this.serverActive.InvokeRequired)
             {
-                UsefulDelegate ud = new UsefulDelegate(EnableCBSending);
-                this.Invoke(ud);
-            }
-            else
-            {
-                sendCBB.Enabled = true;
-                sendCBB.Text = "Send CB";
-                sendCBB.ForeColor = System.Drawing.Color.Black;
-            }
-
-        }
-
-        public void EnableCBGetting()
-        {
-
-            if (this.serverActive.InvokeRequired)
-            {
-                UsefulDelegate ud = new UsefulDelegate(EnableCBGetting);
+                UsefulDelegate ud = new UsefulDelegate(EnableCB);
                 this.Invoke(ud);
             }
             else
             {
                 getCBB.Enabled = true;
-                getCBB.Text = "Get CB";
-                getCBB.ForeColor = System.Drawing.Color.Black;
+                sendCBB.Enabled = true;
+
+                statusCB.ForeColor = System.Drawing.Color.Green;
+                statusCB.Text = "Ready";
             }
 
         }

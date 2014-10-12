@@ -215,7 +215,7 @@ namespace PDS_Project_Client
                     lock (_dq) { m = _dq.Dequeue(); }
                     i = ((GetMsgCBP)m).i;
 
-                    Console.WriteLine("Processing Getting RQ to: " + i);
+                    //Console.WriteLine("Processing Getting RQ to: " + i);
 
                     if ( (i != 0) && (i != 1) && (i != 2) && (i != 3) ) continue;
 
@@ -226,7 +226,7 @@ namespace PDS_Project_Client
                         try
                         {
                             MsgStream.Send(m, _ds[i]);
-                            Console.WriteLine("richiesta di ricezione inviata");
+                            //Console.WriteLine("richiesta di ricezione inviata");
 
                             do{
 
@@ -239,30 +239,26 @@ namespace PDS_Project_Client
                                     System.Windows.Forms.Clipboard.SetData(dataMsgCBP.format, dataMsgCBP.content);
                                 }
 
-                                /*if (m is TextMsgCBP) //TEXTMSG
-                                {
-                                    string content = ((TextMsgCBP)m).content;
-                                    System.Windows.Forms.Clipboard.SetText(content);
-                                }*/
 
                                 if (m is InitFileCBP) //FILEMSG
                                 {
-                                    //Console.WriteLine("Arrivato l'INIT FILE CBP");
-
-                                    if( _eas == -1 )
+                                    /*
                                     System.Windows.Forms.MessageBox.Show("Receiving file/s from server: " + i.ToString()
                                         + " .\nYou will be advised when the transfer is completed.", "Starting File/s Transfer",
                                         System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
+                                    */
 
                                     ClipboardFiles.RecvClipboardFiles(_ds[i]);
                                     Console.WriteLine("CBP : Received Files.");
-
-                                    if (_eas == -1)
+                                    
+                                    /*
+                                    
                                     System.Windows.Forms.MessageBox.Show("File/s received from server: " + i.ToString()
                                         + " .", "Transfer completed",
                                         System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
-
-                                    _sp[i].EnableCBGetting();
+                                    */
+                                    
+                                    _sp[i].EnableCB();
                                     break;
                                 }
 
@@ -284,20 +280,20 @@ namespace PDS_Project_Client
                                             + " .", "Transfer completed",
                                             System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
 
-                                        _sp[i].EnableCBGetting();
+                                        _sp[i].EnableCB();
                                         break;
                                     }
                                     else
                                     {
                                         MsgStream.Send(new StopFileCBP(), _ds[i]);
-                                        _sp[i].EnableCBGetting();
+                                        _sp[i].EnableCB();
                                         break;
                                     }
                                 }
 
-                                _sp[i].EnableCBGetting();
                             }while(!(m is StopFileCBP));
 
+                            _sp[i].EnableCB();
                         }
                         catch (Exception e)
                         {

@@ -231,12 +231,14 @@ namespace PDS_Project_Client
                         _Host.EnqueueCBMsg();
                     }
 
-                    if (km.VirtualKey == VirtualKeyShort.KEY_V && km.Pressed)
-                    {
-                        _Host.SendCB();
-                    }
-
                     if(ALT){
+
+
+                        if (km.VirtualKey == VirtualKeyShort.KEY_V && km.Pressed)
+                        {
+                            _Host.SendCB();
+                        }
+
 
                         //  HOT KEY HOST 
                         if (km.VirtualKey == _hostHK && km.Pressed)
