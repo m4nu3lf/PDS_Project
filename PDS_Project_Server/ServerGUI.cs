@@ -15,13 +15,13 @@ namespace PDS_Project_Server
 {
     public partial class ServerGUI : Form
     {
-        private IPAddress _serverAddress;
         private NotifyIcon _notifyIcon;
         private EventServer _evtServer;
         private ClipboardServer _clpbServer;
         private Icon _inactiveIcon;
         private Icon _activeIcon;
         private Blinking _blinking;
+        private String _addressHint;
 
         public ServerGUI()
         {
@@ -37,46 +37,25 @@ namespace PDS_Project_Server
             _notifyIcon.DoubleClick += notifyIcon_DoubleClick;
 
             // Read settings
+            _addressHint = (string)Properties.Settings.Default["IpAddress"];
             eventsPortUpDown.Value = (ushort)Properties.Settings.Default["EventsPort"];
             clipboardUpDown.Value = (ushort)Properties.Settings.Default["ClipboardPort"];
             psswBox.Text = (string)Properties.Settings.Default["Password"];
             autorunCheckBox.Checked = (bool)Properties.Settings.Default["Autorun"];
 
-            // Look for an IPv4 address
-            foreach (IPAddress address in Dns.GetHostAddresses(Dns.GetHostName()))
-            {
-                if (address.AddressFamily == AddressFamily.InterNetwork
-                    && address.ToString() != "127.0.0.1")
-                    _serverAddress = address;
-            }
-
-            // Check if no IPv4 available
-            if (_serverAddress == null)
-                foreach (IPAddress address in Dns.GetHostAddresses(Dns.GetHostName()))
-                {
-                    if (address.AddressFamily == AddressFamily.InterNetworkV6
-                        && address.ToString() !=  "::1")
-                        _serverAddress = address;
-                }
-
-            if (_serverAddress != null)
-            {
-                ipBox.Text = _serverAddress.ToString();
-                _evtServer = new EventServer(this.server_StateChange);
-                _clpbServer = new ClipboardServer(this.server_StateChange);
-            }
-            else
-            {
-                ipBox.Text = "Error: No interface found!";
-            }
+            _evtServer = new EventServer(this.server_StateChange);
+            _clpbServer = new ClipboardServer(this.server_StateChange);
 
             _blinking = new Blinking();
+
 
             if (autorunCheckBox.Checked)
             {
                 WindowState = FormWindowState.Minimized;
                 button1_Click(null, null);
             }
+
+            updateIpAddressComboBox();
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -96,8 +75,10 @@ namespace PDS_Project_Server
 
         private void button1_Click(object sender, EventArgs e)
         {
-            _evtServer.Start((int)eventsPortUpDown.Value, psswBox.Text);
-            _clpbServer.Start((int)clipboardUpDown.Value, psswBox.Text);
+            _evtServer.Start((IPAddress) ipComboBox.SelectedItem,
+                (int)eventsPortUpDown.Value, psswBox.Text);
+            _clpbServer.Start((IPAddress) ipComboBox.SelectedItem,
+                (int)clipboardUpDown.Value, psswBox.Text);
         }
 
         private void ServerGUI_Resize(object sender, EventArgs e)
@@ -156,7 +137,8 @@ namespace PDS_Project_Server
                     (_evtServer.State is EventServer.AuthenticatedState
                     && _clpbServer.State is ClipboardServer.AuthenticatedState))
                 {
-                    ipBox.Enabled = false;
+                    ipComboBox.Enabled = false;
+                    updateButton.Enabled = false;
                     eventsPortUpDown.Enabled = false;
                     clipboardUpDown.Enabled = false;
                     psswBox.Enabled = false;
@@ -173,7 +155,8 @@ namespace PDS_Project_Server
                 {
                     statusLabel.ForeColor = Color.Red;
                     statusLabel.Text = _evtServer.State.GetMsg();
-                    ipBox.Enabled = true;
+                    ipComboBox.Enabled = true;
+                    updateButton.Enabled = true;
                     eventsPortUpDown.Enabled = true;
                     clipboardUpDown.Enabled = true;
                     psswBox.Enabled = true;
@@ -208,6 +191,46 @@ namespace PDS_Project_Server
         private void label5_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (ipComboBox.SelectedItem != null)
+                _addressHint = ipComboBox.SelectedItem.ToString();
+        }
+
+        private void updateIpAddressComboBox()
+        {
+            ipComboBox.SelectedItem = null;
+            ipComboBox.SelectedText = "";
+            ipComboBox.Items.Clear();
+
+            // Look for an IPv4 address
+            foreach (IPAddress address in Dns.GetHostAddresses(Dns.GetHostName()))
+            {
+                if (address.AddressFamily == AddressFamily.InterNetwork && address.ToString() != "127.0.0.1" ||
+                    address.AddressFamily == AddressFamily.InterNetworkV6 && address.ToString() != "::1"
+                    && address.IsIPv6LinkLocal)
+                    ipComboBox.Items.Add(address);
+            }
+            ipComboBox.Items.Add(IPAddress.Any);
+            ipComboBox.Items.Add(IPAddress.IPv6Any);
+            ipComboBox.Sorted = true;
+
+            foreach (object address in ipComboBox.Items)
+            {
+                if (address.ToString() == _addressHint)
+                    ipComboBox.SelectedItem = address;
+            }
+            if (ipComboBox.SelectedItem == null && ipComboBox.Items.Count > 0)
+            {
+                ipComboBox.SelectedItem = ipComboBox.Items[0];
+            }
+        }
+
+        private void updateButton_Click(object sender, EventArgs e)
+        {
+            updateIpAddressComboBox();
         }
 
     }
