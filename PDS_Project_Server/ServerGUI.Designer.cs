@@ -34,8 +34,8 @@ namespace PDS_Project_Server
             key = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run\\", true);
             if (autorunCheckBox.Checked)
             {
-                key.SetValue(ProgramKeyName, AppDomain.CurrentDomain.BaseDirectory +
-                    AppDomain.CurrentDomain.FriendlyName);
+                key.SetValue(ProgramKeyName, "\"" + AppDomain.CurrentDomain.BaseDirectory +
+                    AppDomain.CurrentDomain.FriendlyName + "\"");
             }
             else
             {

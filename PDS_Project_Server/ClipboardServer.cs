@@ -50,8 +50,11 @@ namespace PDS_Project_Server
                         }
                         MsgStream.Send(new InitFileCBP(), Server.CommSocket);
                         ClipboardFiles.SendClipboardFiles(Server.CommSocket);
+                        MsgStream.Send(new StopFileCBP(), Server.CommSocket);
+                        MsgStream.Receive(Server.CommSocket); // wait for an ack
                     }
-                    MsgStream.Send(new StopFileCBP(), Server.CommSocket);
+                    else
+                        MsgStream.Send(new StopFileCBP(), Server.CommSocket);
                 }
             }
 

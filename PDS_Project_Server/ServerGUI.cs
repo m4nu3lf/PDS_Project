@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.IO;
 
 namespace PDS_Project_Server
 {
@@ -28,11 +29,13 @@ namespace PDS_Project_Server
             InitializeComponent();
             Resize += ServerGUI_Resize;
 
+            Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+
             // Notify icon initialization
             _notifyIcon = new NotifyIcon();
             _notifyIcon.BalloonTipText = "PDS_Project_Server";
-            _inactiveIcon = new Icon("../../tray.ico");
-            _activeIcon = new Icon("../../active.ico");
+            _inactiveIcon = new Icon("tray.ico");
+            _activeIcon = new Icon("active.ico");
             _notifyIcon.Icon = _inactiveIcon;
             _notifyIcon.DoubleClick += notifyIcon_DoubleClick;
 
