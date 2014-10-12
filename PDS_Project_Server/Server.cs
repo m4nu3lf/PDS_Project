@@ -308,6 +308,8 @@ namespace PDS_Project_Server
             _newState = new DisconnectedState();
             _newState.Server = this;
             _serverThread = new Thread(this.Run);
+            _serverThread.SetApartmentState(System.Threading.ApartmentState.STA);
+            _serverThread.Start();
         }
 
         public delegate void OnStateChanged(StateBase newState = null); 

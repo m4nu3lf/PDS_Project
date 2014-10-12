@@ -104,8 +104,6 @@ namespace PDS_Project_Common
                 }
             }
             while (!(o is StopFileCBP));
-            foreach (String s in sc)
-                Console.WriteLine("Clipboard content: " + s);
             Clipboard.SetFileDropList(sc);
         }
 

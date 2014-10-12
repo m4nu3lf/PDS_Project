@@ -17,20 +17,28 @@ namespace PDS_Project_Server
             {
                 base.Update();
 
-                if (_obj is TextMsgCBP)
+                if(_obj is DataMsgCBP)
                 {
-                    Clipboard.SetText(((TextMsgCBP)_obj).content);
+                    DataMsgCBP dataMsgCBP = (DataMsgCBP)_obj;
+                    Clipboard.SetData(dataMsgCBP.format, dataMsgCBP.content);
                 }
                 else if (_obj is InitFileCBP)
                 {
                     ClipboardFiles.RecvClipboardFiles(Server.CommSocket);
+                    Thread.CurrentThread.Abort();
                 }
                 else if (_obj is GetMsgCBP)
                 {
-                    if (Clipboard.ContainsText())
+                    IDataObject clipboardData = Clipboard.GetDataObject();
+                    string[] formats = clipboardData.GetFormats();
+                    foreach (string format in formats)
                     {
-                        MsgStream.Send(new TextMsgCBP(Clipboard.GetText()), Server.CommSocket);
+                        if (format == DataFormats.FileDrop)
+                            continue;
+                        MsgStream.Send(new DataMsgCBP(format, clipboardData.GetData(format)),
+                            Server.CommSocket);
                     }
+
                     if (Clipboard.ContainsFileDropList())
                     {
                         if (ClipboardFiles.GetCBFilesSize() > ClipboardFiles.MaxSize)
@@ -61,7 +69,7 @@ namespace PDS_Project_Server
 
         public ClipboardServer(OnStateChanged onStateChanged = null) : base(onStateChanged)
         {
-            _serverThread.SetApartmentState(System.Threading.ApartmentState.STA);
+
         }
     }
 }

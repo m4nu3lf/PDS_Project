@@ -199,12 +199,17 @@ namespace PDS_Project_Client
                             MsgStream.Send(m, _ds[i]);
                             m = (Message)MsgStream.Receive(_ds[i]);
 
+                            if (m is DataMsgCBP)
+                            {
+                                DataMsgCBP dataMsgCBP = (DataMsgCBP)m;
+                                System.Windows.Forms.Clipboard.SetData(dataMsgCBP.format, dataMsgCBP.content);
+                            }
 
-                            if (m is TextMsgCBP) //TEXTMSG
+                            /*if (m is TextMsgCBP) //TEXTMSG
                             {
                                 string content = ((TextMsgCBP)m).content;
                                 System.Windows.Forms.Clipboard.SetText(content);
-                            }
+                            }*/
 
                             if (m is InitFileCBP) //FILEMSG
                             {

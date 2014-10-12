@@ -1,4 +1,7 @@
-﻿using PDS_Project_Common;
+﻿using System;
+using System.IO;
+using Microsoft.Win32;
+using PDS_Project_Common;
 
 namespace PDS_Project_Server
 {
@@ -15,6 +18,26 @@ namespace PDS_Project_Server
         /// <param name="disposing">ha valore true se le risorse gestite devono essere eliminate, false in caso contrario.</param>
         protected override void Dispose(bool disposing)
         {
+            // Save settings
+            Properties.Settings.Default["EventsPort"] = (ushort)eventsPortUpDown.Value;
+            Properties.Settings.Default["ClipboardPort"] = (ushort)clipboardUpDown.Value;
+            Properties.Settings.Default["Password"] = psswBox.Text;
+            Properties.Settings.Default["Autorun"] = autorunCheckBox.Checked;
+            Properties.Settings.Default.Save();
+            RegistryKey key;
+            key = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run\\", true);
+            if (autorunCheckBox.Checked)
+            {
+                key.SetValue("PDS_Project_Server", AppDomain.CurrentDomain.BaseDirectory +
+                    AppDomain.CurrentDomain.FriendlyName);
+            }
+            else
+            {
+                key.DeleteValue("PDS_Project_Server");
+            }
+            key.Close();
+
+
             if (disposing && (components != null))
             {
                 components.Dispose();
@@ -49,6 +72,7 @@ namespace PDS_Project_Server
             this.label5 = new System.Windows.Forms.Label();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.statusLabel = new System.Windows.Forms.Label();
+            this.autorunCheckBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.eventsPortUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.clipboardUpDown)).BeginInit();
             this.SuspendLayout();
@@ -182,15 +206,16 @@ namespace PDS_Project_Server
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(80, 149);
+            this.label5.Location = new System.Drawing.Point(80, 169);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(40, 13);
             this.label5.TabIndex = 13;
             this.label5.Text = "Status:";
+            this.label5.Click += new System.EventHandler(this.label5_Click);
             // 
             // statusStrip1
             // 
-            this.statusStrip1.Location = new System.Drawing.Point(0, 144);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 164);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(300, 22);
             this.statusStrip1.TabIndex = 11;
@@ -200,17 +225,29 @@ namespace PDS_Project_Server
             // statusLabel
             // 
             this.statusLabel.AutoSize = true;
-            this.statusLabel.Location = new System.Drawing.Point(126, 149);
+            this.statusLabel.Location = new System.Drawing.Point(123, 169);
             this.statusLabel.Name = "statusLabel";
             this.statusLabel.Size = new System.Drawing.Size(73, 13);
             this.statusLabel.TabIndex = 14;
             this.statusLabel.Text = "Disconnected";
             // 
+            // autorunCheckBox
+            // 
+            this.autorunCheckBox.AutoSize = true;
+            this.autorunCheckBox.Location = new System.Drawing.Point(126, 145);
+            this.autorunCheckBox.Name = "autorunCheckBox";
+            this.autorunCheckBox.Size = new System.Drawing.Size(134, 17);
+            this.autorunCheckBox.TabIndex = 15;
+            this.autorunCheckBox.Text = "Autorun at system boot";
+            this.autorunCheckBox.UseVisualStyleBackColor = true;
+            this.autorunCheckBox.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
             // ServerGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(300, 166);
+            this.ClientSize = new System.Drawing.Size(300, 186);
+            this.Controls.Add(this.autorunCheckBox);
             this.Controls.Add(this.statusLabel);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.stopButton);
@@ -251,6 +288,7 @@ namespace PDS_Project_Server
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.Label statusLabel;
+        private System.Windows.Forms.CheckBox autorunCheckBox;
     }
 }
 

@@ -754,13 +754,23 @@ namespace PDS_Project_Client
             Socket s = _host.ds(i);
             if( s == null ) return;
 
-            if (Clipboard.ContainsData(DataFormats.Text))
+            IDataObject clipboardData = Clipboard.GetDataObject();
+            string[] formats = clipboardData.GetFormats();
+            foreach (string format in formats)
+            {
+                if (format == DataFormats.FileDrop)
+                    continue;
+                MsgStream.Send(new DataMsgCBP(format, clipboardData.GetData(format)),
+                    _host.ds(i));
+            }
+
+            /*if (Clipboard.ContainsData(DataFormats.Text))
             {
                 string txt = Clipboard.GetText();
-                MsgStream.Send(new TextMsgCBP(txt), _host.ds(i));
+                MsgStream.Send(new TextMsgCBP(txt), );
                 //MessageBox.Show("Clipboard sent to server:" + i.ToString() + " .\nCheck on it.", "Transfer Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         
-            }
+            }*/
 
             if (Clipboard.ContainsFileDropList()) 
             {

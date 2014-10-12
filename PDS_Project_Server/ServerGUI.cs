@@ -36,6 +36,12 @@ namespace PDS_Project_Server
             _notifyIcon.Icon = _inactiveIcon;
             _notifyIcon.DoubleClick += notifyIcon_DoubleClick;
 
+            // Read settings
+            eventsPortUpDown.Value = (ushort)Properties.Settings.Default["EventsPort"];
+            clipboardUpDown.Value = (ushort)Properties.Settings.Default["ClipboardPort"];
+            psswBox.Text = (string)Properties.Settings.Default["Password"];
+            autorunCheckBox.Checked = (bool)Properties.Settings.Default["Autorun"];
+
             // Look for an IPv4 address
             foreach (IPAddress address in Dns.GetHostAddresses(Dns.GetHostName()))
             {
@@ -65,6 +71,12 @@ namespace PDS_Project_Server
             }
 
             _blinking = new Blinking();
+
+            if (autorunCheckBox.Checked)
+            {
+                WindowState = FormWindowState.Minimized;
+                button1_Click(null, null);
+            }
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -135,7 +147,7 @@ namespace PDS_Project_Server
                 stateChangedCallback cb = new stateChangedCallback(server_StateChange);
                 this.Invoke(cb, new object[] {newState});
             }
-            else
+            else if (_evtServer != null && _clpbServer != null)
             {
                 if ((_evtServer.State is Server.WaitingState
                     && _clpbServer.State is Server.WaitingState) ||
@@ -184,6 +196,16 @@ namespace PDS_Project_Server
         }
 
         private void eventsPortUpDown_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label5_Click(object sender, EventArgs e)
         {
 
         }

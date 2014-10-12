@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Specialized;
+using System.Drawing;
+using System.IO;
 
 namespace PDS_Project_Common
 {
@@ -143,23 +145,6 @@ namespace PDS_Project_Common
 
     }
 
-
-
-    /* TEXT PROTOCOL */
-
-    [Serializable]
-    public class TextMsgCBP : Message
-    {
-        public string content { set; get; }
-        public TextMsgCBP(string c) 
-        {
-            content = c;
-        }
-
-    }
-
-
-
     /* FILE PROTOCOL */
     
     [Serializable]
@@ -167,7 +152,6 @@ namespace PDS_Project_Common
     {
         public InitFileCBP(){ }
     }
-
 
     [Serializable]
     public class DirMsgCBP : Message
@@ -199,7 +183,6 @@ namespace PDS_Project_Common
 
     }
 
-
     [Serializable]
     public class StopFileCBP : Message
     {
@@ -216,6 +199,22 @@ namespace PDS_Project_Common
     public class MaxSizeCBP : Message
     {
         public MaxSizeCBP() { }
+    }
+
+    /* OTHER CLIPBOARD DATA */
+
+    [Serializable]
+    public class DataMsgCBP : Message
+    {
+        public object content { get; set; }
+        public string format { get; set; }
+
+        public DataMsgCBP(string f, object c)
+        {
+            content = c;
+            format = f;
+        }
+
     }
 
 
