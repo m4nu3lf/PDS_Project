@@ -25,7 +25,6 @@ namespace PDS_Project_Server
                 else if (_obj is InitFileCBP)
                 {
                     ClipboardFiles.RecvClipboardFiles(Server.CommSocket);
-                    Thread.CurrentThread.Abort();
                 }
                 else if (_obj is GetMsgCBP)
                 {
@@ -35,6 +34,7 @@ namespace PDS_Project_Server
                     {
                         if (format == DataFormats.FileDrop)
                             continue;
+                        Console.WriteLine("Format: " + format);
                         MsgStream.Send(new DataMsgCBP(format, clipboardData.GetData(format)),
                             Server.CommSocket);
                     }
@@ -50,8 +50,8 @@ namespace PDS_Project_Server
                         }
                         MsgStream.Send(new InitFileCBP(), Server.CommSocket);
                         ClipboardFiles.SendClipboardFiles(Server.CommSocket);
-                        MsgStream.Send(new StopFileCBP(), Server.CommSocket);
                     }
+                    MsgStream.Send(new StopFileCBP(), Server.CommSocket);
                 }
             }
 

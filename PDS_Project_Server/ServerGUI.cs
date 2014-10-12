@@ -96,8 +96,8 @@ namespace PDS_Project_Server
 
         private void button1_Click(object sender, EventArgs e)
         {
-            _evtServer.Start(_serverAddress, (int)eventsPortUpDown.Value, psswBox.Text);
-            _clpbServer.Start(_serverAddress, (int)clipboardUpDown.Value, psswBox.Text);
+            _evtServer.Start((int)eventsPortUpDown.Value, psswBox.Text);
+            _clpbServer.Start((int)clipboardUpDown.Value, psswBox.Text);
         }
 
         private void ServerGUI_Resize(object sender, EventArgs e)

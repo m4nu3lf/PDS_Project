@@ -7,6 +7,8 @@ namespace PDS_Project_Server
 {
     partial class ServerGUI
     {
+        private const string ProgramKeyName = "PDS_Project_Server";
+
         /// <summary>
         /// Variabile di progettazione necessaria.
         /// </summary>
@@ -28,12 +30,13 @@ namespace PDS_Project_Server
             key = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run\\", true);
             if (autorunCheckBox.Checked)
             {
-                key.SetValue("PDS_Project_Server", AppDomain.CurrentDomain.BaseDirectory +
+                key.SetValue(ProgramKeyName, AppDomain.CurrentDomain.BaseDirectory +
                     AppDomain.CurrentDomain.FriendlyName);
             }
             else
             {
-                key.DeleteValue("PDS_Project_Server");
+                if (key.GetValue(ProgramKeyName, null) != null)
+                    key.DeleteValue("PDS_Project_Server");
             }
             key.Close();
 

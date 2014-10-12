@@ -218,7 +218,7 @@ namespace PDS_Project_Server
 
         }
 
-        public void Start(IPAddress address, int port, String password)
+        public void Start(int port, String password)
         {
             if (_serverThread.ThreadState == ThreadState.Unstarted)
                 _serverThread.Start();
@@ -230,7 +230,7 @@ namespace PDS_Project_Server
                 _welcomeSocket = new Socket(SocketType.Stream, ProtocolType.Tcp);
                 try
                 {
-                    _welcomeSocket.Bind(new IPEndPoint(address, port));
+                    _welcomeSocket.Bind(new IPEndPoint(IPAddress.Any, port));
                 }
                 catch (SocketException e)
                 {
