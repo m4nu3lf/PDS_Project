@@ -30,7 +30,7 @@ namespace PDS_Project_Common
                  {
                      di = new DirectoryInfo(path);
                      name = path.Substring(di.FullName.Length - di.Name.Length);
-                     Console.WriteLine("Try to sending Dir: " + name);
+                     //Console.WriteLine("Try to sending Dir: " + name);
                      MsgStream.Send(new DirMsgCBP(name, true), socket);
                      SeekAndSend(socket, path, di.FullName.Length - di.Name.Length);
                  }
@@ -38,7 +38,7 @@ namespace PDS_Project_Common
                  {
                      fi = new FileInfo(path);
                      name = path.Substring(fi.DirectoryName.Length + 1);
-                     Console.WriteLine("Try to sending File: " + name);
+                     //Console.WriteLine("Try to sending File: " + name);
                      MsgStream.Send(new FileMsgCBP(name, File.ReadAllBytes(path), true), socket); 
                  }
             }
@@ -53,7 +53,7 @@ namespace PDS_Project_Common
             foreach (string dir in Directory.EnumerateDirectories(path))
             {
                 name = dir.Substring(toCut);
-                Console.WriteLine("Try to sending Dir: " + name);
+                //Console.WriteLine("Try to sending Dir: " + name);
                 MsgStream.Send(new DirMsgCBP(name, false), socket);
                 SeekAndSend(socket, dir, toCut);
             }
@@ -61,7 +61,7 @@ namespace PDS_Project_Common
             foreach (string file in Directory.EnumerateFiles(path))
             {
                 name = file.Substring(toCut);
-                Console.WriteLine("Try to sending File: " + name);
+                //Console.WriteLine("Try to sending File: " + name);
                 MsgStream.Send(new FileMsgCBP(name, File.ReadAllBytes(file), false), socket);
             }
 
@@ -77,7 +77,7 @@ namespace PDS_Project_Common
             string path = null;
             string tmpdir = Path.GetTempPath() + "PDS_project\\";
 
-            Console.WriteLine("Files stored in: "  + tmpdir);
+            //Console.WriteLine("Files stored in: "  + tmpdir);
             
             if( Directory.Exists(tmpdir) )
                 Directory.Delete(tmpdir, true);
@@ -92,7 +92,7 @@ namespace PDS_Project_Common
                     path = tmpdir + ((FileMsgCBP)o).name;
                     File.WriteAllBytes(path, ((FileMsgCBP)o).content);
                     if (((FileMsgCBP)o).root) sc.Add(path);
-                    Console.WriteLine("Craeted new File: " + path);
+                    //Console.WriteLine("Craeted new File: " + path);
                 }
 
                 if (o is DirMsgCBP)
@@ -100,10 +100,13 @@ namespace PDS_Project_Common
                     path = tmpdir + ((DirMsgCBP)o).name;
                     Directory.CreateDirectory(path);
                     if (((DirMsgCBP)o).root) sc.Add(path);
-                    Console.WriteLine("Craeted new Dir: " + path);
+                    //Console.WriteLine("Craeted new Dir: " + path);
                 }
             }
             while (!(o is StopFileCBP));
+            
+            //foreach (String s in sc) Console.WriteLine("Clipboard content: " + s);
+            
             Clipboard.SetFileDropList(sc);
         }
 

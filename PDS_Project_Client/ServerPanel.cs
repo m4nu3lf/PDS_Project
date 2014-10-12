@@ -741,6 +741,11 @@ namespace PDS_Project_Client
         {
             sendCBB.Enabled = false;
 
+            StartSendingCB();
+        }
+
+        public void StartSendingCB()
+        {
             CBDeamon = new Thread(sendClipboardDatas);
             CBDeamon.SetApartmentState(ApartmentState.STA);
             CBDeamon.Start();
@@ -772,6 +777,10 @@ namespace PDS_Project_Client
                         
             }*/
 
+
+
+                /* SENDING FILE TYPE */
+
             if (Clipboard.ContainsFileDropList()) 
             {
                 long size = ClipboardFiles.GetCBFilesSize();
@@ -786,7 +795,16 @@ namespace PDS_Project_Client
 
                 MsgStream.Send(new InitFileCBP(), s);
                 ClipboardFiles.SendClipboardFiles(s);
+                    //Console.WriteLine("CBP : Sent Files.");
                 MsgStream.Send(new StopFileCBP(), s);
+            }
+            }
+            catch (Exception e)
+            {
+                System.Windows.Forms.MessageBox.Show("Ops...\nSomething goes wrong during Clipboard Transfer[on Sending].\nThe connection will be closed.\nTry again later.",
+                    "Clipboard Transfer Error!", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
+                this.DisconnectionReq();
+                Console.WriteLine("Clipboard file transfer error: " + e.Message);
             }
 
 

@@ -134,9 +134,11 @@ namespace PDS_Project_Client
                                 MsgStream.Send(m, _es[_eas]); //sending data
                                 //Console.WriteLine("Sent");
                             }
-                            catch (Exception)
+                            catch (Exception e)
                             {
-                                Console.WriteLine("Errore nell'invio: chiusura sockets.");
+                                Console.WriteLine("Error during event comunication: " + e.Message);
+                                System.Windows.Forms.MessageBox.Show("Ops...\nSomething goes wrong during Events Transfer.\nThe connection will be closed.\nTry again later.",
+                                    "Event Transfer Error!", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
                                 _sp[_eas].DisconnectionReq();
                                 _eas = -1;
                                 continue;
@@ -169,12 +171,25 @@ namespace PDS_Project_Client
 
         /* clipboard managing */
 
+        public void SendCB()
+        {
+            if (_eas != -1) _sp[_eas].StartSendingCB();
+        }
+
         public void EnqueueCBMsg(Message m)
         {
             lock (_dq) { _dq.Enqueue(m); }    //enqueueing MSG
             _de.Set(); // setting the event to wake the thread
         }
 
+        public void EnqueueCBMsg()
+        {
+            lock (_dq) {
+                if (_eas != -1) _dq.Enqueue(new GetMsgCBP(_eas)); //enqueueing MSG
+            }    
+
+            _de.Set(); // setting the event to wake the thread
+        }
 
         public void ReceiveCBMsg()
         {
@@ -213,13 +228,15 @@ namespace PDS_Project_Client
 
                             if (m is InitFileCBP) //FILEMSG
                             {
-
+                                if( _eas == -1 )
                                 System.Windows.Forms.MessageBox.Show("Receiving file/s from server: " + i.ToString()
-                                    + " .\nYou will be advised when the transfer is completed.", "Starting Transfer",
+                                    + " .\nYou will be advised when the transfer is completed.", "Starting File/s Transfer",
                                     System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
 
                                 ClipboardFiles.RecvClipboardFiles(_ds[i]);
+                                Console.WriteLine("CBP : Received Files.");
 
+                                if (_eas == -1)
                                 System.Windows.Forms.MessageBox.Show("File/s received from server: " + i.ToString()
                                     + " .", "Transfer completed",
                                     System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
@@ -229,12 +246,12 @@ namespace PDS_Project_Client
                             if (m is MaxSizeCBP) 
                             {
                                 if (System.Windows.Forms.MessageBox.Show("The size of clipboard's content is greater than MaxSize: " + ClipboardFiles.MaxSize
-                                        + " \nConfirm the transfer?", "Closing Warning", System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Warning) == System.Windows.Forms.DialogResult.Yes)
+                                        + " \nConfirm the transfer?", "File size exceeding", System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Warning) == System.Windows.Forms.DialogResult.Yes)
                                 {
 
 
                                     System.Windows.Forms.MessageBox.Show("Receiving file/s from server: " + i.ToString()
-                                        + " .\nYou will be advised when the transfer is completed.", "Starting Transfer",
+                                        + " .\nYou will be advised when the transfer is completed.", "Starting File/s Transfer",
                                         System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
 
                                     MsgStream.Send(new ConfirmCBP(), _ds[i]);
@@ -251,10 +268,13 @@ namespace PDS_Project_Client
                             }
 
                         }
-                        catch (Exception)
+                        catch (Exception e)
                         {
-                            Console.WriteLine("Errore nella richiesta CB: chiusura sockets e disconnessione.");
+                            //Console.WriteLine("Errore nella richiesta CB: chiusura sockets e disconnessione.");
+                            System.Windows.Forms.MessageBox.Show("Ops...\nSomething goes wrong during Clipboard Transfer[on Receiving].\nThe connection will be closed.\nTry again later.",
+                                "Clipboard Transfer Error!", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
                             _sp[i].DisconnectionReq();
+                            Console.WriteLine("Clipboard file transfer error: " + e.Message);
                         }
 
                     }//end checking socket nullity
