@@ -48,14 +48,13 @@ namespace PDS_Project_Server
 
             _blinking = new Blinking();
 
+            updateIpAddressListBox();
 
             if (autorunCheckBox.Checked)
             {
                 WindowState = FormWindowState.Minimized;
-                button1_Click(null, null);
+                startServers();
             }
-
-            updateIpAddressComboBox();
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -73,12 +72,19 @@ namespace PDS_Project_Server
 
         }
 
+        private void startServers()
+        {
+            IPAddress address = (IPAddress)ipListBox.SelectedItem;
+            if (ipListBox.SelectedItem != null)
+            {
+                _evtServer.Start(address, (int)eventsPortUpDown.Value, psswBox.Text);
+                _clpbServer.Start(address, (int)clipboardUpDown.Value, psswBox.Text);
+            }
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
-            _evtServer.Start((IPAddress) ipComboBox.SelectedItem,
-                (int)eventsPortUpDown.Value, psswBox.Text);
-            _clpbServer.Start((IPAddress) ipComboBox.SelectedItem,
-                (int)clipboardUpDown.Value, psswBox.Text);
+            startServers();
         }
 
         private void ServerGUI_Resize(object sender, EventArgs e)
@@ -137,7 +143,7 @@ namespace PDS_Project_Server
                     (_evtServer.State is EventServer.AuthenticatedState
                     && _clpbServer.State is ClipboardServer.AuthenticatedState))
                 {
-                    ipComboBox.Enabled = false;
+                    ipListBox.Enabled = false;
                     updateButton.Enabled = false;
                     eventsPortUpDown.Enabled = false;
                     clipboardUpDown.Enabled = false;
@@ -155,7 +161,7 @@ namespace PDS_Project_Server
                 {
                     statusLabel.ForeColor = Color.Red;
                     statusLabel.Text = _evtServer.State.GetMsg();
-                    ipComboBox.Enabled = true;
+                    ipListBox.Enabled = true;
                     updateButton.Enabled = true;
                     eventsPortUpDown.Enabled = true;
                     clipboardUpDown.Enabled = true;
@@ -193,17 +199,10 @@ namespace PDS_Project_Server
 
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private void updateIpAddressListBox()
         {
-            if (ipComboBox.SelectedItem != null)
-                _addressHint = ipComboBox.SelectedItem.ToString();
-        }
-
-        private void updateIpAddressComboBox()
-        {
-            ipComboBox.SelectedItem = null;
-            ipComboBox.SelectedText = "";
-            ipComboBox.Items.Clear();
+            ipListBox.SelectedItem = null;
+            ipListBox.Items.Clear();
 
             // Look for an IPv4 address
             foreach (IPAddress address in Dns.GetHostAddresses(Dns.GetHostName()))
@@ -211,26 +210,32 @@ namespace PDS_Project_Server
                 if (address.AddressFamily == AddressFamily.InterNetwork && address.ToString() != "127.0.0.1" ||
                     address.AddressFamily == AddressFamily.InterNetworkV6 && address.ToString() != "::1"
                     && address.IsIPv6LinkLocal)
-                    ipComboBox.Items.Add(address);
+                    ipListBox.Items.Add(address);
             }
-            ipComboBox.Items.Add(IPAddress.Any);
-            ipComboBox.Items.Add(IPAddress.IPv6Any);
-            ipComboBox.Sorted = true;
+            ipListBox.Items.Add(IPAddress.Any);
+            ipListBox.Items.Add(IPAddress.IPv6Any);
 
-            foreach (object address in ipComboBox.Items)
+            List<IPAddress> addresses = ipListBox.Items.OfType<IPAddress>().ToList();
+            foreach (object address in addresses)
             {
                 if (address.ToString() == _addressHint)
-                    ipComboBox.SelectedItem = address;
+                    ipListBox.SelectedItem = address;
             }
-            if (ipComboBox.SelectedItem == null && ipComboBox.Items.Count > 0)
+            if (ipListBox.SelectedItem == null)
             {
-                ipComboBox.SelectedItem = ipComboBox.Items[0];
+                ipListBox.SelectedItem = ipListBox.Items[0];
             }
         }
 
         private void updateButton_Click(object sender, EventArgs e)
         {
-            updateIpAddressComboBox();
+            updateIpAddressListBox();
+        }
+
+        private void ipListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (ipListBox.SelectedItem != null)
+                _addressHint = ipListBox.SelectedItem.ToString();
         }
 
     }
