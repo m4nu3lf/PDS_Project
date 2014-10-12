@@ -67,6 +67,11 @@ namespace PDS_Project_Server
             State = new AuthenticatedState();
         }
 
+        protected override string GetServiceName()
+        {
+            return "Remote Clipboard";
+        }
+
         public ClipboardServer(OnStateChanged onStateChanged = null) : base(onStateChanged)
         {
 

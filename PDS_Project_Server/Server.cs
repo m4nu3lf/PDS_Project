@@ -234,8 +234,8 @@ namespace PDS_Project_Server
                 }
                 catch (SocketException e)
                 {
-                    MessageBox.Show("The specified address and port couple is already in use "
-                                    + "or it has not yet been freed by the system!",
+                    MessageBox.Show("The specified address and port couple for the " + GetServiceName() +
+                                    " service is already in use or it has not yet been freed by the system!",
                                     "Address Error",
                                     MessageBoxButtons.OK,
                                     MessageBoxIcon.Exclamation);
@@ -299,6 +299,8 @@ namespace PDS_Project_Server
         }
 
         abstract protected void SetAuthenticated();
+
+        abstract protected string GetServiceName();
 
         public Server(OnStateChanged onStateChanged)
         {

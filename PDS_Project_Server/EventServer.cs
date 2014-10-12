@@ -103,6 +103,11 @@ namespace PDS_Project_Server
             State = new AuthenticatedState();
         }
 
+        protected override string GetServiceName()
+        {
+            return "Remote Input";
+        }
+
         public EventServer(OnStateChanged onStateChanged = null) : base(onStateChanged)
         {
             
