@@ -173,23 +173,32 @@ namespace PDS_Project_Client
 
         public void SendCB()
         {
-            if (_eas != -1) _sp[_eas].StartSendingCB();
+            int i = _eas;
+            if ((i != 0) && (i != 1) && (i != 2) && (i != 3)) return; 
+            _sp[i].StartSendingCB();
         }
 
         public void EnqueueCBMsg(Message m)
         {
-            lock (_dq) { _dq.Enqueue(m); }    //enqueueing MSG
+            lock (_dq) {
+                _dq.Enqueue(m); 
+            }    //enqueueing MSG
             _de.Set(); // setting the event to wake the thread
         }
 
         public void EnqueueCBMsg()
         {
+
+            int i = _eas;
+            if ((i != 0) && (i != 1) && (i != 2) && (i != 3)) return; 
+
             lock (_dq) {
-                if (_eas != -1) _dq.Enqueue(new GetMsgCBP(_eas)); //enqueueing MSG
-                else return;
+                _dq.Enqueue(new GetMsgCBP(i)); //enqueueing MSG
+                _sp[i].StartCBGetting();
             }    
 
             _de.Set(); // setting the event to wake the thread
+
         }
 
         public void ReceiveCBMsg()
@@ -206,9 +215,14 @@ namespace PDS_Project_Client
                     lock (_dq) { m = _dq.Dequeue(); }
                     i = ((GetMsgCBP)m).i;
 
+                    Console.WriteLine("Processing Getting RQ to: " + i);
+
+                    if ( (i != 0) && (i != 1) && (i != 2) && (i != 3) ) continue;
+
                     if (_ds[i] != null)
                     {
-                        
+                        _sp[i].CBGetting();
+
                         try
                         {
                             MsgStream.Send(m, _ds[i]);
@@ -221,7 +235,7 @@ namespace PDS_Project_Client
                                 if (m is DataMsgCBP)
                                 {
                                     DataMsgCBP dataMsgCBP = (DataMsgCBP)m;
-                                    Console.WriteLine("ricevuto pacchetto: " + dataMsgCBP.format);
+                                    //Console.WriteLine("ricevuto pacchetto: " + dataMsgCBP.format);
                                     System.Windows.Forms.Clipboard.SetData(dataMsgCBP.format, dataMsgCBP.content);
                                 }
 
@@ -233,7 +247,7 @@ namespace PDS_Project_Client
 
                                 if (m is InitFileCBP) //FILEMSG
                                 {
-                                    Console.WriteLine("Arrivato l'INIT FILE CBP");
+                                    //Console.WriteLine("Arrivato l'INIT FILE CBP");
 
                                     if( _eas == -1 )
                                     System.Windows.Forms.MessageBox.Show("Receiving file/s from server: " + i.ToString()
@@ -247,7 +261,9 @@ namespace PDS_Project_Client
                                     System.Windows.Forms.MessageBox.Show("File/s received from server: " + i.ToString()
                                         + " .", "Transfer completed",
                                         System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
-                                    
+
+                                    _sp[i].EnableCBGetting();
+                                    break;
                                 }
 
                                 if (m is MaxSizeCBP) 
@@ -268,15 +284,18 @@ namespace PDS_Project_Client
                                             + " .", "Transfer completed",
                                             System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
 
+                                        _sp[i].EnableCBGetting();
                                         break;
                                     }
                                     else
                                     {
                                         MsgStream.Send(new StopFileCBP(), _ds[i]);
+                                        _sp[i].EnableCBGetting();
                                         break;
                                     }
                                 }
 
+                                _sp[i].EnableCBGetting();
                             }while(!(m is StopFileCBP));
 
                         }

@@ -433,8 +433,8 @@ namespace PDS_Project_Client
 
             //DEFAULT CONFIG
 
-            this.tb_IP.Text = "192.168.0.5";
-            //this.tb_IP.Text = "169.254.162.184";
+            //this.tb_IP.Text = "192.168.0.5";
+            this.tb_IP.Text = "169.254.162.184";
             //this.tb_IP.Text = "172.20.90.244";
             this.tb_EP.Text = "200" + i.ToString();
             this.tb_DP.Text = "300" + i.ToString();
@@ -736,17 +736,56 @@ namespace PDS_Project_Client
         private void getCB_click(Object o, EventArgs e)
         {
             _host.EnqueueCBMsg(new GetMsgCBP(i));
+            getCBB.ForeColor = System.Drawing.Color.Orange;
+            getCBB.Enabled = false;
+            getCBB.Text = "On queue...";
+        }
+
+        public void StartCBGetting()
+        {
+
+            if (this.serverActive.InvokeRequired)
+            {
+                UsefulDelegate ud = new UsefulDelegate(StartCBGetting);
+                this.Invoke(ud);
+            }
+            else
+            {
+                getCBB.ForeColor = System.Drawing.Color.Orange;
+                getCBB.Enabled = false;
+                getCBB.Text = "On queue...";
+            }
+
+        }
+
+        public void CBGetting()
+        {
+
+            if (this.serverActive.InvokeRequired)
+            {
+                UsefulDelegate ud = new UsefulDelegate(CBGetting);
+                this.Invoke(ud);
+            }
+            else
+            {
+                getCBB.ForeColor = System.Drawing.Color.Red;
+                getCBB.Text = "Getting...";
+            }
+
         }
 
         private void sendCB_click(Object o, EventArgs e)
         {
-            sendCBB.Enabled = false;
-
             StartSendingCB();
         }
 
         public void StartSendingCB()
         {
+
+            sendCBB.ForeColor = System.Drawing.Color.Red;
+            sendCBB.Text = "Sending...";
+            sendCBB.Enabled = false;
+
             CBDeamon = new Thread(sendClipboardDatas);
             CBDeamon.SetApartmentState(ApartmentState.STA);
             CBDeamon.Start();
@@ -756,9 +795,13 @@ namespace PDS_Project_Client
         private void sendClipboardDatas()
         {
             //MessageBox.Show("Sending clipboard to server:" + i.ToString() + " .\nYou will be advised when the transfer is completed.", "Starting Transfer", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            
+
             Socket s = _host.ds(i);
-            if( s == null ) return;
+            if (s == null)
+            {
+                EnableCBSending();
+                return;
+            }
 
             IDataObject clipboardData = Clipboard.GetDataObject();
             string[] formats = clipboardData.GetFormats();
@@ -789,8 +832,9 @@ namespace PDS_Project_Client
                     if (size > ClipboardFiles.MaxSize)
                     {
                         if (MessageBox.Show("The size of clipboard's content is greater than MaxSize: " + ClipboardFiles.MaxSize  
-                            + " \nConfirm the transfer?", "Closing Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No) 
+                            + " \nConfirm the transfer?", "Closing Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
                         {
+                            EnableCBSending();
                             return;
                         }
                     }
@@ -810,23 +854,43 @@ namespace PDS_Project_Client
             }
 
 
-            EnableCBTransfers();
+            EnableCBSending();
             return;
 
         }
 
 
-        private void EnableCBTransfers()
+
+        public void EnableCBSending()
         {
 
             if (this.serverActive.InvokeRequired)
             {
-                UsefulDelegate ud = new UsefulDelegate(EnableCBTransfers);
+                UsefulDelegate ud = new UsefulDelegate(EnableCBSending);
                 this.Invoke(ud);
             }
             else
             {
                 sendCBB.Enabled = true;
+                sendCBB.Text = "Send CB";
+                sendCBB.ForeColor = System.Drawing.Color.Black;
+            }
+
+        }
+
+        public void EnableCBGetting()
+        {
+
+            if (this.serverActive.InvokeRequired)
+            {
+                UsefulDelegate ud = new UsefulDelegate(EnableCBGetting);
+                this.Invoke(ud);
+            }
+            else
+            {
+                getCBB.Enabled = true;
+                getCBB.Text = "Get CB";
+                getCBB.ForeColor = System.Drawing.Color.Black;
             }
 
         }
